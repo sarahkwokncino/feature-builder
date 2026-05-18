@@ -621,7 +621,7 @@ const PHASES = [
           { id: 'add-fees',            name: 'Add Fees',                        sub: 'Fees',                             type: 'low'    },
           { id: 'add-pricing',         name: 'Add Pricing & Profitability',     sub: 'Facility',                         type: 'low'    },
           { id: 'amortisation',        name: 'Amortisation Schedule',           sub: 'Loan Structuring',                 type: 'high'   },
-          { id: 'add-covenants',       name: 'Add Covenants',                   sub: 'Covenants',                        type: 'low'    },
+          { id: 'add-covenants',       name: 'Add Covenants',                   sub: 'Covenants',                        type: 'linked' },
           { id: 'add-collateral',      name: 'Add Collateral',                  sub: 'Collateral',                       type: 'low'    },
           { id: 'add-conditions',      name: 'Add Conditions',                  sub: 'Conditions',                       type: 'low'    },
           { id: 'collect-store-docs-s',name: 'Collect & Store Documents',       sub: 'Document Manager',                 type: 'low'    },
@@ -827,11 +827,14 @@ function buildCard(card) {
   return div;
 }
 
+const CARD_LINKS = {
+  'review-checklist': '../smart-checklist-builder/index.html',
+  'add-covenants':    '../Covenants/index.html',
+};
+
 function onCardClick(card) {
-  if (card.type === 'linked' || card.id === 'review-checklist') {
-    window.location.href = '../smart-checklist-builder/index.html';
-    return;
-  }
+  const link = CARD_LINKS[card.id] || (card.type === 'linked' ? '../smart-checklist-builder/index.html' : null);
+  if (link) { window.location.href = link; return; }
   openModal(card);
 }
 
