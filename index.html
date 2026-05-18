@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Checklist Builder</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #1b2a4a;
+      --navy-light: #243558;
+      --blue: #0070d2;
+      --blue-hover: #005fb2;
+      --green: #2e7d32;
+      --green-light: #e8f5e9;
+      --red: #c62828;
+      --red-light: #ffebee;
+      --orange: #e65100;
+      --gray-50: #f8f9fa;
+      --gray-100: #f1f3f5;
+      --gray-200: #e9ecef;
+      --gray-300: #dee2e6;
+      --gray-400: #ced4da;
+      --gray-500: #adb5bd;
+      --gray-600: #6c757d;
+      --gray-700: #495057;
+      --gray-800: #343a40;
+      --gray-900: #212529;
+      --border-radius: 6px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow: 0 2px 8px rgba(0,0,0,0.12);
+      --shadow-lg: 0 4px 20px rgba(0,0,0,0.15);
+      --transition: 0.15s ease;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      color: var(--gray-900);
+      background: var(--gray-100);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      background: var(--navy);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      height: 52px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .topbar-logo {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .topbar-sep {
+      opacity: 0.3;
+      font-size: 18px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--border-radius);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: background var(--transition), opacity var(--transition);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn:disabled { opacity: 0.45; cursor: default; }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--blue-hover); }
+    .btn-success { background: var(--green); color: #fff; }
+    .btn-success:hover:not(:disabled) { background: #1b5e20; }
+    .btn-ghost { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+    .btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,0.2); }
+    .btn-outline { background: #fff; color: var(--gray-700); border: 1px solid var(--gray-300); }
+    .btn-outline:hover:not(:disabled) { background: var(--gray-50); border-color: var(--gray-400); }
+    .btn-danger-outline { background: #fff; color: var(--red); border: 1px solid #ef9a9a; }
+    .btn-danger-outline:hover:not(:disabled) { background: var(--red-light); }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+    /* ── Layout ── */
+    .main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Left panel ── */
+    .left-panel {
+      width: 340px;
+      min-width: 280px;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-right: 1px solid var(--gray-200);
+      flex-shrink: 0;
+    }
+
+    .panel-header {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--gray-200);
+      background: var(--gray-50);
+    }
+    .panel-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .panel-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+      margin-bottom: 4px;
+    }
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--gray-800);
+    }
+
+    .req-count {
+      background: var(--blue);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 1px 7px;
+      min-width: 22px;
+      text-align: center;
+    }
+
+    .req-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 6px 0;
+    }
+
+    .req-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: background var(--transition), border-color var(--transition);
+      position: relative;
+    }
+    .req-item:hover { background: var(--gray-50); }
+    .req-item.active {
+      background: #e8f0fe;
+      border-left-color: var(--blue);
+    }
+    .req-item.active .req-item-name { color: var(--blue); font-weight: 600; }
+
+    .req-item-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 11px;
+    }
+    .req-item-icon.status-todo { background: var(--gray-200); color: var(--gray-600); }
+    .req-item-icon.status-complete { background: #c8e6c9; color: var(--green); }
+
+    .req-item-name {
+      flex: 1;
+      font-size: 13px;
+      color: var(--gray-800);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .req-item-name.untitled { color: var(--gray-500); font-style: italic; }
+
+    .req-item-del {
+      opacity: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--gray-500);
+      padding: 2px 4px;
+      border-radius: 3px;
+      transition: opacity var(--transition), color var(--transition);
+      font-size: 16px;
+      line-height: 1;
+    }
+    .req-item:hover .req-item-del { opacity: 1; }
+    .req-item-del:hover { color: var(--red); }
+
+    .add-req-row {
+      padding: 10px 16px;
+      border-top: 1px solid var(--gray-200);
+      background: var(--gray-50);
+    }
+    .add-req-row .btn { width: 100%; justify-content: center; }
+
+    /* ── Right panel ── */
+    .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .detail-empty {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-500);
+      gap: 12px;
+    }
+    .detail-empty-icon { font-size: 48px; }
+    .detail-empty-text { font-size: 15px; color: var(--gray-500); }
+
+    .detail-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .detail-header {
+      padding: 16px 24px 12px;
+      border-bottom: 1px solid var(--gray-200);
+      background: #fff;
+      flex-shrink: 0;
+    }
+    .detail-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--gray-900);
+      min-height: 26px;
+      overflow-wrap: break-word;
+    }
+    .detail-title.untitled { color: var(--gray-400); font-style: italic; }
+    .detail-header-actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .detail-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 24px;
+    }
+    .field-full { grid-column: 1 / -1; }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .field-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+    }
+    .field-value {
+      font-size: 13px;
+      color: var(--gray-800);
+      min-height: 20px;
+      padding: 2px 0;
+      overflow-wrap: break-word;
+    }
+    .field-value.empty { color: var(--gray-400); font-style: italic; }
+
+    .field-value.readonly {
+      background: var(--gray-100);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--border-radius);
+      padding: 6px 10px;
+      color: var(--gray-600);
+      font-style: italic;
+    }
+
+    .stage-check-view {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--gray-700);
+    }
+    .stage-check-box {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--gray-400);
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--green);
+      background: #fff;
+    }
+    .stage-check-box.checked {
+      background: var(--green-light);
+      border-color: var(--green);
+    }
+
+    .placeholder-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      background: #e8f0fe;
+      border: 1px solid #bbdefb;
+      border-radius: var(--border-radius);
+      font-size: 12px;
+      color: var(--blue);
+      font-weight: 500;
+    }
+    .placeholder-badge .icon { font-size: 14px; }
+
+    /* ── Form (edit mode) ── */
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--gray-300);
+      border-radius: var(--border-radius);
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--gray-900);
+      background: #fff;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(0,112,210,0.12);
+    }
+    .form-textarea {
+      resize: vertical;
+      min-height: 72px;
+    }
+    .form-select { cursor: pointer; }
+
+    .form-input.readonly-field {
+      background: var(--gray-100);
+      color: var(--gray-500);
+      cursor: not-allowed;
+      border-color: var(--gray-200);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+    }
+    .checkbox-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--blue);
+    }
+    .checkbox-row label {
+      font-size: 13px;
+      color: var(--gray-800);
+      cursor: pointer;
+    }
+
+    .placeholder-section {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--border-radius);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .placeholder-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* toggle switch */
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--gray-300);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform var(--transition);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .toggle input:checked + .toggle-slider { background: var(--blue); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+    .divider {
+      height: 1px;
+      background: var(--gray-200);
+      margin: 16px 0;
+    }
+
+    /* ── YAML modal ── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      width: 680px;
+      max-width: 95vw;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .modal-title { font-size: 15px; font-weight: 700; }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--gray-500);
+      line-height: 1;
+      padding: 2px 4px;
+    }
+    .modal-close:hover { color: var(--gray-800); }
+    .modal-body {
+      padding: 16px 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .modal-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-shrink: 0;
+      background: var(--gray-50);
+    }
+
+    .yaml-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .yaml-preview {
+      background: var(--gray-900);
+      color: #a8d8a8;
+      font-family: 'Cascadia Code', 'Fira Mono', 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.6;
+      padding: 14px 16px;
+      border-radius: var(--border-radius);
+      overflow-x: auto;
+      white-space: pre;
+      max-height: 340px;
+      overflow-y: auto;
+    }
+
+    .meta-note {
+      background: #fff8e1;
+      border: 1px solid #ffe082;
+      border-radius: var(--border-radius);
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--orange);
+      margin-bottom: 12px;
+    }
+
+    /* ── Empty state in req list ── */
+    .req-list-empty {
+      padding: 32px 16px;
+      text-align: center;
+      color: var(--gray-500);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* ── Notification toast ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--gray-800);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: var(--border-radius);
+      font-size: 13px;
+      box-shadow: var(--shadow-lg);
+      z-index: 200;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── Picklist editor ── */
+    .pl-tab {
+      width: 100%;
+      text-align: left;
+      padding: 9px 14px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--gray-700);
+      border-left: 3px solid transparent;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .pl-tab:hover { background: var(--gray-100); }
+    .pl-tab.active { background: #e8f0fe; border-left-color: var(--blue); color: var(--blue); font-weight: 600; }
+
+    .pl-value-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 8px;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--border-radius);
+      background: #fff;
+    }
+    .pl-value-row span { flex: 1; font-size: 13px; color: var(--gray-800); }
+    .pl-value-del {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--gray-400);
+      font-size: 15px;
+      line-height: 1;
+      padding: 1px 3px;
+      border-radius: 3px;
+      transition: color var(--transition);
+    }
+    .pl-value-del:hover { color: var(--red); }
+
+    /* ── Scrollbar styling ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
+  </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">nCino</span>
+    <span class="topbar-sep">/</span>
+    <span class="topbar-title">Smart Checklist Builder</span>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <button class="btn btn-ghost" onclick="openPicklistModal()" title="Manage picklist values">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+      Picklists
+    </button>
+    <button class="btn btn-ghost" onclick="openYamlModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export YAML
+    </button>
+  </div>
+</header>
+
+<!-- Main layout -->
+<div class="main">
+
+  <!-- Left panel -->
+  <aside class="left-panel">
+    <div class="panel-header">
+      <div class="panel-label">SmartChecklist</div>
+      <div class="panel-header-row">
+        <div class="panel-title">Requirements</div>
+        <span class="req-count" id="req-count">0</span>
+      </div>
+    </div>
+
+    <div class="req-list" id="req-list">
+      <div class="req-list-empty" id="req-list-empty">
+        No requirements yet.<br>Click <strong>+ Add Requirement</strong> to get started.
+      </div>
+    </div>
+
+    <div class="add-req-row">
+      <button class="btn btn-primary" onclick="addRequirement()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add Requirement
+      </button>
+    </div>
+  </aside>
+
+  <!-- Right panel -->
+  <main class="right-panel" id="right-panel">
+    <div class="detail-empty" id="detail-empty">
+      <div class="detail-empty-icon">☑</div>
+      <div class="detail-empty-text">Select a requirement to view details</div>
+    </div>
+
+    <!-- Detail view (hidden until a req is selected) -->
+    <div class="detail-panel" id="detail-panel" style="display:none;">
+      <div class="detail-header">
+        <div class="detail-title" id="detail-title"></div>
+        <div class="detail-header-actions" id="detail-actions"></div>
+      </div>
+      <div class="detail-body" id="detail-body"></div>
+    </div>
+  </main>
+</div>
+
+<!-- YAML Export Modal -->
+<div class="modal-backdrop" id="yaml-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Export YAML — nCino Man Configuration</span>
+      <button class="modal-close" onclick="closeYamlModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="yaml-meta-grid">
+        <div class="field-group">
+          <label class="field-label" for="meta-story-id">Story ID</label>
+          <input class="form-input" id="meta-story-id" placeholder="e.g. SC-CONFIG-001" />
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="meta-feature-area">Feature Area</label>
+          <input class="form-input" id="meta-feature-area" placeholder="e.g. commercial-lending/conditions" />
+        </div>
+        <div class="field-group" style="grid-column:1/-1">
+          <label class="field-label" for="meta-title">Title</label>
+          <input class="form-input" id="meta-title" placeholder="e.g. Smart Checklist Requirements — My Project" />
+        </div>
+      </div>
+      <div class="meta-note">
+        Preview below. Fill in Story ID, Feature Area and Title before downloading. Records with no Name will be skipped.
+      </div>
+      <div class="yaml-preview" id="yaml-preview"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeYamlModal()">Cancel</button>
+      <button class="btn btn-success" onclick="downloadYaml()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download .yaml
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Picklist Modal -->
+<div class="modal-backdrop" id="picklist-modal">
+  <div class="modal" style="width:560px;">
+    <div class="modal-header">
+      <span class="modal-title">Manage Picklist Values</span>
+      <button class="modal-close" onclick="closePicklistModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body" style="padding:0;">
+      <div style="display:flex;height:420px;">
+        <!-- Picklist selector sidebar -->
+        <div style="width:160px;border-right:1px solid var(--gray-200);padding:8px 0;flex-shrink:0;background:var(--gray-50);">
+          <div id="pl-tabs"></div>
+        </div>
+        <!-- Values editor -->
+        <div style="flex:1;padding:16px;display:flex;flex-direction:column;gap:12px;overflow:hidden;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gray-500)" id="pl-active-label"></div>
+          <div id="pl-values-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
+          <div style="display:flex;gap:8px;">
+            <input class="form-input" id="pl-new-value" placeholder="New value…" style="flex:1" onkeydown="if(event.key==='Enter')addPicklistValue()" />
+            <button class="btn btn-primary btn-sm" onclick="addPicklistValue()">+ Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closePicklistModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────────
+let requirements = [];
+let selectedId = null;
+let editingId = null;
+
+const PICKLIST_STORAGE_KEY = 'smart-checklist-picklists-v1';
+
+const PICKLIST_DEFAULTS = {
+  taskType:       ['Pre-Offer', 'Post-Offer', 'Solicitor', 'Internal', 'N/A'],
+  category:       ['General', 'Residential', 'Commercial', 'Development'],
+  assignedParty:  ['Credit Analyst / Underwriter', 'Credit Manager', 'Relationship Manager',
+                   'Packaging Analyst', 'Compliance Officer', 'Legal', 'Solicitor', 'Surveyor', 'Other'],
+  approvalProcess: ['Self-Approval', 'Submit for Approval'],
+  requirementType: ['Condition Precedent', 'Condition Subsequent'],
+  neededBy:       ['Full Application', 'Loan Packaging', 'Credit Underwriting',
+                   'Approval / Loan Committee', 'Doc Prep', 'Conveyancing',
+                   'Facility Issuance', 'Final Review', 'Booked', 'Complete'],
+};
+
+const PICKLIST_LABELS = {
+  taskType:       'Task Type',
+  category:       'Category',
+  assignedParty:  'Assignee',
+  neededBy:       'Needed By',
+  approvalProcess:'Approval Process',
+  requirementType:'Requirement Type',
+};
+
+// Keys that users can edit via the modal
+const EDITABLE_PICKLISTS = ['taskType', 'category', 'assignedParty', 'neededBy', 'approvalProcess', 'requirementType'];
+
+let picklists = {};
+
+function loadPicklists() {
+  try {
+    const raw = localStorage.getItem(PICKLIST_STORAGE_KEY);
+    picklists = raw ? JSON.parse(raw) : {};
+  } catch(e) { picklists = {}; }
+  // Fill in any missing keys with defaults
+  EDITABLE_PICKLISTS.forEach(k => {
+    if (!picklists[k]) picklists[k] = [...PICKLIST_DEFAULTS[k]];
+  });
+}
+
+function persistPicklists() {
+  localStorage.setItem(PICKLIST_STORAGE_KEY, JSON.stringify(picklists));
+}
+
+// Returns ['', ...values] for use in <select> elements
+function getPL(key) {
+  return ['', ...(picklists[key] || PICKLIST_DEFAULTS[key] || [])];
+}
+
+// ── Picklist modal ─────────────────────────────────────────────────────────────
+let activePLKey = EDITABLE_PICKLISTS[0];
+
+function openPicklistModal() {
+  document.getElementById('picklist-modal').classList.add('open');
+  renderPLTabs();
+  renderPLValues();
+}
+
+function closePicklistModal() {
+  document.getElementById('picklist-modal').classList.remove('open');
+}
+
+function renderPLTabs() {
+  const tabs = document.getElementById('pl-tabs');
+  tabs.innerHTML = EDITABLE_PICKLISTS.map(key => `
+    <button class="pl-tab ${key === activePLKey ? 'active' : ''}" onclick="switchPLTab('${key}')">
+      ${PICKLIST_LABELS[key]}
+    </button>
+  `).join('');
+}
+
+function switchPLTab(key) {
+  activePLKey = key;
+  renderPLTabs();
+  renderPLValues();
+  document.getElementById('pl-new-value').value = '';
+  document.getElementById('pl-new-value').focus();
+}
+
+function renderPLValues() {
+  document.getElementById('pl-active-label').textContent = PICKLIST_LABELS[activePLKey];
+  const list = document.getElementById('pl-values-list');
+  const values = picklists[activePLKey] || [];
+  if (values.length === 0) {
+    list.innerHTML = `<div style="color:var(--gray-400);font-size:13px;padding:8px 0;">No values yet.</div>`;
+    return;
+  }
+  list.innerHTML = values.map((v, i) => `
+    <div class="pl-value-row">
+      <span>${esc(v)}</span>
+      <button class="pl-value-del" onclick="deletePicklistValue(${i})" title="Remove">&#x2715;</button>
+    </div>
+  `).join('');
+}
+
+function addPicklistValue() {
+  const input = document.getElementById('pl-new-value');
+  const val = input.value.trim();
+  if (!val) return;
+  if (picklists[activePLKey].includes(val)) {
+    showToast('Value already exists.');
+    return;
+  }
+  picklists[activePLKey].push(val);
+  persistPicklists();
+  renderPLValues();
+  input.value = '';
+  input.focus();
+}
+
+function deletePicklistValue(idx) {
+  picklists[activePLKey].splice(idx, 1);
+  persistPicklists();
+  renderPLValues();
+}
+
+document.getElementById('picklist-modal').addEventListener('click', function(e) {
+  if (e.target === this) closePicklistModal();
+});
+
+// Pre-built placeholder list — users can add more in the modal
+const PLACEHOLDERS = [
+  { id: 'ph_001', name: 'Credit Memo' },
+  { id: 'ph_002', name: 'Valuation Report' },
+  { id: 'ph_003', name: 'Title Report' },
+  { id: 'ph_004', name: 'Insurance Certificate' },
+  { id: 'ph_005', name: 'AML / KYC Pack' },
+  { id: 'ph_006', name: 'Asset & Liability Statement' },
+  { id: 'ph_007', name: 'Building Survey' },
+  { id: 'ph_008', name: 'Environmental Report' },
+  { id: 'ph_009', name: 'Management Accounts' },
+  { id: 'ph_010', name: 'Offer Letter' },
+];
+
+function uid() {
+  return 'req_' + Math.random().toString(36).slice(2, 9);
+}
+
+function makeReq() {
+  const now = new Date().toISOString();
+  return {
+    id: uid(),
+    // Editable fields
+    name: '',
+    taskType: '',
+    category: '',
+    description: '',
+    legalDescription: '',
+    assignedParty: '',
+    approvalProcess: '',
+    requirementType: '',
+    neededBy: '',
+    stageCheck: false,
+    doNotAutoGenerate: false,
+    isTemplate: true,
+    // Placeholder linkage (optional)
+    hasPlaceholder: false,
+    placeholderId: '',
+    placeholderName: '',
+    // Read-only
+    createdById: 'current-user@org.com',
+    lastModifiedById: 'current-user@org.com',
+    createdAt: now,
+    lastModifiedAt: now,
+  };
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────────
+function render() {
+  renderList();
+  renderDetail();
+}
+
+function renderList() {
+  const list = document.getElementById('req-list');
+  const empty = document.getElementById('req-list-empty');
+  const count = document.getElementById('req-count');
+
+  count.textContent = requirements.length;
+  empty.style.display = requirements.length === 0 ? '' : 'none';
+
+  // Remove existing items (not the empty placeholder)
+  Array.from(list.querySelectorAll('.req-item')).forEach(el => el.remove());
+
+  requirements.forEach(req => {
+    const div = document.createElement('div');
+    div.className = 'req-item' + (req.id === selectedId ? ' active' : '');
+    div.dataset.id = req.id;
+    div.innerHTML = `
+      <span class="req-item-icon ${req.name ? 'status-todo' : 'status-todo'}">
+        ${req.name ? '☑' : '○'}
+      </span>
+      <span class="req-item-name ${req.name ? '' : 'untitled'}">
+        ${esc(req.name) || 'Untitled Requirement'}
+      </span>
+      <button class="req-item-del" title="Delete" data-id="${req.id}">&#x2715;</button>
+    `;
+    div.addEventListener('click', (e) => {
+      if (e.target.classList.contains('req-item-del')) return;
+      selectReq(req.id);
+    });
+    div.querySelector('.req-item-del').addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteReq(req.id);
+    });
+    list.appendChild(div);
+  });
+}
+
+function renderDetail() {
+  const emptyEl = document.getElementById('detail-empty');
+  const panelEl = document.getElementById('detail-panel');
+
+  if (!selectedId) {
+    emptyEl.style.display = '';
+    panelEl.style.display = 'none';
+    return;
+  }
+
+  const req = requirements.find(r => r.id === selectedId);
+  if (!req) { emptyEl.style.display = ''; panelEl.style.display = 'none'; return; }
+
+  emptyEl.style.display = 'none';
+  panelEl.style.display = '';
+
+  const titleEl = document.getElementById('detail-title');
+  titleEl.textContent = req.name || 'Untitled Requirement';
+  titleEl.className = 'detail-title' + (req.name ? '' : ' untitled');
+
+  const actionsEl = document.getElementById('detail-actions');
+  const bodyEl = document.getElementById('detail-body');
+
+  if (editingId === selectedId) {
+    renderEditForm(req, actionsEl, bodyEl);
+  } else {
+    renderViewMode(req, actionsEl, bodyEl);
+  }
+}
+
+function renderViewMode(req, actionsEl, bodyEl) {
+  actionsEl.innerHTML = `
+    <button class="btn btn-outline btn-sm" onclick="startEdit('${req.id}')">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      Edit
+    </button>
+    <button class="btn btn-outline btn-sm" onclick="cloneReq('${req.id}')">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      Clone
+    </button>
+  `;
+
+  let placeholderHtml = '';
+  if (req.hasPlaceholder && req.placeholderName) {
+    placeholderHtml = `
+      <div class="field-group field-full">
+        <div class="field-label">Linked Document Manager Placeholder</div>
+        <div class="field-value">
+          <span class="placeholder-badge">
+            <span class="icon">📄</span>
+            Open &nbsp; <strong>${esc(req.placeholderName)}</strong>
+          </span>
+        </div>
+      </div>
+    `;
+  }
+
+  bodyEl.innerHTML = `
+    <div class="field-grid">
+      ${placeholderHtml}
+
+      <div class="field-group">
+        <div class="field-label">Assignee</div>
+        <div class="field-value ${req.assignedParty ? '' : 'empty'}">${esc(req.assignedParty) || '—'}</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Last Modified By ID</div>
+        <div class="field-value readonly">${esc(req.lastModifiedById)}</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Created By ID</div>
+        <div class="field-value readonly">${esc(req.createdById)}</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Needed By</div>
+        <div class="field-value ${req.neededBy ? '' : 'empty'}">${esc(req.neededBy) || '—'}</div>
+      </div>
+
+      <div class="field-group field-full">
+        <div class="field-label">Description</div>
+        <div class="field-value ${req.description ? '' : 'empty'}">${esc(req.description) || '—'}</div>
+      </div>
+      <div class="field-group field-full">
+        <div class="field-label">Legal Description</div>
+        <div class="field-value ${req.legalDescription ? '' : 'empty'}">${esc(req.legalDescription) || '—'}</div>
+      </div>
+
+      <div class="divider field-full"></div>
+
+      <div class="field-group">
+        <div class="field-label">Task Type</div>
+        <div class="field-value ${req.taskType ? '' : 'empty'}">${esc(req.taskType) || '—'}</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Category</div>
+        <div class="field-value ${req.category ? '' : 'empty'}">${esc(req.category) || '—'}</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Requirement Type</div>
+        <div class="field-value ${req.requirementType ? '' : 'empty'}">${esc(req.requirementType) || '—'}</div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Approval Process</div>
+        <div class="field-value ${req.approvalProcess ? '' : 'empty'}">${esc(req.approvalProcess) || '—'}</div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-label">Stage Check</div>
+        <div class="field-value">
+          <span class="stage-check-view">
+            <span class="stage-check-box ${req.stageCheck ? 'checked' : ''}">${req.stageCheck ? '✓' : ''}</span>
+            ${req.stageCheck ? 'Yes' : 'No'}
+          </span>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Do Not Auto-Generate</div>
+        <div class="field-value">
+          <span class="stage-check-view">
+            <span class="stage-check-box ${req.doNotAutoGenerate ? 'checked' : ''}">${req.doNotAutoGenerate ? '✓' : ''}</span>
+            ${req.doNotAutoGenerate ? 'Yes' : 'No'}
+          </span>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Is Template</div>
+        <div class="field-value">
+          <span class="stage-check-view">
+            <span class="stage-check-box ${req.isTemplate ? 'checked' : ''}">${req.isTemplate ? '✓' : ''}</span>
+            ${req.isTemplate ? 'Yes' : 'No'}
+          </span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderEditForm(req, actionsEl, bodyEl) {
+  actionsEl.innerHTML = `
+    <button class="btn btn-success btn-sm" onclick="saveEdit('${req.id}')">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Save
+    </button>
+    <button class="btn btn-outline btn-sm" onclick="cancelEdit()">Cancel</button>
+  `;
+
+  const placeholderOptions = PLACEHOLDERS.map(p =>
+    `<option value="${p.id}" ${req.placeholderId === p.id ? 'selected' : ''}>${esc(p.name)}</option>`
+  ).join('');
+
+  bodyEl.innerHTML = `
+    <div class="field-grid">
+      <!-- Name (full width) -->
+      <div class="field-group field-full">
+        <label class="field-label" for="f-name">Name <span style="color:var(--red)">*</span></label>
+        <input class="form-input" id="f-name" value="${esc(req.name)}" placeholder="Requirement name" />
+      </div>
+
+      <!-- Placeholder section (full width) -->
+      <div class="field-group field-full">
+        <div class="field-label">Document Manager Placeholder (optional)</div>
+        <div class="placeholder-section">
+          <label class="placeholder-toggle">
+            <span class="toggle">
+              <input type="checkbox" id="f-has-placeholder" ${req.hasPlaceholder ? 'checked' : ''} onchange="togglePlaceholderFields(this)" />
+              <span class="toggle-slider"></span>
+            </span>
+            <span style="font-size:13px;color:var(--gray-700)">Link to a Document Manager Placeholder</span>
+          </label>
+          <div id="placeholder-fields" style="display:${req.hasPlaceholder ? '' : 'none'}">
+            <div class="field-group">
+              <label class="field-label" for="f-placeholder-select">Select Placeholder</label>
+              <select class="form-select" id="f-placeholder-select" onchange="onPlaceholderSelect(this)">
+                <option value="">— Select a placeholder —</option>
+                ${placeholderOptions}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assignee & Needed By -->
+      <div class="field-group">
+        <label class="field-label" for="f-assigned-party">Assignee</label>
+        <select class="form-select" id="f-assigned-party">
+          ${getPL('assignedParty').map(v => `<option value="${v}" ${req.assignedParty===v?'selected':''}>${v||'— Select —'}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="f-needed-by">Needed By</label>
+        <select class="form-select" id="f-needed-by">
+          ${getPL('neededBy').map(v => `<option value="${v}" ${req.neededBy===v?'selected':''}>${v||'— Select —'}</option>`).join('')}
+        </select>
+      </div>
+
+      <!-- Read-only IDs -->
+      <div class="field-group">
+        <label class="field-label">Last Modified By ID <span style="font-weight:400;text-transform:none;font-style:italic;color:var(--gray-400)">(read-only)</span></label>
+        <input class="form-input readonly-field" value="${esc(req.lastModifiedById)}" readonly />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Created By ID <span style="font-weight:400;text-transform:none;font-style:italic;color:var(--gray-400)">(read-only)</span></label>
+        <input class="form-input readonly-field" value="${esc(req.createdById)}" readonly />
+      </div>
+
+      <!-- Description -->
+      <div class="field-group field-full">
+        <label class="field-label" for="f-description">Description</label>
+        <textarea class="form-textarea" id="f-description" placeholder="Requirement description…">${esc(req.description)}</textarea>
+      </div>
+
+      <!-- Legal Description -->
+      <div class="field-group field-full">
+        <label class="field-label" for="f-legal-description">Legal Description</label>
+        <textarea class="form-textarea" id="f-legal-description" placeholder="Legal description…">${esc(req.legalDescription)}</textarea>
+      </div>
+
+      <div class="divider field-full"></div>
+
+      <!-- Task Type & Category -->
+      <div class="field-group">
+        <label class="field-label" for="f-task-type">Task Type</label>
+        <select class="form-select" id="f-task-type">
+          ${getPL('taskType').map(v => `<option value="${v}" ${req.taskType===v?'selected':''}>${v||'— Select —'}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="f-category">Category</label>
+        <select class="form-select" id="f-category">
+          ${getPL('category').map(v => `<option value="${v}" ${req.category===v?'selected':''}>${v||'— Select —'}</option>`).join('')}
+        </select>
+      </div>
+
+      <!-- Requirement Type & Approval Process -->
+      <div class="field-group">
+        <label class="field-label" for="f-requirement-type">Requirement Type</label>
+        <select class="form-select" id="f-requirement-type">
+          ${getPL('requirementType').map(v => `<option value="${v}" ${req.requirementType===v?'selected':''}>${v||'— Select —'}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label" for="f-approval-process">Approval Process</label>
+        <select class="form-select" id="f-approval-process">
+          ${getPL('approvalProcess').map(v => `<option value="${v}" ${req.approvalProcess===v?'selected':''}>${v||'— Select —'}</option>`).join('')}
+        </select>
+      </div>
+
+      <!-- Checkboxes -->
+      <div class="field-group field-full">
+        <div class="checkbox-row">
+          <input type="checkbox" id="f-stage-check" ${req.stageCheck ? 'checked' : ''} />
+          <label for="f-stage-check">Stage Check</label>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="f-do-not-auto-generate" ${req.doNotAutoGenerate ? 'checked' : ''} />
+          <label for="f-do-not-auto-generate">Do Not Auto-Generate</label>
+        </div>
+        <div class="checkbox-row">
+          <span class="stage-check-box checked" style="flex-shrink:0">✓</span>
+          <span style="font-size:13px;color:var(--gray-500)">Is Template (LLC_BI__Is_Template__c) — always true</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── Actions ────────────────────────────────────────────────────────────────────
+function addRequirement() {
+  const req = makeReq();
+  requirements.push(req);
+  selectedId = req.id;
+  editingId = req.id;
+  persist();
+  render();
+  // Focus name input
+  setTimeout(() => {
+    const el = document.getElementById('f-name');
+    if (el) el.focus();
+  }, 50);
+}
+
+function selectReq(id) {
+  if (editingId && editingId !== id) {
+    // Auto-save current edit before switching
+    saveEdit(editingId, true);
+  }
+  selectedId = id;
+  editingId = null;
+  render();
+}
+
+function deleteReq(id) {
+  requirements = requirements.filter(r => r.id !== id);
+  if (selectedId === id) { selectedId = null; editingId = null; }
+  persist();
+  render();
+  showToast('Requirement deleted.');
+}
+
+function cloneReq(id) {
+  const src = requirements.find(r => r.id === id);
+  if (!src) return;
+  const clone = { ...src, id: uid(), name: src.name + ' (copy)', createdAt: new Date().toISOString(), lastModifiedAt: new Date().toISOString() };
+  const idx = requirements.findIndex(r => r.id === id);
+  requirements.splice(idx + 1, 0, clone);
+  selectedId = clone.id;
+  editingId = clone.id;
+  persist();
+  render();
+  setTimeout(() => { const el = document.getElementById('f-name'); if (el) { el.focus(); el.select(); } }, 50);
+  showToast('Cloned — edit the name and save.');
+}
+
+function startEdit(id) {
+  editingId = id;
+  render();
+  setTimeout(() => {
+    const el = document.getElementById('f-name');
+    if (el) el.focus();
+  }, 50);
+}
+
+function cancelEdit() {
+  editingId = null;
+  render();
+}
+
+function saveEdit(id, silent) {
+  const req = requirements.find(r => r.id === id);
+  if (!req) return;
+
+  const get = (sel) => {
+    const el = document.getElementById(sel);
+    return el ? el.value.trim() : '';
+  };
+  const getChecked = (sel) => {
+    const el = document.getElementById(sel);
+    return el ? el.checked : false;
+  };
+
+  req.name = get('f-name');
+  req.taskType = get('f-task-type');
+  req.category = get('f-category');
+  req.description = get('f-description');
+  req.legalDescription = get('f-legal-description');
+  req.assignedParty = get('f-assigned-party');
+  req.approvalProcess = get('f-approval-process');
+  req.requirementType = get('f-requirement-type');
+  req.neededBy = get('f-needed-by');
+  req.stageCheck = getChecked('f-stage-check');
+  req.doNotAutoGenerate = getChecked('f-do-not-auto-generate');
+  req.isTemplate = true;
+  req.hasPlaceholder = getChecked('f-has-placeholder');
+
+  if (req.hasPlaceholder) {
+    const sel = document.getElementById('f-placeholder-select');
+    if (sel && sel.value) {
+      req.placeholderId = sel.value;
+      const ph = PLACEHOLDERS.find(p => p.id === sel.value);
+      req.placeholderName = ph ? ph.name : sel.value;
+    }
+  } else {
+    req.placeholderId = '';
+    req.placeholderName = '';
+  }
+
+  req.lastModifiedAt = new Date().toISOString();
+
+  persist();
+  if (!silent) {
+    editingId = null;
+    render();
+    showToast('Saved.');
+  }
+}
+
+function togglePlaceholderFields(checkbox) {
+  const fields = document.getElementById('placeholder-fields');
+  if (fields) fields.style.display = checkbox.checked ? '' : 'none';
+}
+
+function onPlaceholderSelect(sel) {
+  // nothing special needed — value is read on save
+}
+
+// ── YAML ───────────────────────────────────────────────────────────────────────
+function buildYaml() {
+  const storyId = document.getElementById('meta-story-id').value.trim() || 'SC-CONFIG-001';
+  const title = document.getElementById('meta-title').value.trim() || 'Smart Checklist Requirements';
+  const featureArea = document.getElementById('meta-feature-area').value.trim() || 'smart-checklist';
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  const named = requirements.filter(r => r.name.trim());
+
+  let yaml = '';
+  yaml += `story_id: "${storyId}"\n`;
+  yaml += `title: "${yamlStr(title)}"\n`;
+  yaml += `feature_area: ${featureArea}\n`;
+  yaml += `source:\n`;
+  yaml += `  type: smart-checklist-builder\n`;
+  yaml += `  ref: "smart-checklist-builder@${today}"\n`;
+  yaml += `\n`;
+  yaml += `records:\n`;
+  yaml += `\n`;
+
+  if (named.length === 0) {
+    yaml += `  # No named requirements yet.\n`;
+  }
+
+  named.forEach(req => {
+    yaml += `  - object: LLC_BI__Requirement__c\n`;
+    yaml += `    fields:\n`;
+    yaml += `      Name: "${yamlStr(req.name)}"\n`;
+    yaml += `      LLC_BI__Is_Template__c: ${req.isTemplate}\n`;
+
+    if (req.taskType)        yaml += `      Task_Type__c: "${yamlStr(req.taskType)}"\n`;
+    if (req.category)        yaml += `      LLC_BI__Category__c: "${yamlStr(req.category)}"\n`;
+    if (req.description)     yaml += `      LLC_BI__Description__c: "${yamlStr(req.description)}"\n`;
+    if (req.legalDescription) yaml += `      LLC_BI__Legal_Description__c: "${yamlStr(req.legalDescription)}"\n`;
+    if (req.assignedParty)   yaml += `      LLC_BI__Assigned_Party__c: "${yamlStr(req.assignedParty)}"\n`;
+    if (req.approvalProcess) yaml += `      LLC_BI__Approval_Process__c: "${yamlStr(req.approvalProcess)}"\n`;
+    if (req.requirementType) yaml += `      LLC_BI__Requirement_Type__c: "${yamlStr(req.requirementType)}"\n`;
+    if (req.neededBy)        yaml += `      LLC_BI__Needed_By__c: "${yamlStr(req.neededBy)}"\n`;
+    yaml += `      LLC_BI__Do_Not_Auto_Generate__c: ${req.doNotAutoGenerate}\n`;
+    if (req.stageCheck)      yaml += `      LLC_BI__Stage_Check__c: ${req.stageCheck}\n`;
+    if (req.hasPlaceholder && req.placeholderName) {
+      yaml += `      # Linked Document Manager Placeholder: "${yamlStr(req.placeholderName)}"\n`;
+      yaml += `      LLC_BI__Document_Manager_Placeholder__c: "${yamlStr(req.placeholderName)}"\n`;
+    }
+    yaml += `\n`;
+  });
+
+  return yaml;
+}
+
+function openYamlModal() {
+  document.getElementById('yaml-modal').classList.add('open');
+  refreshYamlPreview();
+
+  // Live update preview as meta fields change
+  ['meta-story-id', 'meta-title', 'meta-feature-area'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.oninput = refreshYamlPreview;
+  });
+}
+
+function closeYamlModal() {
+  document.getElementById('yaml-modal').classList.remove('open');
+}
+
+function refreshYamlPreview() {
+  document.getElementById('yaml-preview').textContent = buildYaml();
+}
+
+function downloadYaml() {
+  const yaml = buildYaml();
+  const storyId = document.getElementById('meta-story-id').value.trim() || 'smart-checklist';
+  const blob = new Blob([yaml], { type: 'text/yaml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${storyId.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.yaml`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  closeYamlModal();
+  showToast('YAML file downloaded.');
+}
+
+// ── Persistence ───────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'smart-checklist-builder-v1';
+
+function persist() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(requirements));
+}
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) requirements = JSON.parse(raw);
+  } catch (e) {
+    requirements = [];
+  }
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function esc(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function yamlStr(str) {
+  if (!str) return '';
+  return str.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// Close modal on backdrop click
+document.getElementById('yaml-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeYamlModal();
+});
+
+// Init
+loadPicklists();
+loadFromStorage();
+render();
+</script>
+</body>
+</html>
