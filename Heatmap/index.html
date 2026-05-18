@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nCino Feature Builder</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:          #1b2a4a;
+      --navy-light:    #243558;
+      --navy-mid:      #2d3f63;
+      --blue:          #0070d2;
+      --blue-hover:    #005fb2;
+      --green:         #2e7d32;
+      --red:           #c62828;
+      --red-light:     #ffebee;
+      --amber:         #f59e0b;
+      --amber-light:   #fffbeb;
+      --amber-border:  #fcd34d;
+      --gray-50:       #f8f9fa;
+      --gray-100:      #f1f3f5;
+      --gray-200:      #e9ecef;
+      --gray-300:      #dee2e6;
+      --gray-400:      #ced4da;
+      --gray-500:      #adb5bd;
+      --gray-600:      #6c757d;
+      --gray-700:      #495057;
+      --gray-800:      #343a40;
+      --gray-900:      #212529;
+      /* Card type colours — matching screenshot */
+      --card-native-low:  #c8cfd8;   /* Gold Standard – Native / Low Config  */
+      --card-native-high: #9faab8;   /* Gold Standard – Native / High Config */
+      --card-manual:      #fde68a;   /* Manual Activity                       */
+      --card-custom-bg:   #ffffff;   /* Custom – white with red left border   */
+      --border-radius:    6px;
+      --shadow-sm:  0 1px 3px rgba(0,0,0,0.08);
+      --shadow:     0 2px 8px rgba(0,0,0,0.12);
+      --shadow-lg:  0 4px 20px rgba(0,0,0,0.15);
+      --transition: 0.15s ease;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      color: var(--gray-900);
+      background: var(--gray-100);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      background: var(--navy);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      height: 52px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      z-index: 10;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .topbar-logo {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+    .topbar-sep {
+      opacity: 0.3;
+      font-size: 18px;
+    }
+    .topbar-title {
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .topbar-right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--border-radius);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: background var(--transition), opacity var(--transition);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn:disabled { opacity: 0.45; cursor: default; }
+    .btn-ghost {
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    .btn-ghost:hover:not(:disabled) { background: rgba(255,255,255,0.2); }
+    .btn-outline {
+      background: #fff;
+      color: var(--gray-700);
+      border: 1px solid var(--gray-300);
+    }
+    .btn-outline:hover:not(:disabled) { background: var(--gray-50); border-color: var(--gray-400); }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: var(--blue-hover); }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+    /* hidden file input for import */
+    #import-file { display: none; }
+
+    /* ── Legend strip ── */
+    .legend-bar {
+      background: #fff;
+      border-bottom: 1px solid var(--gray-200);
+      padding: 6px 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .legend-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--gray-500);
+      margin-right: 4px;
+    }
+    .legend-items {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--gray-700);
+    }
+    .legend-swatch {
+      width: 20px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .legend-swatch.native-low  { background: var(--card-native-low); }
+    .legend-swatch.native-high { background: var(--card-native-high); }
+    .legend-swatch.manual      { background: var(--card-manual); border: 1px solid var(--amber-border); }
+    .legend-swatch.custom      { background: var(--card-custom-bg); border-left: 3px solid var(--red); border-top: 1px solid var(--gray-300); border-right: 1px solid var(--gray-300); border-bottom: 1px solid var(--gray-300); }
+    .legend-swatch.linked      { background: #e8f0fe; border: 1px solid #bbdefb; }
+
+    /* ── Scrollable canvas ── */
+    .canvas {
+      flex: 1;
+      overflow: auto;
+      padding: 20px 20px 40px;
+    }
+
+    /* ── Phase row ── */
+    .phase-row {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 0;
+      min-width: fit-content;
+    }
+
+    /* ── Phase chevron banner ── */
+    .phase-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: var(--navy);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      height: 40px;
+      padding: 0 24px 0 20px;
+      /* chevron right */
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%);
+      user-select: none;
+    }
+    /* First phase: flat left edge */
+    .phase-header.first {
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 0 100%);
+      border-radius: 4px 0 0 4px;
+    }
+    /* Last phase: flat right edge */
+    .phase-header.last {
+      clip-path: polygon(12px 0, 100% 0, 100% 100%, 12px 100%, 0 50%);
+      padding-left: 28px;
+    }
+    /* Middle phases: notch left and right */
+    .phase-header.middle {
+      clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
+      padding-left: 28px;
+    }
+
+    /* ── Sub-phase columns ── */
+    .subphase-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .subphase-block {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .subphase-header {
+      background: var(--navy-mid);
+      color: rgba(255,255,255,0.85);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      text-align: center;
+      border-bottom: 2px solid rgba(255,255,255,0.1);
+    }
+
+    /* ── Cards grid ── */
+    .cards-col {
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 148px;
+      max-width: 148px;
+      background: #f4f5f7;
+      border-right: 1px solid var(--gray-200);
+    }
+    .cards-col:last-child { border-right: none; }
+
+    /* ── Feature card ── */
+    .card {
+      background: var(--card-native-low);
+      border-radius: 4px;
+      padding: 7px 9px;
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+      box-shadow: var(--shadow-sm);
+      min-height: 52px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 2px;
+      position: relative;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+      filter: brightness(0.96);
+    }
+    .card:active {
+      transform: translateY(0);
+    }
+
+    /* Card variants */
+    .card.native-low  { background: var(--card-native-low); }
+    .card.native-high { background: var(--card-native-high); }
+    .card.manual      {
+      background: var(--card-manual);
+      border: 1px solid var(--amber-border);
+    }
+    .card.custom      {
+      background: var(--card-custom-bg);
+      border: 1px solid var(--gray-300);
+      border-left: 3px solid var(--red);
+    }
+    .card.linked      {
+      background: #dbeafe;
+      border: 1px solid #93c5fd;
+      cursor: pointer;
+    }
+    .card.linked:hover {
+      background: #bfdbfe;
+    }
+
+    /* Card text */
+    .card-name {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.3;
+    }
+    .card.manual .card-name   { color: #78350f; }
+    .card.custom .card-name   { color: var(--gray-800); }
+    .card.linked .card-name   { color: #1d4ed8; }
+
+    .card-sub {
+      font-size: 10px;
+      color: var(--gray-700);
+      line-height: 1.2;
+    }
+    .card.manual .card-sub  { color: #92400e; }
+    .card.custom .card-sub  { color: var(--gray-600); }
+    .card.linked .card-sub  { color: #2563eb; }
+
+    /* linked arrow indicator */
+    .card-link-icon {
+      position: absolute;
+      top: 5px;
+      right: 6px;
+      font-size: 10px;
+      color: #2563eb;
+      opacity: 0.7;
+    }
+
+    /* status dot (configured / not configured) */
+    .card-status {
+      position: absolute;
+      bottom: 5px;
+      right: 6px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--gray-400);
+    }
+    .card-status.configured { background: var(--green); }
+
+    /* ── Phase + sub-phase layout wrapper ── */
+    .phase-section {
+      display: flex;
+      flex-direction: column;
+    }
+    .phase-section + .phase-section {
+      margin-left: 4px;
+    }
+
+    /* ── Full heatmap layout ── */
+    .heatmap {
+      display: inline-flex;   /* shrink-wrap to content */
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* Row that holds all phase chevrons */
+    .phases-banner {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 0;
+    }
+
+    /* Row that holds all sub-phase + cards grouped by phase */
+    .phases-body {
+      display: flex;
+      gap: 4px;
+      align-items: flex-start;
+    }
+
+    /* One phase's body block */
+    .phase-body {
+      display: flex;
+      gap: 0;
+      flex-shrink: 0;
+    }
+
+    /* ── Modal backdrop ── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      width: 440px;
+      max-width: 95vw;
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 16px 20px 12px;
+      border-bottom: 1px solid var(--gray-200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--navy);
+      color: #fff;
+    }
+    .modal-title {
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: rgba(255,255,255,0.7);
+      line-height: 1;
+      padding: 2px 4px;
+    }
+    .modal-close:hover { color: #fff; }
+    .modal-body {
+      padding: 24px 20px;
+    }
+    .modal-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .modal-feature-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 4px;
+    }
+    .modal-sub {
+      font-size: 12px;
+      color: var(--gray-500);
+      margin-bottom: 16px;
+    }
+    .modal-message {
+      background: var(--gray-100);
+      border-radius: var(--border-radius);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--gray-700);
+      line-height: 1.55;
+    }
+    .modal-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--gray-200);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      background: var(--gray-50);
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--gray-800);
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: var(--border-radius);
+      font-size: 13px;
+      box-shadow: var(--shadow-lg);
+      z-index: 300;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
+
+    /* divider between phase sections */
+    .phase-divider {
+      width: 4px;
+      align-self: stretch;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<header class="topbar">
+  <div class="topbar-left">
+    <span class="topbar-logo">nCino</span>
+    <span class="topbar-sep">/</span>
+    <span class="topbar-title">Feature Builder</span>
+  </div>
+  <div class="topbar-right"></div>
+</header>
+
+<!-- Legend -->
+<div class="legend-bar">
+  <span class="legend-label">Legend</span>
+  <div class="legend-items">
+    <div class="legend-item">
+      <div class="legend-swatch native-low"></div>
+      Gold Standard – Native / Low Config
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch native-high"></div>
+      Gold Standard – Native / High Config
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch manual"></div>
+      Manual Activity
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch custom"></div>
+      Custom
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch linked"></div>
+      Linked (navigates to builder)
+    </div>
+  </div>
+</div>
+
+<!-- Scrollable heatmap canvas -->
+<div class="canvas">
+  <div class="heatmap" id="heatmap"></div>
+</div>
+
+<!-- "Not Configured" modal -->
+<div class="modal-backdrop" id="feature-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Feature Details</span>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <span class="modal-icon">🔧</span>
+      <div class="modal-feature-name" id="modal-feature-name"></div>
+      <div class="modal-sub" id="modal-feature-sub"></div>
+      <div class="modal-message">
+        This feature is not yet configured. Check back soon, or use the Import button to load a configuration file.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Data ───────────────────────────────────────────────────────────────────────
+//
+// Card types:
+//   'low'    → Gold Standard – Native / Low Config  (default grey-blue)
+//   'high'   → Gold Standard – Native / High Config (darker grey-blue)
+//   'manual' → Manual Activity (amber)
+//   'custom' → Custom (white + red border)
+//   'linked' → Special: navigates to smart-checklist-builder
+
+const PHASES = [
+  {
+    id: 'qualification',
+    name: 'Qualification',
+    subphases: [
+      {
+        id: 'referral',
+        name: 'Referral',
+        cards: [
+          { id: 'opp-intake',          name: 'Opportunity Intake',              sub: 'Customer Portal',                  type: 'low'    },
+          { id: 'create-amend-rel',    name: 'Create & Amend Relationships',    sub: 'Relationship',                     type: 'low'    },
+          { id: 'create-prospects',    name: 'Create Prospects',                sub: 'Relationship',                     type: 'low'    },
+          { id: 'create-hierarchies',  name: 'Create Hierarchies',              sub: 'Connections',                      type: 'low'    },
+          { id: 'connect-entities',    name: 'Connect Related Entities & IDs',  sub: 'Connections',                      type: 'low'    },
+          { id: 'upload-docs',         name: 'Upload Documents',                sub: 'Document Manager',                 type: 'low'    },
+          { id: 'create-countries',    name: 'Create Countries',                sub: 'Custom',                           type: 'custom' },
+        ]
+      },
+      {
+        id: 'qualify',
+        name: 'Qualify',
+        cards: [
+          { id: 'spread-financials',   name: 'Spread Financials',               sub: 'Spreads',                          type: 'low'    },
+          { id: 'risk-rating',         name: 'Risk Rating',                     sub: 'Risk Rating',                      type: 'low'    },
+          { id: 'compliance-multi',    name: 'Compliance Checks',               sub: 'Multiple Systems',                 type: 'high'   },
+          { id: 'compliance-aecb',     name: 'Compliance Checks',               sub: 'AECB, CBRB',                       type: 'high'   },
+          { id: 'compliance-dev',      name: 'Compliance Deviations',           sub: 'Smart checklist',                  type: 'high'   },
+          { id: 'account-behaviour',   name: 'Account Behaviour',               sub: 'Rel. & Doc Man',                   type: 'low'    },
+          { id: 'capture-deal-info',   name: 'Capture Deal Info',               sub: 'Deal Proposal',                    type: 'low'    },
+          { id: 'select-products-q',   name: 'Select Products',                 sub: 'Product Catalogue & Hierarchy',    type: 'low'    },
+          { id: 'advance-deal',        name: 'Advance Deal',                    sub: 'Product Package',                  type: 'low'    },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'underwriting',
+    name: 'Underwriting',
+    subphases: [
+      {
+        id: 'structure',
+        name: 'Structure',
+        cards: [
+          { id: 'app-details',         name: 'Application Details',             sub: 'Product Package',                  type: 'low'    },
+          { id: 'econ-dep',            name: 'Capture Economic Dependent Details', sub: 'Relationship',                  type: 'low'    },
+          { id: 'select-products-s',   name: 'Select Products',                 sub: 'Product Catalogue & Hierarchy',    type: 'low'    },
+          { id: 'add-loan-limits',     name: 'Add Loan Limits',                 sub: 'Facility Hierarchy',               type: 'low'    },
+          { id: 'build-loan-info',     name: 'Build Loan Info',                 sub: 'Loan team, Borrowing Structure',   type: 'high'   },
+          { id: 'add-fees',            name: 'Add Fees',                        sub: 'Fees',                             type: 'low'    },
+          { id: 'add-pricing',         name: 'Add Pricing & Profitability',     sub: 'Facility',                         type: 'low'    },
+          { id: 'amortisation',        name: 'Amortisation Schedule',           sub: 'Loan Structuring',                 type: 'high'   },
+          { id: 'add-covenants',       name: 'Add Covenants',                   sub: 'Covenants',                        type: 'low'    },
+          { id: 'add-collateral',      name: 'Add Collateral',                  sub: 'Collateral',                       type: 'low'    },
+          { id: 'add-conditions',      name: 'Add Conditions',                  sub: 'Conditions',                       type: 'low'    },
+          { id: 'collect-store-docs-s',name: 'Collect & Store Documents',       sub: 'Document Manager',                 type: 'low'    },
+        ]
+      },
+      {
+        id: 'analyse',
+        name: 'Analyse',
+        cards: [
+          { id: 'analyse-financials',  name: 'Analyse Financials',              sub: 'Spreads',                          type: 'low'    },
+          { id: 'ext-risk-ratings',    name: 'External Risk Ratings',           sub: 'Bankers Almanac',                  type: 'high'   },
+          { id: 'analyse-collateral',  name: 'Analyse Collateral',              sub: 'Rent Roll & Tenancy Management',   type: 'high'   },
+          { id: 'ext-data',            name: 'External Data (Countries & FI)',  sub: 'Bankers Almanac',                  type: 'high'   },
+          { id: 'review-exposure',     name: 'Review Exposure',                 sub: 'Finacle',                          type: 'high'   },
+          { id: 'review-policy-exc',   name: 'Review Policy Exceptions',        sub: 'Policy Exceptions',                type: 'low'    },
+          { id: 'populate-credit-memo',name: 'Populate Credit Memo & CAS',      sub: 'Credit Memo',                      type: 'high'   },
+          { id: 'risk-checklist',      name: 'Risk Compliance Checklist',       sub: 'Smart Checklist',                  type: 'low'    },
+          { id: 'entity-search',       name: 'Run Entity Search Report',        sub: 'AECB, CBRB',                       type: 'high'   },
+          { id: 'gen-term-sheet',      name: 'Generate Term Sheet',             sub: 'Doc Gen',                          type: 'low'    },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'decisioning',
+    name: 'Decisioning',
+    subphases: [
+      {
+        id: 'approve',
+        name: 'Approve',
+        cards: [
+          { id: 'review-credit-memo',  name: 'Review Credit Memo',              sub: 'Credit Memo',                      type: 'low'    },
+          { id: 'refer-credit-comm',   name: 'Refer to Credit Committee',       sub: 'Convene',                          type: 'high'   },
+          { id: 'review-approval',     name: 'Review Approval Tasks & Notifications', sub: '',                           type: 'low'    },
+          { id: 'approve-deal',        name: 'Approve Deal',                    sub: 'Approval Process',                 type: 'low'    },
+          { id: 'decline-deal',        name: 'Decline Deal',                    sub: 'Adverse Actions',                  type: 'low'    },
+          { id: 'auto-decision',       name: 'Auto Decision',                   sub: 'Auto Decision',                    type: 'high'   },
+          { id: 'approve-rating',      name: 'Approve Rating',                  sub: "Moodys CreditLens",                type: 'high'   },
+          { id: 'submit-review',       name: 'Submit for Review',               sub: 'Approval Process',                 type: 'low'    },
+          { id: 'submit-approval',     name: 'Submit for Approval',             sub: 'Approval Process',                 type: 'low'    },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'fulfilment',
+    name: 'Fulfilment',
+    subphases: [
+      {
+        id: 'review',
+        name: 'Review',
+        cards: [
+          { id: 'post-approval',       name: 'Post Approval Change',            sub: 'Change Memo',                      type: 'low'    },
+          { id: 'review-checklist',    name: 'Review Checklist',                sub: 'Smart Checklist',                  type: 'linked' },
+          { id: 'review-by-checker',   name: 'Review by Checker',               sub: 'Approval Process',                 type: 'low'    },
+          { id: 'digital-sig',         name: 'Digital Signature',               sub: 'TBC',                              type: 'manual' },
+        ]
+      },
+      {
+        id: 'contract',
+        name: 'Contract',
+        cards: [
+          { id: 'gen-facility-agr',    name: 'Generate Facility Agreement',     sub: 'Doc Gen',                          type: 'low'    },
+          { id: 'gen-security-agr',    name: 'Generate Security Agreement',     sub: 'Doc Gen',                          type: 'low'    },
+          { id: 'covenant-booking',    name: 'Covenant Booking',                sub: 'Finacle',                          type: 'high'   },
+          { id: 'collect-store-docs-c',name: 'Collect & Store Docs',            sub: 'Document Manager',                 type: 'low'    },
+          { id: 'booking-form',        name: 'Booking Form',                    sub: 'Doc Gen',                          type: 'low'    },
+        ]
+      },
+      {
+        id: 'book',
+        name: 'Book',
+        cards: [
+          { id: 'limit-booking',       name: 'Limit Booking',                   sub: 'Finacle',                          type: 'high'   },
+          { id: 'security-booking',    name: 'Security Booking',                sub: 'Finacle',                          type: 'high'   },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'post-fulfilment',
+    name: 'Post-Fulfilment',
+    subphases: [
+      {
+        id: 'service',
+        name: 'Service',
+        cards: [
+          { id: 'draws-disbursements', name: 'Draws & Disbursements',           sub: 'Finacle',                          type: 'high'   },
+          { id: 'condition-mon-svc',   name: 'Condition Monitoring',            sub: 'Conditions',                       type: 'low'    },
+          { id: 'reviews-mods',        name: 'Reviews & Modifications',         sub: 'Credit Actions',                   type: 'low'    },
+          { id: 'ccm',                 name: 'Continuous Credit Monitoring',    sub: 'CCM',                               type: 'high'   },
+        ]
+      },
+      {
+        id: 'monitor',
+        name: 'Monitor',
+        cards: [
+          { id: 'covenant-mon',        name: 'Covenant Monitoring',             sub: 'Covenant Mgmt',                    type: 'low'    },
+          { id: 'condition-mon-mon',   name: 'Condition Monitoring',            sub: 'Conditions',                       type: 'low'    },
+          { id: 'bulk-annual-review',  name: 'Bulk Annual Review (Country & FI)', sub: 'Custom',                         type: 'custom' },
+        ]
+      },
+    ]
+  },
+];
+
+// ── Feature status state ───────────────────────────────────────────────────────
+// Status: 'not-configured' | 'configured' | 'linked'
+let featureStatus = {};
+
+function initStatus() {
+  PHASES.forEach(phase => {
+    phase.subphases.forEach(sp => {
+      sp.cards.forEach(card => {
+        if (!featureStatus[card.id]) {
+          featureStatus[card.id] = card.type === 'linked' ? 'linked' : 'not-configured';
+        }
+      });
+    });
+  });
+}
+
+// ── Render heatmap ─────────────────────────────────────────────────────────────
+function renderHeatmap() {
+  const root = document.getElementById('heatmap');
+  root.innerHTML = '';
+
+  // Phase banners row
+  const bannersRow = document.createElement('div');
+  bannersRow.className = 'phases-banner';
+
+  // Phase bodies row
+  const bodiesRow = document.createElement('div');
+  bodiesRow.className = 'phases-body';
+
+  const total = PHASES.length;
+  PHASES.forEach((phase, phaseIdx) => {
+    const subCount = phase.subphases.length;
+    // Calculate total pixel width for this phase's banner
+    // Each sub-phase column is 148px wide (card width) + 1px border; gap=0 inside phase
+    const colW = 148;
+    const phaseW = subCount * colW;
+
+    // Banner chevron
+    const banner = document.createElement('div');
+    banner.className = 'phase-header' +
+      (phaseIdx === 0 ? ' first' : phaseIdx === total - 1 ? ' last' : ' middle');
+    banner.style.width = phaseW + 'px';
+    banner.style.minWidth = phaseW + 'px';
+    banner.textContent = phase.name;
+    bannersRow.appendChild(banner);
+
+    // Phase body (holds sub-phase columns side by side)
+    const phaseBody = document.createElement('div');
+    phaseBody.className = 'phase-body';
+
+    phase.subphases.forEach(sp => {
+      const spBlock = document.createElement('div');
+      spBlock.className = 'subphase-block';
+
+      const spHeader = document.createElement('div');
+      spHeader.className = 'subphase-header';
+      spHeader.style.width = colW + 'px';
+      spHeader.textContent = sp.name;
+      spBlock.appendChild(spHeader);
+
+      const col = document.createElement('div');
+      col.className = 'cards-col';
+
+      sp.cards.forEach(card => {
+        const el = buildCard(card);
+        col.appendChild(el);
+      });
+
+      spBlock.appendChild(col);
+      phaseBody.appendChild(spBlock);
+    });
+
+    bodiesRow.appendChild(phaseBody);
+  });
+
+  root.appendChild(bannersRow);
+  root.appendChild(bodiesRow);
+}
+
+function buildCard(card) {
+  const div = document.createElement('div');
+  const status = featureStatus[card.id] || 'not-configured';
+
+  // Determine CSS class
+  let typeClass = card.type;
+  if (card.type === 'linked') typeClass = 'linked';
+  div.className = `card ${typeClass}`;
+  div.title = card.name + (card.sub ? ` / ${card.sub}` : '');
+
+  div.innerHTML = `
+    <div class="card-name">${esc(card.name)}</div>
+    ${card.sub ? `<div class="card-sub">${esc(card.sub)}</div>` : ''}
+    ${card.type === 'linked' ? `<span class="card-link-icon">&#x2197;</span>` : `<span class="card-status ${status === 'configured' ? 'configured' : ''}"></span>`}
+  `;
+
+  div.addEventListener('click', () => onCardClick(card));
+  return div;
+}
+
+function onCardClick(card) {
+  if (card.type === 'linked' || card.id === 'review-checklist') {
+    window.location.href = '../smart-checklist-builder/index.html';
+    return;
+  }
+  openModal(card);
+}
+
+// ── Modal ──────────────────────────────────────────────────────────────────────
+function openModal(card) {
+  document.getElementById('modal-title').textContent = 'Feature Details';
+  document.getElementById('modal-feature-name').textContent = card.name;
+  document.getElementById('modal-feature-sub').textContent = card.sub ? card.sub : '';
+  document.getElementById('feature-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('feature-modal').classList.remove('open');
+}
+
+document.getElementById('feature-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ── Export ─────────────────────────────────────────────────────────────────────
+function buildExportPayload() {
+  const features = [];
+  PHASES.forEach(phase => {
+    phase.subphases.forEach(sp => {
+      sp.cards.forEach(card => {
+        features.push({
+          id: card.id,
+          name: card.name,
+          sub: card.sub || '',
+          phase: phase.name,
+          subphase: sp.name,
+          type: card.type,
+          status: featureStatus[card.id] || 'not-configured',
+        });
+      });
+    });
+  });
+  return { features };
+}
+
+function exportJSON() {
+  const payload = buildExportPayload();
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'feature-builder-export.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Exported feature-builder-export.json');
+}
+
+// ── Import ─────────────────────────────────────────────────────────────────────
+function triggerImport() {
+  document.getElementById('import-file').value = '';
+  document.getElementById('import-file').click();
+}
+
+function handleImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.features || !Array.isArray(data.features)) {
+        throw new Error('Invalid format: expected { features: [...] }');
+      }
+      let updated = 0;
+      data.features.forEach(f => {
+        if (f.id && f.status) {
+          featureStatus[f.id] = f.status;
+          updated++;
+        }
+      });
+      renderHeatmap();
+      showToast(`Imported ${updated} feature status${updated !== 1 ? 'es' : ''}.`);
+    } catch (err) {
+      showToast('Import failed: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function esc(str) {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+initStatus();
+renderHeatmap();
+</script>
+</body>
+</html>
