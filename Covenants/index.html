@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nCino / Covenant Type Builder</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:          #1b2a4a;
+      --sf-blue:       #0176d3;
+      --sf-navy:       #16325c;
+      --sf-bg:         #f3f3f3;
+      --sf-white:      #ffffff;
+      --sf-border:     #dddbda;
+      --sf-text:       #3e3e3c;
+      --sf-text-light: #706e6b;
+      --sf-link:       #0070d2;
+      --sf-stage-done: #2e844a;
+      --green:         #2e7d32;
+      --red:           #c62828;
+      --amber:         #e8a000;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Salesforce Sans', 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      background: var(--sf-bg);
+      color: var(--sf-text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ══ GLOBAL NAV ════════════════════════════════════════════════════════════ */
+    .sf-global-nav {
+      background: var(--navy);
+      height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      flex-shrink: 0;
+      gap: 8px;
+    }
+    .sf-app-name {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+    .sf-global-actions { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+    .sf-icon-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.8); font-size: 14px; cursor: default;
+      transition: background .1s;
+    }
+    .sf-icon-btn:hover { background: rgba(255,255,255,0.1); }
+    .sf-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #c9a227; color: #fff; font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* builder tools in nav */
+    .builder-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 11px;
+      background: var(--amber); color: #1b2a4a;
+      border: none; border-radius: 4px;
+      font-size: 12px; font-weight: 700;
+      cursor: pointer; white-space: nowrap;
+      transition: background .15s;
+    }
+    .builder-btn:hover { background: #ffb800; }
+    .builder-btn.ghost {
+      background: rgba(255,255,255,0.15); color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .builder-btn.ghost:hover { background: rgba(255,255,255,0.25); }
+
+    .dropdown-wrap { position: relative; display: inline-block; }
+    .dropdown-menu {
+      display: none; position: absolute; top: calc(100% + 4px); right: 0;
+      background: #fff; border: 1px solid var(--sf-border);
+      border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+      z-index: 200; min-width: 165px; padding: 4px 0;
+    }
+    .dropdown-wrap.open .dropdown-menu { display: block; }
+    .dropdown-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; font-size: 12.5px; color: var(--sf-text);
+      cursor: pointer; white-space: nowrap;
+    }
+    .dropdown-item:hover { background: #f3f3f3; }
+    .dropdown-sep { height: 1px; background: var(--sf-border); margin: 4px 0; }
+
+    /* ══ RECORD HEADER ════════════════════════════════════════════════════════ */
+    .record-header {
+      background: #fff;
+      border-bottom: 1px solid var(--sf-border);
+      padding: 10px 16px 0;
+      flex-shrink: 0;
+    }
+    .record-obj-label {
+      font-size: 11px; color: var(--sf-text-light);
+      display: flex; align-items: center; gap: 5px;
+      margin-bottom: 2px;
+    }
+    .record-obj-icon {
+      width: 16px; height: 16px; border-radius: 3px;
+      background: var(--sf-blue); color: #fff;
+      font-size: 9px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .record-name {
+      font-size: 18px; font-weight: 700; color: var(--sf-text);
+      margin-bottom: 8px;
+    }
+
+    /* ══ PAGE TABS ════════════════════════════════════════════════════════════ */
+    .page-tabs {
+      display: flex; gap: 0;
+      border-bottom: 1px solid var(--sf-border);
+      background: #fff;
+      flex-shrink: 0;
+    }
+    .page-tab {
+      padding: 9px 18px;
+      font-size: 13px; color: var(--sf-text-light);
+      cursor: pointer; border-bottom: 3px solid transparent;
+      white-space: nowrap;
+      transition: color .15s, border-color .15s;
+    }
+    .page-tab:hover { color: var(--sf-text); }
+    .page-tab.active { color: var(--sf-blue); border-bottom-color: var(--sf-blue); font-weight: 600; }
+
+    /* ══ MAIN AREA ════════════════════════════════════════════════════════════ */
+    .main-area {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* ── Left nav ── */
+    .left-nav {
+      width: 200px;
+      min-width: 160px;
+      border-right: 1px solid var(--sf-border);
+      background: #fff;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .left-nav-item {
+      padding: 9px 16px;
+      font-size: 13px;
+      color: var(--sf-text);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: background .1s, border-color .1s;
+    }
+    .left-nav-item:hover { background: #f5f5f5; }
+    .left-nav-item.active {
+      background: #e8f0fe;
+      border-left-color: var(--sf-blue);
+      color: var(--sf-blue);
+      font-weight: 600;
+    }
+
+    /* ── Content panel ── */
+    .content-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--sf-bg);
+    }
+
+    /* ── Covenant tabs (Covenants / Manage Covenants) ── */
+    .cov-tabs {
+      display: flex; gap: 0;
+      border-bottom: 2px solid var(--sf-border);
+      background: #fff;
+      flex-shrink: 0;
+      padding: 0 16px;
+    }
+    .cov-tab {
+      padding: 8px 4px; margin-right: 20px;
+      font-size: 13px; color: var(--sf-text-light);
+      cursor: pointer; border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: color .1s, border-color .1s;
+    }
+    .cov-tab:hover { color: var(--sf-text); }
+    .cov-tab.active { color: var(--sf-blue); border-bottom-color: var(--sf-blue); font-weight: 600; }
+
+    /* ── Covenants table area ── */
+    .cov-table-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+    }
+
+    .cov-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .cov-section-title {
+      font-size: 13px; font-weight: 700; color: var(--sf-text);
+    }
+    .cov-section-sub {
+      font-size: 11px; color: var(--sf-text-light); margin-top: 2px;
+    }
+    .cov-section-actions { display: flex; gap: 8px; }
+
+    .cov-filter-row {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 10px;
+    }
+    .cov-filter-label {
+      font-size: 12px; color: var(--sf-text-light);
+    }
+
+    /* ── Table ── */
+    .cov-table-wrap {
+      background: #fff;
+      border: 1px solid var(--sf-border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .cov-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .cov-table th {
+      background: #fafafa;
+      border-bottom: 1px solid var(--sf-border);
+      padding: 7px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--sf-text-light);
+      text-align: left;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    .cov-table th .sort-icon { margin-left: 3px; opacity: .5; font-size: 10px; }
+    .cov-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #f3f3f3;
+      font-size: 12.5px;
+      color: var(--sf-text);
+      vertical-align: middle;
+    }
+    .cov-table tr:last-child td { border-bottom: none; }
+    .cov-table tr:hover td { background: #f9f9f9; }
+
+    .cov-type-link { color: var(--sf-link); cursor: pointer; }
+    .cov-type-link:hover { text-decoration: underline; }
+
+    .cov-empty-row td {
+      text-align: center;
+      color: #aaa;
+      padding: 32px;
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      padding: 1px 7px; border-radius: 10px; white-space: nowrap;
+    }
+    .badge-blue   { background: #e8f0fe; color: var(--sf-blue); }
+    .badge-green  { background: #e8f5e9; color: #2e7d32; }
+    .badge-gray   { background: #f0f0f0; color: #777; }
+    .badge-orange { background: #fff3e0; color: #e65100; }
+
+    /* row action dropdown */
+    .row-action-btn {
+      background: #fff; border: 1px solid var(--sf-border);
+      border-radius: 3px; padding: 2px 6px;
+      font-size: 11px; cursor: pointer; color: var(--sf-text);
+    }
+    .row-action-btn:hover { background: #f3f3f3; }
+
+    /* ══ BUTTONS ══════════════════════════════════════════════════════════════ */
+    .sf-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 5px 12px; border-radius: 4px;
+      font-size: 12.5px; font-weight: 500;
+      cursor: pointer; border: 1px solid var(--sf-border);
+      background: #fff; color: var(--sf-text);
+      white-space: nowrap; transition: background .1s;
+    }
+    .sf-btn:hover { background: #f3f3f3; }
+    .sf-btn.brand { background: var(--sf-blue); color: #fff; border-color: var(--sf-blue); }
+    .sf-btn.brand:hover { background: #005fb2; }
+    .sf-btn.success { background: var(--green); color: #fff; border-color: var(--green); }
+    .sf-btn.success:hover { background: #1b5e20; }
+    .sf-btn.danger { color: var(--red); border-color: #ef9a9a; }
+    .sf-btn.danger:hover { background: #fff0f0; }
+    .sf-btn.sm { padding: 4px 10px; font-size: 12px; }
+
+    /* ══ CREATE COVENANT MODAL ════════════════════════════════════════════════ */
+    .modal-backdrop {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 300;
+      align-items: center; justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .sf-modal {
+      background: #fff; border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.22);
+      width: 600px; max-width: 96vw; max-height: 92vh;
+      display: flex; flex-direction: column; overflow: hidden;
+      position: relative;
+    }
+    .sf-modal-header {
+      padding: 16px 20px 10px;
+      border-bottom: 1px solid var(--sf-border);
+      flex-shrink: 0;
+    }
+    .sf-modal-title { font-size: 16px; font-weight: 700; color: var(--sf-text); text-align: center; }
+    .sf-modal-subtitle { font-size: 12px; color: var(--sf-text-light); text-align: center; margin-top: 3px; }
+    .sf-modal-close {
+      position: absolute; top: 12px; right: 14px;
+      background: none; border: 1px solid var(--sf-border);
+      border-radius: 3px; width: 26px; height: 26px;
+      font-size: 14px; cursor: pointer; color: var(--sf-text-light);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sf-modal-close:hover { background: #f3f3f3; color: var(--sf-text); }
+
+    .sf-modal-section-title {
+      font-size: 13px; font-weight: 700; color: var(--sf-text);
+      padding: 12px 20px 6px;
+      border-bottom: 1px solid var(--sf-border);
+      background: #fafafa;
+    }
+
+    .sf-modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+    .sf-modal-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--sf-border);
+      display: flex; justify-content: center; gap: 10px;
+      background: #fafafa; flex-shrink: 0;
+    }
+
+    /* ── Form fields ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 20px;
+    }
+    .form-full { grid-column: 1 / -1; }
+
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-label {
+      font-size: 11.5px; font-weight: 600;
+      color: var(--sf-text-light);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .form-label .req { color: var(--red); }
+    .form-label .info-icon {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: var(--sf-text-light); color: #fff;
+      font-size: 9px; font-weight: 700;
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: default;
+    }
+
+    .sf-input, .sf-select, .sf-textarea {
+      width: 100%; padding: 6px 10px;
+      border: 1px solid #c9c7c5; border-radius: 4px;
+      font-size: 13px; font-family: inherit;
+      color: var(--sf-text); background: #fff;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .sf-input:focus, .sf-select:focus, .sf-textarea:focus {
+      border-color: #1b96ff;
+      box-shadow: 0 0 0 3px rgba(27,150,255,0.15);
+    }
+    .sf-select { cursor: pointer; }
+    .sf-textarea { resize: vertical; min-height: 60px; }
+
+    /* greyed-out / read-only fields */
+    .sf-input.disabled, .sf-select.disabled {
+      background: #f3f3f3;
+      color: #aeaeae;
+      cursor: not-allowed;
+      border-color: #e0e0e0;
+    }
+
+    /* ── Searchable select wrapper ── */
+    .search-select-wrap { position: relative; }
+    .search-select-input {
+      width: 100%; padding: 6px 28px 6px 10px;
+      border: 1px solid #c9c7c5; border-radius: 4px;
+      font-size: 13px; font-family: inherit; color: var(--sf-text);
+      background: #fff; outline: none; cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .search-select-input:focus {
+      border-color: #1b96ff;
+      box-shadow: 0 0 0 3px rgba(27,150,255,0.15);
+    }
+    .search-select-input.disabled {
+      background: #f3f3f3; color: #aeaeae;
+      cursor: not-allowed; border-color: #e0e0e0;
+    }
+    .search-select-arrow {
+      position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+      pointer-events: none; color: #706e6b; font-size: 11px;
+    }
+    .search-select-dropdown {
+      display: none; position: fixed;
+      background: #fff; border: 1px solid #c9c7c5;
+      border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+      z-index: 9999; max-height: 200px; overflow-y: auto;
+    }
+    .search-select-dropdown.open { display: block; }
+    .search-select-item {
+      padding: 7px 10px; font-size: 12.5px; cursor: pointer;
+      color: var(--sf-text); transition: background .1s;
+    }
+    .search-select-item:hover { background: #e8f0fe; }
+    .search-select-item.selected { background: #e8f0fe; color: var(--sf-blue); font-weight: 600; }
+    .search-select-item.add-new {
+      color: var(--sf-blue); font-style: italic;
+      border-top: 1px solid var(--sf-border);
+    }
+    .search-select-item.add-new:hover { background: #f0f7ff; }
+    .search-select-empty { padding: 10px; font-size: 12px; color: #aaa; text-align: center; }
+
+    /* ══ PICKLIST MODAL ═══════════════════════════════════════════════════════ */
+    .pl-modal {
+      width: 540px;
+    }
+    .pl-tab {
+      width: 100%; text-align: left;
+      padding: 8px 14px; background: none; border: none;
+      cursor: pointer; font-size: 12.5px; color: var(--sf-text);
+      border-left: 3px solid transparent;
+      transition: background .1s, border-color .1s;
+    }
+    .pl-tab:hover { background: #f3f3f3; }
+    .pl-tab.active { background: #e8f0fe; border-left-color: var(--sf-blue); color: var(--sf-blue); font-weight: 600; }
+    .pl-value-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 8px; border: 1px solid var(--sf-border);
+      border-radius: 4px; background: #fff;
+    }
+    .pl-value-row span { flex: 1; font-size: 12.5px; }
+    .pl-value-del {
+      background: none; border: none; cursor: pointer;
+      color: #c9c7c5; font-size: 14px; line-height: 1; padding: 2px 4px;
+      border-radius: 3px;
+    }
+    .pl-value-del:hover { color: var(--red); }
+
+    /* ══ YAML MODAL ═══════════════════════════════════════════════════════════ */
+    .yaml-preview {
+      background: #1e1e1e; color: #9cdcfe;
+      font-family: 'Cascadia Code','Fira Mono','Courier New',monospace;
+      font-size: 11.5px; line-height: 1.6;
+      padding: 12px 14px; border-radius: 4px;
+      overflow-x: auto; white-space: pre;
+      max-height: 300px; overflow-y: auto;
+    }
+
+    /* ══ TOAST ════════════════════════════════════════════════════════════════ */
+    .toast {
+      position: fixed; bottom: 20px; right: 20px;
+      background: #3e3e3c; color: #fff;
+      padding: 8px 14px; border-radius: 4px;
+      font-size: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.25);
+      z-index: 999; opacity: 0; transform: translateY(6px);
+      transition: opacity .2s, transform .2s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c9c7c5; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #aeaeae; }
+  </style>
+</head>
+<body>
+
+<!-- ══ GLOBAL NAV ═══════════════════════════════════════════════════════════ -->
+<div class="sf-global-nav">
+  <div style="display:flex;flex-direction:column;gap:3px;margin-right:8px;cursor:default;">
+    <span style="width:16px;height:2px;background:rgba(255,255,255,.7);display:block;"></span>
+    <span style="width:16px;height:2px;background:rgba(255,255,255,.7);display:block;"></span>
+    <span style="width:16px;height:2px;background:rgba(255,255,255,.7);display:block;"></span>
+  </div>
+  <div class="sf-app-name">nCino</div>
+
+  <!-- Builder tools -->
+  <div style="display:flex;align-items:center;gap:6px;margin-left:16px;">
+    <button class="builder-btn ghost" onclick="window.location.href='../Heatmap/index.html'" title="Back to Heatmap">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Heatmap
+    </button>
+    <div style="width:1px;height:20px;background:rgba(255,255,255,.2);"></div>
+    <span style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,220,100,.7);white-space:nowrap;">Builder Tools</span>
+    <div style="width:1px;height:20px;background:rgba(255,255,255,.2);"></div>
+
+    <button class="builder-btn" onclick="openPicklistModal()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg>
+      Picklists
+    </button>
+
+    <div class="dropdown-wrap" id="export-dd">
+      <button class="builder-btn" onclick="toggleDropdown('export-dd')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export ▾
+      </button>
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="closeDropdowns();openYamlModal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Export as YAML
+        </div>
+        <div class="dropdown-item" onclick="closeDropdowns();exportCsv()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          Export as Excel / CSV
+        </div>
+      </div>
+    </div>
+
+    <div class="dropdown-wrap" id="import-dd">
+      <button class="builder-btn" onclick="toggleDropdown('import-dd')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><line x1="12" y1="3" x2="12" y2="15"/><polyline points="17 8 12 3 7 8"/></svg>
+        Import ▾
+      </button>
+      <div class="dropdown-menu">
+        <div class="dropdown-item" onclick="closeDropdowns();triggerImport('yaml')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Import from YAML
+        </div>
+        <div class="dropdown-item" onclick="closeDropdowns();triggerImport('csv')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+          Import from CSV
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sf-global-actions">
+    <div class="sf-icon-btn">★</div>
+    <div class="sf-icon-btn">＋</div>
+    <div class="sf-icon-btn">?</div>
+    <div class="sf-icon-btn">⚙</div>
+    <div class="sf-avatar">SK</div>
+  </div>
+</div>
+
+<!-- ══ RECORD HEADER ════════════════════════════════════════════════════════ -->
+<div class="record-header">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;">
+    <div>
+      <div class="record-obj-label">
+        <div class="record-obj-icon">L</div>
+        Loan
+      </div>
+      <div class="record-name">nCino — Covenant Type Builder</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;padding-top:6px;">
+      <span style="font-size:11px;color:var(--sf-text-light);" id="record-count">0 covenant types</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAGE TABS ════════════════════════════════════════════════════════════ -->
+<div class="page-tabs">
+  <div class="page-tab">Details</div>
+  <div class="page-tab">Document Generation</div>
+  <div class="page-tab">Document Manager</div>
+  <div class="page-tab">Smart Checklist</div>
+  <div class="page-tab active">Covenants</div>
+  <div class="page-tab">Chatter</div>
+</div>
+
+<!-- ══ MAIN AREA ════════════════════════════════════════════════════════════ -->
+<div class="main-area">
+
+  <!-- Left nav -->
+  <div class="left-nav">
+    <div class="left-nav-item active">Covenants</div>
+  </div>
+
+  <!-- Content panel -->
+  <div class="content-panel">
+
+    <!-- Covenant sub-tabs -->
+    <div class="cov-tabs">
+      <div class="cov-tab active" id="tab-covenants" onclick="switchCovTab('covenants')">Covenants</div>
+      <div class="cov-tab" id="tab-manage" onclick="switchCovTab('manage')">Manage Covenants</div>
+    </div>
+
+    <!-- Covenants tab -->
+    <div class="cov-table-area" id="panel-covenants">
+      <div class="cov-section-header">
+        <div>
+          <div class="cov-section-title">
+            Covenants
+            <span style="font-weight:400;color:var(--sf-text-light);font-size:12px;"> · All Covenants ▾</span>
+          </div>
+          <div class="cov-section-sub" id="cov-count-label">0 items</div>
+        </div>
+        <div class="cov-section-actions">
+          <button class="sf-btn sm" disabled style="opacity:0.45;cursor:not-allowed;">Add Covenants</button>
+          <button class="sf-btn sm brand" onclick="openCreateModal()">Create Covenant</button>
+        </div>
+      </div>
+
+      <div class="cov-table-wrap">
+        <table class="cov-table">
+          <thead>
+            <tr>
+              <th>Covenant Auto Nu… <span class="sort-icon">⇅</span></th>
+              <th>Covenant Type <span class="sort-icon">⇅</span></th>
+              <th>Category <span class="sort-icon">⇅</span></th>
+              <th>Frequency Template <span class="sort-icon">⇅</span></th>
+              <th>Effective Date <span class="sort-icon">⇅</span></th>
+              <th>Grace Days <span class="sort-icon">⇅</span></th>
+              <th>Due Date <span class="sort-icon">⇅</span></th>
+              <th>Active <span class="sort-icon">⇅</span></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="cov-table-body">
+            <tr class="cov-empty-row" id="cov-empty-row">
+              <td colspan="9">No covenant types yet. Click <strong>Create Covenant</strong> to get started.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Manage Covenants tab (placeholder) -->
+    <div class="cov-table-area" id="panel-manage" style="display:none;">
+      <div style="color:#aaa;text-align:center;padding:40px;font-size:13px;">
+        Manage Covenants configuration panel — coming soon.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ CREATE COVENANT MODAL ════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="create-modal">
+  <div class="sf-modal" style="width:580px;">
+    <div class="sf-modal-header">
+      <div class="sf-modal-title">Create New Covenant</div>
+      <div class="sf-modal-subtitle">Enter New Covenant Details for nCino Covenant Type Builder</div>
+      <button class="sf-modal-close" onclick="closeCreateModal()">✕</button>
+    </div>
+
+    <div class="sf-modal-section-title">Add New Covenant Details</div>
+
+    <div class="sf-modal-body">
+      <div class="form-grid">
+
+        <!-- Category (searchable + add new) -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="req">*</span> Category
+          </label>
+          <div class="search-select-wrap" id="cat-wrap">
+            <input type="text" class="search-select-input" id="f-category-input"
+              placeholder="Search or select…"
+              onclick="toggleSearchSelect('cat')"
+              oninput="filterSearchSelect('cat', this.value)"
+              autocomplete="off" />
+            <span class="search-select-arrow">▾</span>
+            <div class="search-select-dropdown" id="cat-dropdown"></div>
+          </div>
+          <input type="hidden" id="f-category-val" />
+        </div>
+
+        <!-- Covenant Type (searchable + add new, filtered by category) -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="req">*</span> Covenant Type
+            <span class="info-icon" title="Covenant types shown are filtered by the selected Category">i</span>
+          </label>
+          <div class="search-select-wrap" id="covtype-wrap">
+            <input type="text" class="search-select-input" id="f-covtype-input"
+              placeholder="Search or select…"
+              onclick="toggleSearchSelect('covtype')"
+              oninput="filterSearchSelect('covtype', this.value)"
+              autocomplete="off" />
+            <span class="search-select-arrow">▾</span>
+            <div class="search-select-dropdown" id="covtype-dropdown"></div>
+          </div>
+          <input type="hidden" id="f-covtype-val" />
+        </div>
+
+        <!-- Relationship (greyed out) -->
+        <div class="form-group form-full">
+          <label class="form-label">
+            <span class="req">*</span> Relationship
+          </label>
+          <div style="position:relative;">
+            <select class="sf-select disabled" disabled>
+              <option value="">— Not configurable here —</option>
+            </select>
+          </div>
+          <div style="font-size:11px;color:#aaa;margin-top:2px;">Set at runtime on the Loan record — not part of Covenant Type configuration.</div>
+        </div>
+
+        <!-- Effective Date (greyed out) -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="req">*</span> Effective Date
+            <span class="info-icon" title="Set at runtime — not part of Covenant Type configuration">i</span>
+          </label>
+          <div style="position:relative;">
+            <input type="text" class="sf-input disabled" disabled placeholder="Set at runtime" />
+          </div>
+          <div style="font-size:11px;color:#aaa;margin-top:2px;">Configured per covenant instance, not here.</div>
+        </div>
+
+        <!-- Frequency Template -->
+        <div class="form-group">
+          <label class="form-label">
+            <span class="req">*</span> Frequency Template
+          </label>
+          <div class="search-select-wrap" id="freq-wrap">
+            <input type="text" class="search-select-input" id="f-freq-input"
+              placeholder="Search or select…"
+              onclick="toggleSearchSelect('freq')"
+              oninput="filterSearchSelect('freq', this.value)"
+              autocomplete="off" />
+            <span class="search-select-arrow">▾</span>
+            <div class="search-select-dropdown" id="freq-dropdown"></div>
+          </div>
+          <input type="hidden" id="f-freq-val" />
+        </div>
+
+        <!-- Grace Days (greyed out) -->
+        <div class="form-group">
+          <label class="form-label">
+            Grace Days
+            <span class="info-icon" title="Default Grace Days is set on the Covenant Type record, not per covenant instance">i</span>
+          </label>
+          <input type="text" class="sf-input disabled" disabled placeholder="Inherited from Covenant Type" />
+          <div style="font-size:11px;color:#aaa;margin-top:2px;">Defined on the Covenant Type record.</div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group form-full">
+          <label class="form-label">Description</label>
+          <textarea class="sf-textarea" id="f-description" rows="2" placeholder="Covenant type description…"></textarea>
+        </div>
+
+        <!-- Active -->
+        <div class="form-group">
+          <label class="form-label">Active</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding-top:2px;">
+            <input type="checkbox" id="f-active" checked style="width:14px;height:14px;accent-color:var(--sf-blue);cursor:pointer;" />
+            LLC_BI__Active__c
+          </label>
+        </div>
+
+        <!-- Auto Generate -->
+        <div class="form-group">
+          <label class="form-label">Auto Generate</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding-top:2px;">
+            <input type="checkbox" id="f-auto-generate" style="width:14px;height:14px;accent-color:var(--sf-blue);cursor:pointer;" />
+            LLC_BI__Auto_Generate__c
+          </label>
+        </div>
+
+      </div>
+
+      <!-- Error -->
+      <div id="create-error" style="display:none;margin-top:10px;padding:7px 10px;background:#fff0f0;border:1px solid #ef9a9a;border-radius:4px;font-size:12px;color:var(--red);"></div>
+    </div>
+
+    <div class="sf-modal-footer">
+      <button class="sf-btn sm" onclick="closeCreateModal()">Associate to Loans</button>
+      <button class="sf-btn sm brand" onclick="saveNewCovenant()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PICKLIST MODAL ════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="picklist-modal">
+  <div class="sf-modal pl-modal">
+    <div class="sf-modal-header">
+      <div class="sf-modal-title" style="text-align:left;">Manage Picklist Values</div>
+      <button class="sf-modal-close" onclick="closePicklistModal()">✕</button>
+    </div>
+    <div class="sf-modal-body" style="padding:0;">
+      <div style="display:flex;height:380px;">
+        <div style="width:155px;border-right:1px solid var(--sf-border);padding:6px 0;flex-shrink:0;background:#fafafa;">
+          <div id="pl-tabs"></div>
+        </div>
+        <div style="flex:1;padding:14px;display:flex;flex-direction:column;gap:10px;overflow:hidden;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sf-text-light);" id="pl-active-label"></div>
+          <div style="font-size:11px;color:var(--sf-text-light);line-height:1.5;" id="pl-active-hint"></div>
+          <div id="pl-values-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px;"></div>
+          <div style="display:flex;gap:6px;">
+            <input class="sf-input" id="pl-new-value" placeholder="New value…" style="flex:1;font-size:12.5px;" onkeydown="if(event.key==='Enter')addPicklistValue()" />
+            <button class="sf-btn sm brand" onclick="addPicklistValue()">+ Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sf-modal-footer" style="justify-content:flex-end;">
+      <button class="sf-btn sm" onclick="closePicklistModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ YAML EXPORT MODAL ═════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="yaml-modal">
+  <div class="sf-modal" style="width:680px;">
+    <div class="sf-modal-header">
+      <div class="sf-modal-title" style="text-align:left;">Export YAML — nCino Man Configuration</div>
+      <button class="sf-modal-close" onclick="closeYamlModal()">✕</button>
+    </div>
+    <div class="sf-modal-body" style="padding:16px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="form-group">
+          <label class="form-label">Story ID</label>
+          <input class="sf-input" id="meta-story-id" placeholder="e.g. COV-CONFIG-001" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Feature Area</label>
+          <input class="sf-input" id="meta-feature-area" value="covenants" />
+        </div>
+        <div class="form-group" style="grid-column:1/-1;">
+          <label class="form-label">Title</label>
+          <input class="sf-input" id="meta-title" placeholder="e.g. Covenant Types — My Project" />
+        </div>
+      </div>
+      <div style="background:#fff8e1;border:1px solid #ffe082;border-radius:4px;padding:7px 10px;font-size:11.5px;color:#e65100;margin-bottom:10px;">
+        Records without a Name are excluded. Fill in Story ID and Title before downloading.
+      </div>
+      <div class="yaml-preview" id="yaml-preview"></div>
+    </div>
+    <div class="sf-modal-footer" style="justify-content:flex-end;">
+      <button class="sf-btn sm" onclick="closeYamlModal()">Cancel</button>
+      <button class="sf-btn sm success" onclick="downloadYaml()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download .yaml
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ IMPORT MODAL ══════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="import-modal">
+  <div class="sf-modal" style="width:460px;">
+    <div class="sf-modal-header">
+      <div class="sf-modal-title" id="import-modal-title" style="text-align:left;">Import Covenant Types</div>
+      <button class="sf-modal-close" onclick="closeImportModal()">✕</button>
+    </div>
+    <div class="sf-modal-body" style="padding:16px;display:flex;flex-direction:column;gap:12px;">
+      <div id="import-mode-msg" style="font-size:12.5px;color:var(--sf-text-light);line-height:1.6;"></div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <label style="font-size:12.5px;">On import:</label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12.5px;">
+          <input type="radio" name="import-mode" value="append" checked /> Append to existing
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12.5px;">
+          <input type="radio" name="import-mode" value="replace" /> Replace all
+        </label>
+      </div>
+      <div id="import-preview" style="max-height:240px;overflow-y:auto;border:1px solid var(--sf-border);border-radius:4px;padding:10px;font-size:12px;background:#fafafa;display:none;"></div>
+      <div id="import-error" style="color:var(--red);font-size:12px;display:none;"></div>
+    </div>
+    <div class="sf-modal-footer" style="justify-content:flex-end;">
+      <button class="sf-btn sm" onclick="closeImportModal()">Cancel</button>
+      <button class="sf-btn sm brand" id="import-confirm-btn" style="display:none;" onclick="confirmImport()">Import</button>
+    </div>
+  </div>
+</div>
+
+<!-- hidden file inputs -->
+<input type="file" id="import-yaml-input" accept=".yaml,.yml" style="display:none" onchange="handleYamlImport(this)" />
+<input type="file" id="import-csv-input"  accept=".csv"       style="display:none" onchange="handleCsvImport(this)" />
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ STATE ════════════════════════════════════════════════════════════════════
+let records = [];
+let selectedId = null;
+let editingRecord = null; // record being created/edited in modal
+
+const STORAGE_KEY         = 'covenant-type-builder-v1';
+const PICKLIST_STORAGE_KEY = 'covenant-type-builder-picklists-v1';
+
+// Category → [CovenantType] mapping
+// In nCino, Covenant Types are records on LLC_BI__Covenant_Type__c
+// Category__c is a picklist on that object; here we store a map of which types belong to which category
+const CATEGORY_TYPE_MAP_KEY = 'covenant-type-builder-cat-map-v1';
+
+const PICKLIST_DEFAULTS = {
+  category:  ['Financial', 'Reporting', 'Operational', 'Insurance', 'Legal', 'Other'],
+  frequency: ['Annually', 'Semi-Annually', 'Quarterly', 'Monthly', 'Ad Hoc', 'One-Time'],
+  financialIndicator: ['DSCR', 'Fixed Charge Coverage Ratio', 'Leverage Ratio', 'Current Ratio', 'Debt to Equity', 'Net Worth', 'Other'],
+  operator: ['>=', '<=', '=', '>', '<'],
+};
+
+const PICKLIST_LABELS = {
+  category:           'Category',
+  frequency:          'Frequency Template',
+  financialIndicator: 'Financial Indicator',
+  operator:           'Operator',
+};
+
+const EDITABLE_PICKLISTS = ['category', 'frequency', 'financialIndicator'];
+
+// covenantTypes is stored per-category: { Financial: ['Cash Flow Forecast', ...], Reporting: [...], ... }
+let picklists = {};
+let categoryTypeMap = {}; // { 'Financial': ['Cash Flow Forecast', 'Financial Indicator', ...], ... }
+let activePLKey = 'category';
+
+const DEFAULT_CATEGORY_TYPE_MAP = {
+  'Financial':    ['Cash Flow Forecast', 'Financial Indicator', 'Leverage Ratio', 'Debt Service Coverage'],
+  'Reporting':    ['Annual Accounts', 'Management Accounts', 'Audit Report', 'Compliance Certificate'],
+  'Operational':  ['Business Plan', 'Insurance Certificate', 'Board Resolution'],
+  'Insurance':    ['Buildings Insurance', 'Life Insurance', 'Public Liability'],
+  'Legal':        ['Legal Opinion', 'Charge Registration', 'Debenture'],
+  'Other':        ['Ad Hoc', 'Custom'],
+};
+
+function uid() { return 'cov_' + Math.random().toString(36).slice(2, 9); }
+
+function makeRecord(overrides) {
+  const now = new Date().toISOString();
+  return Object.assign({
+    id: uid(),
+    name: '',            // covenant type name = the selected covenantType value
+    category: '',
+    covenantType: '',
+    description: '',
+    frequency: '',
+    graceDays: '',
+    active: true,
+    autoGenerate: false,
+    createdAt: now,
+    lastModifiedAt: now,
+  }, overrides || {});
+}
+
+// ══ PERSISTENCE ══════════════════════════════════════════════════════════════
+function persist() { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
+function loadFromStorage() {
+  try { const r = localStorage.getItem(STORAGE_KEY); if (r) records = JSON.parse(r); } catch(e) { records = []; }
+}
+function loadPicklists() {
+  try { const r = localStorage.getItem(PICKLIST_STORAGE_KEY); picklists = r ? JSON.parse(r) : {}; } catch(e) { picklists = {}; }
+  EDITABLE_PICKLISTS.forEach(k => { if (!picklists[k]) picklists[k] = [...PICKLIST_DEFAULTS[k]]; });
+}
+function persistPicklists() { localStorage.setItem(PICKLIST_STORAGE_KEY, JSON.stringify(picklists)); }
+
+function loadCategoryTypeMap() {
+  try { const r = localStorage.getItem(CATEGORY_TYPE_MAP_KEY); categoryTypeMap = r ? JSON.parse(r) : {}; } catch(e) { categoryTypeMap = {}; }
+  // Fill in any missing categories with defaults
+  (picklists.category || PICKLIST_DEFAULTS.category).forEach(cat => {
+    if (!categoryTypeMap[cat]) categoryTypeMap[cat] = [...(DEFAULT_CATEGORY_TYPE_MAP[cat] || ['Other'])];
+  });
+}
+function persistCategoryTypeMap() { localStorage.setItem(CATEGORY_TYPE_MAP_KEY, JSON.stringify(categoryTypeMap)); }
+
+function getPL(key) { return picklists[key] || PICKLIST_DEFAULTS[key] || []; }
+function getTypesForCategory(cat) {
+  if (!cat) {
+    // Return all types across all categories (flattened, deduped)
+    const all = [];
+    Object.values(categoryTypeMap).forEach(arr => arr.forEach(t => { if (!all.includes(t)) all.push(t); }));
+    return all;
+  }
+  return categoryTypeMap[cat] || [];
+}
+
+// ══ TAB SWITCHING ════════════════════════════════════════════════════════════
+function switchCovTab(tab) {
+  document.getElementById('tab-covenants').classList.toggle('active', tab === 'covenants');
+  document.getElementById('tab-manage').classList.toggle('active', tab === 'manage');
+  document.getElementById('panel-covenants').style.display = tab === 'covenants' ? '' : 'none';
+  document.getElementById('panel-manage').style.display    = tab === 'manage'    ? '' : 'none';
+}
+
+// ══ RENDER ═══════════════════════════════════════════════════════════════════
+function render() {
+  renderTable();
+  updateCount();
+}
+
+function updateCount() {
+  const n = records.length;
+  document.getElementById('record-count').textContent = n + ' covenant type' + (n !== 1 ? 's' : '');
+  document.getElementById('cov-count-label').textContent = n + ' item' + (n !== 1 ? 's' : '') + ' · Updated just now';
+}
+
+function renderTable() {
+  const tbody = document.getElementById('cov-table-body');
+  const emptyRow = document.getElementById('cov-empty-row');
+
+  // Remove existing data rows
+  Array.from(tbody.querySelectorAll('.data-row')).forEach(el => el.remove());
+
+  emptyRow.style.display = records.length === 0 ? '' : 'none';
+
+  records.forEach((rec, idx) => {
+    const autoNum = 'COV-' + String(idx + 1).padStart(6, '0');
+    const tr = document.createElement('tr');
+    tr.className = 'data-row';
+    tr.innerHTML = `
+      <td><span class="cov-type-link" onclick="openEditModal('${rec.id}')">${esc(autoNum)}</span></td>
+      <td><span class="cov-type-link" onclick="openEditModal('${rec.id}')">${esc(rec.covenantType) || '<span style="color:#aaa">—</span>'}</span></td>
+      <td>${rec.category ? `<span class="badge badge-blue">${esc(rec.category)}</span>` : '<span style="color:#aaa">—</span>'}</td>
+      <td>${esc(rec.frequency) || '<span style="color:#aaa">—</span>'}</td>
+      <td style="color:#aaa;font-style:italic;font-size:11.5px;">Runtime</td>
+      <td style="color:#aaa;font-style:italic;font-size:11.5px;">From type</td>
+      <td style="color:#aaa;font-style:italic;font-size:11.5px;">Runtime</td>
+      <td>
+        <span class="badge ${rec.active ? 'badge-green' : 'badge-gray'}">${rec.active ? 'Active' : 'Inactive'}</span>
+      </td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="row-action-btn" onclick="openEditModal('${rec.id}')">Edit</button>
+          <button class="row-action-btn" onclick="cloneRecord('${rec.id}')">Clone</button>
+          <button class="row-action-btn" style="color:var(--red);" onclick="deleteRecord('${rec.id}')">✕</button>
+        </div>
+      </td>
+    `;
+    tbody.insertBefore(tr, emptyRow);
+  });
+}
+
+// ══ SEARCHABLE SELECT ════════════════════════════════════════════════════════
+// Manages 3 dropdowns: cat, covtype, freq
+const searchSelects = {
+  cat:     { inputId: 'f-category-input', valId: 'f-category-val',  dropdownId: 'cat-dropdown',     getItems: () => getPL('category'),                      allowAdd: true,  addTarget: 'category' },
+  covtype: { inputId: 'f-covtype-input',  valId: 'f-covtype-val',   dropdownId: 'covtype-dropdown',  getItems: () => getTypesForCategory(getVal('f-category-val')), allowAdd: true,  addTarget: 'covtype' },
+  freq:    { inputId: 'f-freq-input',     valId: 'f-freq-val',      dropdownId: 'freq-dropdown',     getItems: () => getPL('frequency'),                     allowAdd: true,  addTarget: 'frequency' },
+};
+
+let activeSearchSelect = null;
+
+function toggleSearchSelect(key) {
+  const ss = searchSelects[key];
+  if (!ss) return;
+  const input = document.getElementById(ss.inputId);
+  if (input.classList.contains('disabled')) return;
+
+  // Close others
+  Object.keys(searchSelects).forEach(k => {
+    if (k !== key) closeSearchSelect(k);
+  });
+
+  const dd = document.getElementById(ss.dropdownId);
+  if (dd.classList.contains('open')) {
+    closeSearchSelect(key);
+  } else {
+    openSearchSelect(key);
+  }
+}
+
+function openSearchSelect(key) {
+  const ss = searchSelects[key];
+  const dd = document.getElementById(ss.dropdownId);
+  const input = document.getElementById(ss.inputId);
+  const rect = input.getBoundingClientRect();
+  dd.style.left  = rect.left + 'px';
+  dd.style.top   = (rect.bottom + 2) + 'px';
+  dd.style.width = rect.width + 'px';
+  const currentVal = getVal(ss.valId);
+  renderSearchSelectItems(key, currentVal, '');
+  dd.classList.add('open');
+  activeSearchSelect = key;
+}
+
+function closeSearchSelect(key) {
+  const ss = searchSelects[key];
+  document.getElementById(ss.dropdownId).classList.remove('open');
+  if (activeSearchSelect === key) activeSearchSelect = null;
+}
+
+function filterSearchSelect(key, value) {
+  const ss = searchSelects[key];
+  const dd = document.getElementById(ss.dropdownId);
+  const input = document.getElementById(ss.inputId);
+  const rect = input.getBoundingClientRect();
+  dd.style.left  = rect.left + 'px';
+  dd.style.top   = (rect.bottom + 2) + 'px';
+  dd.style.width = rect.width + 'px';
+  dd.classList.add('open');
+  activeSearchSelect = key;
+  const currentVal = getVal(ss.valId);
+  renderSearchSelectItems(key, currentVal, value);
+}
+
+function renderSearchSelectItems(key, selectedVal, filter) {
+  const ss = searchSelects[key];
+  const dd = document.getElementById(ss.dropdownId);
+  const items = ss.getItems().filter(v => !filter || v.toLowerCase().includes(filter.toLowerCase()));
+
+  let html = '';
+  if (items.length === 0 && !filter) {
+    html = `<div class="search-select-empty">No options. Add one below.</div>`;
+  } else if (items.length === 0) {
+    html = `<div class="search-select-empty">No matches for "${esc(filter)}"</div>`;
+  } else {
+    html = items.map(v =>
+      `<div class="search-select-item${v === selectedVal ? ' selected' : ''}" onmousedown="event.preventDefault();selectSearchItem('${key}', ${JSON.stringify(v)})">${esc(v)}</div>`
+    ).join('');
+  }
+
+  if (ss.allowAdd) {
+    const label = filter ? `+ Add "${esc(filter)}"` : '+ Add new value…';
+    html += `<div class="search-select-item add-new" onmousedown="event.preventDefault();addSearchSelectValue('${key}', ${JSON.stringify(filter)})">${label}</div>`;
+  }
+
+  dd.innerHTML = html;
+}
+
+function selectSearchItem(key, val) {
+  const ss = searchSelects[key];
+  document.getElementById(ss.inputId).value = val;
+  document.getElementById(ss.valId).value = val;
+  closeSearchSelect(key);
+
+  // When category changes, reset covtype
+  if (key === 'cat') {
+    document.getElementById('f-covtype-input').value = '';
+    document.getElementById('f-covtype-val').value = '';
+    // Ensure category exists in map
+    if (!categoryTypeMap[val]) {
+      categoryTypeMap[val] = [...(DEFAULT_CATEGORY_TYPE_MAP[val] || [])];
+      persistCategoryTypeMap();
+    }
+  }
+
+  clearCreateError();
+}
+
+function addSearchSelectValue(key, filter) {
+  const ss = searchSelects[key];
+  let val = filter ? filter.trim() : '';
+  if (!val) {
+    val = prompt('Enter new value:');
+    if (!val || !val.trim()) return;
+    val = val.trim();
+  }
+
+  if (key === 'cat') {
+    // Add to category picklist
+    if (!picklists.category.includes(val)) {
+      picklists.category.push(val);
+      persistPicklists();
+    }
+    if (!categoryTypeMap[val]) {
+      categoryTypeMap[val] = [];
+      persistCategoryTypeMap();
+    }
+  } else if (key === 'covtype') {
+    // Add to the current category's type list
+    const cat = getVal('f-category-val');
+    if (!cat) { showToast('Select a Category first.'); return; }
+    if (!categoryTypeMap[cat]) categoryTypeMap[cat] = [];
+    if (!categoryTypeMap[cat].includes(val)) {
+      categoryTypeMap[cat].push(val);
+      persistCategoryTypeMap();
+    }
+  } else if (key === 'freq') {
+    if (!picklists.frequency.includes(val)) {
+      picklists.frequency.push(val);
+      persistPicklists();
+    }
+  }
+
+  // Select it
+  selectSearchItem(key, val);
+}
+
+function getVal(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+}
+
+// Close dropdowns on outside click
+document.addEventListener('mousedown', e => {
+  if (!e.target.closest('.search-select-wrap') && !e.target.closest('.search-select-dropdown') && !e.target.closest('.dropdown-wrap')) {
+    Object.keys(searchSelects).forEach(k => closeSearchSelect(k));
+    closeDropdowns();
+  }
+});
+
+// ══ CREATE / EDIT MODAL ══════════════════════════════════════════════════════
+function openCreateModal(editId) {
+  editingRecord = editId ? records.find(r => r.id === editId) : null;
+  const rec = editingRecord || makeRecord();
+
+  // Set modal title
+  document.querySelector('#create-modal .sf-modal-title').textContent = editId ? 'Edit Covenant Type' : 'Create New Covenant';
+  document.querySelector('#create-modal .sf-modal-subtitle').textContent = editId
+    ? 'Update Covenant Type details'
+    : 'Enter New Covenant Details for nCino Covenant Type Builder';
+
+  // Reset fields
+  document.getElementById('f-category-input').value  = rec.category;
+  document.getElementById('f-category-val').value    = rec.category;
+  document.getElementById('f-covtype-input').value   = rec.covenantType;
+  document.getElementById('f-covtype-val').value     = rec.covenantType;
+  document.getElementById('f-freq-input').value      = rec.frequency;
+  document.getElementById('f-freq-val').value        = rec.frequency;
+  document.getElementById('f-description').value     = rec.description;
+  document.getElementById('f-active').checked        = rec.active;
+  document.getElementById('f-auto-generate').checked = rec.autoGenerate;
+  clearCreateError();
+
+  document.getElementById('create-modal').classList.add('open');
+}
+
+function openEditModal(id) { openCreateModal(id); }
+
+function closeCreateModal() {
+  document.getElementById('create-modal').classList.remove('open');
+  Object.keys(searchSelects).forEach(k => closeSearchSelect(k));
+  editingRecord = null;
+}
+
+function clearCreateError() {
+  const el = document.getElementById('create-error');
+  el.style.display = 'none'; el.textContent = '';
+}
+function showCreateError(msg) {
+  const el = document.getElementById('create-error');
+  el.textContent = msg; el.style.display = '';
+}
+
+function saveNewCovenant() {
+  const category    = getVal('f-category-val').trim();
+  const covenantType = getVal('f-covtype-val').trim();
+  const frequency   = getVal('f-freq-val').trim();
+
+  if (!category)     { showCreateError('Category is required.'); return; }
+  if (!covenantType) { showCreateError('Covenant Type is required.'); return; }
+  if (!frequency)    { showCreateError('Frequency Template is required.'); return; }
+
+  const description  = document.getElementById('f-description').value.trim();
+  const active       = document.getElementById('f-active').checked;
+  const autoGenerate = document.getElementById('f-auto-generate').checked;
+
+  if (editingRecord) {
+    // Update existing
+    editingRecord.category     = category;
+    editingRecord.covenantType = covenantType;
+    editingRecord.name         = covenantType;
+    editingRecord.frequency    = frequency;
+    editingRecord.description  = description;
+    editingRecord.active       = active;
+    editingRecord.autoGenerate = autoGenerate;
+    editingRecord.lastModifiedAt = new Date().toISOString();
+    showToast('Covenant type updated.');
+  } else {
+    const rec = makeRecord({
+      category, covenantType, name: covenantType,
+      frequency, description, active, autoGenerate,
+    });
+    records.push(rec);
+    showToast('Covenant type created.');
+  }
+
+  persist();
+  render();
+  closeCreateModal();
+}
+
+// ══ RECORD ACTIONS ═══════════════════════════════════════════════════════════
+function deleteRecord(id) {
+  records = records.filter(r => r.id !== id);
+  persist(); render();
+  showToast('Deleted.');
+}
+
+function cloneRecord(id) {
+  const src = records.find(r => r.id === id);
+  if (!src) return;
+  const clone = { ...src, id: uid(), covenantType: src.covenantType + ' (copy)', name: src.name + ' (copy)', createdAt: new Date().toISOString(), lastModifiedAt: new Date().toISOString() };
+  const idx = records.findIndex(r => r.id === id);
+  records.splice(idx + 1, 0, clone);
+  persist(); render();
+  showToast('Cloned.');
+}
+
+// ══ PICKLIST MODAL ════════════════════════════════════════════════════════════
+const PICKLIST_HINTS = {
+  category:           'Values appear in the Category dropdown when creating a covenant. Each category has its own set of Covenant Types.',
+  frequency:          'Frequency Template values define how often a covenant is reviewed (Annually, Quarterly, etc.).',
+  financialIndicator: 'Used when a covenant type is a Financial Indicator — maps to LLC_BI__Financial_Indicator__c.',
+  operator:           'Comparison operator for financial indicator thresholds (>=, <=, etc.).',
+};
+
+function openPicklistModal() {
+  document.getElementById('picklist-modal').classList.add('open');
+  renderPLTabs(); renderPLValues();
+}
+function closePicklistModal() { document.getElementById('picklist-modal').classList.remove('open'); }
+function renderPLTabs() {
+  const tabs = [
+    { key: 'category',           label: 'Category' },
+    { key: 'covtypes',           label: 'Covenant Types' },
+    { key: 'frequency',          label: 'Frequency Template' },
+    { key: 'financialIndicator', label: 'Financial Indicator' },
+  ];
+  document.getElementById('pl-tabs').innerHTML = tabs.map(t =>
+    `<button class="pl-tab ${activePLKey === t.key ? 'active' : ''}" onclick="switchPLTab('${t.key}')">${t.label}</button>`
+  ).join('');
+}
+function switchPLTab(key) {
+  activePLKey = key; renderPLTabs(); renderPLValues();
+  const el = document.getElementById('pl-new-value'); if (el) { el.value = ''; el.focus(); }
+}
+function renderPLValues() {
+  const hint = document.getElementById('pl-active-hint');
+
+  if (activePLKey === 'covtypes') {
+    // Show category → types editor
+    document.getElementById('pl-active-label').textContent = 'Covenant Types by Category';
+    hint.textContent = 'Each category has its own list of Covenant Types. Select a category below to manage its types.';
+
+    const categories = picklists.category || PICKLIST_DEFAULTS.category;
+    let html = '';
+    categories.forEach(cat => {
+      const types = categoryTypeMap[cat] || [];
+      html += `<div style="margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--sf-blue);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">${esc(cat)}</div>
+        ${types.length === 0
+          ? `<div style="color:#aaa;font-size:12px;font-style:italic;padding:3px 0;">No types yet.</div>`
+          : types.map((t, i) => `
+            <div class="pl-value-row" style="margin-bottom:4px;">
+              <span>${esc(t)}</span>
+              <button class="pl-value-del" onclick="deleteCovType('${esc(cat)}', ${i})">✕</button>
+            </div>`).join('')}
+        <div style="display:flex;gap:5px;margin-top:4px;">
+          <input class="sf-input" placeholder="Add type for ${esc(cat)}…" id="pl-add-type-${btoa(cat).replace(/[^a-z0-9]/gi,'')}" style="font-size:12px;padding:4px 8px;" onkeydown="if(event.key==='Enter')addCovType('${esc(cat)}')" />
+          <button class="sf-btn sm brand" onclick="addCovType('${esc(cat)}')">+ Add</button>
+        </div>
+      </div>`;
+    });
+    document.getElementById('pl-values-list').innerHTML = html;
+    document.getElementById('pl-new-value').placeholder = 'Add new Category…';
+    return;
+  }
+
+  hint.textContent = PICKLIST_HINTS[activePLKey] || '';
+  document.getElementById('pl-active-label').textContent = PICKLIST_LABELS[activePLKey];
+  const vals = picklists[activePLKey] || [];
+  document.getElementById('pl-values-list').innerHTML = vals.length === 0
+    ? `<div style="color:#aaa;font-size:12px;padding:6px 0;">No values yet.</div>`
+    : vals.map((v, i) => `
+        <div class="pl-value-row">
+          <span>${esc(v)}</span>
+          <button class="pl-value-del" onclick="deletePicklistValue(${i})">✕</button>
+        </div>`).join('');
+  document.getElementById('pl-new-value').placeholder = 'New value…';
+}
+
+function addCovType(cat) {
+  const safeId = btoa(cat).replace(/[^a-z0-9]/gi,'');
+  const input = document.getElementById(`pl-add-type-${safeId}`);
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) return;
+  if (!categoryTypeMap[cat]) categoryTypeMap[cat] = [];
+  if (!categoryTypeMap[cat].includes(val)) {
+    categoryTypeMap[cat].push(val);
+    persistCategoryTypeMap();
+  }
+  renderPLValues();
+  input.value = '';
+  showToast(`Added "${val}" to ${cat}.`);
+}
+
+function deleteCovType(cat, idx) {
+  if (!categoryTypeMap[cat]) return;
+  categoryTypeMap[cat].splice(idx, 1);
+  persistCategoryTypeMap();
+  renderPLValues();
+}
+
+function addPicklistValue() {
+  if (activePLKey === 'covtypes') {
+    // Adding a new Category
+    const input = document.getElementById('pl-new-value');
+    const val = input.value.trim();
+    if (!val) return;
+    if (!picklists.category.includes(val)) {
+      picklists.category.push(val);
+      persistPicklists();
+    }
+    if (!categoryTypeMap[val]) { categoryTypeMap[val] = []; persistCategoryTypeMap(); }
+    renderPLValues(); renderPLTabs();
+    input.value = '';
+    showToast(`Category "${val}" added.`);
+    return;
+  }
+  const input = document.getElementById('pl-new-value');
+  const val = input.value.trim();
+  if (!val) return;
+  if (picklists[activePLKey].includes(val)) { showToast('Value already exists.'); return; }
+  picklists[activePLKey].push(val);
+  persistPicklists();
+  if (activePLKey === 'category' && !categoryTypeMap[val]) { categoryTypeMap[val] = []; persistCategoryTypeMap(); }
+  renderPLValues();
+  input.value = ''; input.focus();
+}
+function deletePicklistValue(idx) {
+  picklists[activePLKey].splice(idx, 1);
+  persistPicklists(); renderPLValues();
+}
+document.getElementById('picklist-modal').addEventListener('click', function(e) { if (e.target === this) closePicklistModal(); });
+
+// ══ YAML ══════════════════════════════════════════════════════════════════════
+function buildYaml() {
+  const storyId     = document.getElementById('meta-story-id').value.trim()     || 'COV-CONFIG-001';
+  const title       = document.getElementById('meta-title').value.trim()        || 'Covenant Types';
+  const featureArea = document.getElementById('meta-feature-area').value.trim() || 'covenants';
+  const today = new Date().toISOString().slice(0, 10);
+  const named = records.filter(r => r.covenantType.trim());
+
+  let y = `story_id: "${storyId}"\ntitle: "${yamlStr(title)}"\nfeature_area: ${featureArea}\n`;
+  y += `source:\n  type: covenant-type-builder\n  ref: "covenant-type-builder@${today}"\n\nrecords:\n\n`;
+
+  if (!named.length) { y += '  # No covenant types configured yet.\n'; return y; }
+
+  named.forEach(rec => {
+    y += `  - object: LLC_BI__Covenant_Type__c\n    fields:\n`;
+    y += `      Name: "${yamlStr(rec.covenantType)}"\n`;
+    if (rec.category)   y += `      Category__c: "${yamlStr(rec.category)}"\n`;
+    if (rec.description) y += `      LLC_BI__Description__c: "${yamlStr(rec.description)}"\n`;
+    if (rec.frequency)  y += `      LLC_BI__Frequency__c: "${yamlStr(rec.frequency)}"\n`;
+    y += `      LLC_BI__Active__c: ${rec.active}\n`;
+    y += `      LLC_BI__Auto_Generate__c: ${rec.autoGenerate}\n`;
+    y += `\n`;
+  });
+  return y;
+}
+
+function openYamlModal() {
+  document.getElementById('yaml-modal').classList.add('open');
+  refreshYamlPreview();
+  ['meta-story-id','meta-title','meta-feature-area'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.oninput = refreshYamlPreview;
+  });
+}
+function closeYamlModal() { document.getElementById('yaml-modal').classList.remove('open'); }
+function refreshYamlPreview() { document.getElementById('yaml-preview').textContent = buildYaml(); }
+function downloadYaml() {
+  const yaml = buildYaml();
+  const storyId = document.getElementById('meta-story-id').value.trim() || 'covenants';
+  const blob = new Blob([yaml], { type: 'text/yaml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `${storyId.toLowerCase().replace(/[^a-z0-9]+/g,'-')}.yaml`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url); closeYamlModal(); showToast('YAML downloaded.');
+}
+document.getElementById('yaml-modal').addEventListener('click', function(e) { if (e.target === this) closeYamlModal(); });
+
+// ══ CSV EXPORT ════════════════════════════════════════════════════════════════
+const CSV_COLS = [
+  { key: 'covenantType', label: 'Name' },
+  { key: 'category',     label: 'Category__c' },
+  { key: 'description',  label: 'LLC_BI__Description__c' },
+  { key: 'frequency',    label: 'LLC_BI__Frequency__c' },
+  { key: 'active',       label: 'LLC_BI__Active__c' },
+  { key: 'autoGenerate', label: 'LLC_BI__Auto_Generate__c' },
+];
+function csvCell(v) {
+  if (v === undefined || v === null) return '';
+  const s = String(v);
+  return (s.includes(',') || s.includes('"') || s.includes('\n')) ? '"' + s.replace(/"/g,'""') + '"' : s;
+}
+function exportCsv() {
+  const named = records.filter(r => r.covenantType.trim());
+  if (!named.length) { showToast('No covenant types to export.'); return; }
+  const rows = [CSV_COLS.map(c => c.label)];
+  named.forEach(rec => rows.push(CSV_COLS.map(c => csvCell(rec[c.key] ?? ''))));
+  const csv = rows.map(row => row.join(',')).join('\r\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'covenant-types.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url); showToast('CSV downloaded.');
+}
+
+// ══ IMPORT ════════════════════════════════════════════════════════════════════
+let pendingImportRecords = [];
+function triggerImport(type) {
+  if (type === 'yaml') { document.getElementById('import-yaml-input').value = ''; document.getElementById('import-yaml-input').click(); }
+  else                 { document.getElementById('import-csv-input').value  = ''; document.getElementById('import-csv-input').click(); }
+}
+function handleYamlImport(input) {
+  if (!input.files.length) return;
+  const reader = new FileReader();
+  reader.onload = e => parseYamlImport(e.target.result);
+  reader.readAsText(input.files[0]);
+}
+function handleCsvImport(input) {
+  if (!input.files.length) return;
+  const reader = new FileReader();
+  reader.onload = e => parseCsvImport(e.target.result);
+  reader.readAsText(input.files[0]);
+}
+function parseYamlImport(text) {
+  const parsed = [];
+  const blocks = text.split(/\n  - object: LLC_BI__Covenant_Type__c/);
+  blocks.shift();
+  blocks.forEach(block => {
+    const rec = makeRecord();
+    const gF = label => { const m = block.match(new RegExp(`${label}:\\s*"([^"]*)"`, 'i')); return m ? m[1].replace(/\\n/g,'\n').replace(/\\"/g,'"') : ''; };
+    const gB = label => { const m = block.match(new RegExp(`${label}:\\s*(true|false)`, 'i')); return m ? m[1]==='true' : false; };
+    rec.covenantType = gF('Name'); rec.name = rec.covenantType;
+    rec.category     = gF('Category__c');
+    rec.description  = gF('LLC_BI__Description__c');
+    rec.frequency    = gF('LLC_BI__Frequency__c');
+    rec.active       = gB('LLC_BI__Active__c');
+    rec.autoGenerate = gB('LLC_BI__Auto_Generate__c');
+    if (rec.covenantType) parsed.push(rec);
+  });
+  if (!parsed.length) { showImportError('No LLC_BI__Covenant_Type__c records found.'); return; }
+  showImportPreview(parsed, 'YAML');
+}
+function parseCsvImport(text) {
+  const raw = text.replace(/^\uFEFF/,'');
+  const lines = raw.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) { showImportError('File appears empty.'); return; }
+  const headers = parseCsvRow(lines[0]).map(h => h.trim());
+  const colIdx = {};
+  CSV_COLS.forEach(c => { const i = headers.indexOf(c.label); if (i !== -1) colIdx[c.key] = i; });
+  if (colIdx['covenantType'] === undefined) { showImportError('Could not find a "Name" column.'); return; }
+  const parsed = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = parseCsvRow(lines[i]);
+    const get = key => colIdx[key] !== undefined ? (cells[colIdx[key]] || '').trim() : '';
+    const rec = makeRecord();
+    rec.covenantType = get('covenantType'); rec.name = rec.covenantType;
+    rec.category = get('category'); rec.description = get('description');
+    rec.frequency = get('frequency');
+    rec.active = get('active').toLowerCase() === 'true';
+    rec.autoGenerate = get('autoGenerate').toLowerCase() === 'true';
+    if (rec.covenantType) parsed.push(rec);
+  }
+  if (!parsed.length) { showImportError('No data rows found.'); return; }
+  showImportPreview(parsed, 'CSV');
+}
+function parseCsvRow(line) {
+  const cells = []; let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') { if (inQ && line[i+1]==='"') { cur+='"'; i++; } else inQ=!inQ; }
+    else if (ch===',' && !inQ) { cells.push(cur); cur=''; }
+    else cur+=ch;
+  }
+  cells.push(cur); return cells;
+}
+function showImportError(msg) {
+  document.getElementById('import-error').textContent = msg;
+  document.getElementById('import-error').style.display = '';
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('import-confirm-btn').style.display = 'none';
+  document.getElementById('import-modal').classList.add('open');
+}
+function showImportPreview(recs, format) {
+  pendingImportRecords = recs;
+  document.getElementById('import-modal-title').textContent = `Import from ${format}`;
+  document.getElementById('import-mode-msg').textContent = `Found ${recs.length} covenant type${recs.length!==1?'s':''}.`;
+  document.getElementById('import-error').style.display = 'none';
+  const preview = document.getElementById('import-preview');
+  preview.innerHTML = recs.slice(0,20).map(r =>
+    `<div style="padding:4px 0;border-bottom:1px solid #eee;font-size:12px;">${esc(r.covenantType)}${r.category?' <span style="color:#9a9a9a">— '+esc(r.category)+'</span>':''}</div>`
+  ).join('') + (recs.length > 20 ? `<div style="padding:4px 0;color:#9a9a9a;font-size:11px;">…and ${recs.length-20} more</div>` : '');
+  preview.style.display = '';
+  document.getElementById('import-confirm-btn').style.display = '';
+  document.getElementById('import-modal').classList.add('open');
+}
+function closeImportModal() { document.getElementById('import-modal').classList.remove('open'); pendingImportRecords = []; }
+function confirmImport() {
+  const mode = document.querySelector('input[name="import-mode"]:checked').value;
+  records = mode === 'replace' ? pendingImportRecords : [...records, ...pendingImportRecords];
+  persist(); render();
+  const n = pendingImportRecords.length;
+  closeImportModal();
+  showToast(`Imported ${n} covenant type${n!==1?'s':''}.`);
+  pendingImportRecords = [];
+}
+document.getElementById('import-modal').addEventListener('click', function(e) { if (e.target === this) closeImportModal(); });
+
+// ══ DROPDOWNS ═════════════════════════════════════════════════════════════════
+function toggleDropdown(id) {
+  const el = document.getElementById(id);
+  const wasOpen = el.classList.contains('open');
+  closeDropdowns();
+  if (!wasOpen) el.classList.add('open');
+}
+function closeDropdowns() { document.querySelectorAll('.dropdown-wrap.open').forEach(el => el.classList.remove('open')); }
+
+// ══ HELPERS ═══════════════════════════════════════════════════════════════════
+function esc(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function yamlStr(s) {
+  if (!s) return '';
+  return String(s).replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\n/g,'\\n');
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// Escape key closes modals
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeCreateModal(); closePicklistModal(); closeYamlModal(); closeImportModal();
+    Object.keys(searchSelects).forEach(k => closeSearchSelect(k));
+  }
+});
+
+// ══ INIT ══════════════════════════════════════════════════════════════════════
+loadPicklists();
+loadFromStorage();
+loadCategoryTypeMap();
+render();
+</script>
+</body>
+</html>
