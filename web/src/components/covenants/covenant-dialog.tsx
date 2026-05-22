@@ -1,7 +1,7 @@
 "use client";
 
-import { useMutation } from "convex/react";
-import { useEffect, useState } from "react";
+import { useMutation, useQuery } from "convex/react";
+import { useEffect, useMemo, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { COVENANT_CATEGORY_TYPE_MAP } from "@/lib/picklist-defaults";
+import {
+  COVENANT_CATEGORY_TYPE_MAP,
+  COV_TYPE_KEY_PREFIX,
+} from "@/lib/picklist-defaults";
 import { toast } from "sonner";
 
 // base-ui's Select uses `null` as the empty/unset value (shows placeholder).
@@ -42,6 +45,9 @@ export function CovenantDialog({
 }) {
   const create = useMutation(api.covenants.create);
   const update = useMutation(api.covenants.update);
+
+  // Load all covenants-scope picklist rows so we can derive the covType: entries
+  const storedPicklists = useQuery(api.picklists.listForScope, { scope: "covenants" });
 
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
@@ -68,13 +74,24 @@ export function CovenantDialog({
     }
   }, [record, open]);
 
+  // Build category→types map: stored covType: rows override defaults
+  const categoryTypeMap = useMemo(() => {
+    const m: Record<string, string[]> = { ...COVENANT_CATEGORY_TYPE_MAP };
+    if (storedPicklists) {
+      for (const row of storedPicklists) {
+        if (row.key.startsWith(COV_TYPE_KEY_PREFIX)) {
+          const cat = row.key.slice(COV_TYPE_KEY_PREFIX.length);
+          m[cat] = row.values;
+        }
+      }
+    }
+    return m;
+  }, [storedPicklists]);
+
   const categoryOptions = picklistMap.get("category") ?? [];
   const frequencyOptions = picklistMap.get("frequency") ?? [];
-  const financialIndicatorOptions =
-    picklistMap.get("financialIndicator") ?? [];
-  const typeOptions = category
-    ? COVENANT_CATEGORY_TYPE_MAP[category] ?? []
-    : [];
+  const financialIndicatorOptions = picklistMap.get("financialIndicator") ?? [];
+  const typeOptions = category ? (categoryTypeMap[category] ?? []) : [];
 
   async function handleSave() {
     const trimmed = name.trim();

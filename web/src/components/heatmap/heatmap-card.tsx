@@ -48,15 +48,15 @@ export function HeatmapCard({
       ) : null}
       <div className="mt-1.5 flex items-center justify-between">
         {card.type === "linked" ? (
-          <span className="text-[10px] font-semibold uppercase tracking-wide text-[var(--color-blue)]">
-            Linked ↗
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-amber-900">
+            Open ↗
           </span>
         ) : (
           <span
             className={`inline-block h-2 w-2 rounded-full ${
               card.status === "configured"
-                ? "bg-emerald-500"
-                : "bg-slate-400/60"
+                ? "bg-emerald-400"
+                : "bg-white/30"
             }`}
             aria-label={card.status}
           />

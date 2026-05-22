@@ -19,11 +19,12 @@
   --color-amber: #f59e0b;
   --color-amber-light: #fffbeb;
   --color-amber-border: #fcd34d;
-  --color-card-native-low: #c8cfd8;
-  --color-card-native-high: #9faab8;
-  --color-card-manual: #fde68a;
-  --color-card-custom-bg: #ffffff;
+  --color-card-native-low: #4a5568;
+  --color-card-native-high: #4a5568;
+  --color-card-manual: #4a5568;
+  --color-card-custom-bg: #4a5568;
   --color-card-custom-border: #c62828;
+  --color-card-linked: #fbbf24;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);

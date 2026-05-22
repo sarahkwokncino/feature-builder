@@ -118,7 +118,7 @@ export const createCard = mutation({
       v.literal("linked"),
     ),
     configuratorKind: v.optional(
-      v.union(v.literal("covenants"), v.literal("checklist")),
+      v.union(v.literal("covenants"), v.literal("checklist"), v.literal("product-hierarchy")),
     ),
   },
   handler: async (ctx, args) => {
@@ -160,7 +160,7 @@ export const updateCard = mutation({
       ),
     ),
     configuratorKind: v.optional(
-      v.union(v.literal("covenants"), v.literal("checklist")),
+      v.union(v.literal("covenants"), v.literal("checklist"), v.literal("product-hierarchy")),
     ),
   },
   handler: async (ctx, { id, ...patch }) => {
@@ -185,6 +185,16 @@ export const deleteCard = mutation({
       .withIndex("byCard", (q) => q.eq("cardId", id))
       .collect();
     for (const r of reqs) await ctx.db.delete(r._id);
+    const groups = await ctx.db
+      .query("docmanGroups")
+      .withIndex("byCard", (q) => q.eq("cardId", id))
+      .collect();
+    for (const g of groups) await ctx.db.delete(g._id);
+    const phs = await ctx.db
+      .query("docmanPlaceholders")
+      .withIndex("byCard", (q) => q.eq("cardId", id))
+      .collect();
+    for (const p of phs) await ctx.db.delete(p._id);
     await ctx.db.delete(id);
   },
 });
@@ -230,6 +240,16 @@ export const deleteSubphase = mutation({
         .withIndex("byCard", (q) => q.eq("cardId", card._id))
         .collect();
       for (const r of reqs) await ctx.db.delete(r._id);
+      const groups = await ctx.db
+        .query("docmanGroups")
+        .withIndex("byCard", (q) => q.eq("cardId", card._id))
+        .collect();
+      for (const g of groups) await ctx.db.delete(g._id);
+      const phs = await ctx.db
+        .query("docmanPlaceholders")
+        .withIndex("byCard", (q) => q.eq("cardId", card._id))
+        .collect();
+      for (const p of phs) await ctx.db.delete(p._id);
       await ctx.db.delete(card._id);
     }
     await ctx.db.delete(id);
@@ -258,6 +278,40 @@ export const renamePhase = mutation({
   },
 });
 
+// Patches all existing Document Manager cards to wire them to docman.
+export const migrateDocmanCards = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const all = await ctx.db.query("cards").collect();
+    const targets = all.filter(
+      (c) => c.sub === "Document Manager" && c.configuratorKind !== "docman",
+    );
+    for (const card of targets) {
+      await ctx.db.patch(card._id, {
+        type: "linked",
+        configuratorKind: "docman",
+      });
+    }
+    return targets.length;
+  },
+});
+
+// Patches all existing "Select Products" cards to wire them to product-hierarchy.
+export const migrateSelectProductsCards = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const all = await ctx.db.query("cards").collect();
+    const targets = all.filter((c) => c.name === "Select Products");
+    for (const card of targets) {
+      await ctx.db.patch(card._id, {
+        type: "linked",
+        configuratorKind: "product-hierarchy",
+      });
+    }
+    return targets.length;
+  },
+});
+
 export const deletePhase = mutation({
   args: { id: v.id("phases") },
   handler: async (ctx, { id }) => {
@@ -281,6 +335,16 @@ export const deletePhase = mutation({
           .withIndex("byCard", (q) => q.eq("cardId", card._id))
           .collect();
         for (const r of reqs) await ctx.db.delete(r._id);
+        const groups = await ctx.db
+          .query("docmanGroups")
+          .withIndex("byCard", (q) => q.eq("cardId", card._id))
+          .collect();
+        for (const g of groups) await ctx.db.delete(g._id);
+        const phs = await ctx.db
+          .query("docmanPlaceholders")
+          .withIndex("byCard", (q) => q.eq("cardId", card._id))
+          .collect();
+        for (const p of phs) await ctx.db.delete(p._id);
         await ctx.db.delete(card._id);
       }
       await ctx.db.delete(sub._id);

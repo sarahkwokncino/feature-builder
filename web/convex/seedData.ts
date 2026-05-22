@@ -8,7 +8,7 @@ export interface SeedCard {
   name: string;
   sub: string;
   type: SeedCardType;
-  configuratorKind?: "covenants" | "checklist";
+  configuratorKind?: "covenants" | "checklist" | "product-hierarchy" | "docman";
 }
 
 export interface SeedSubphase {
@@ -33,7 +33,7 @@ export const SEED_PHASES: SeedPhase[] = [
           { name: "Create Prospects", sub: "Relationship", type: "low" },
           { name: "Create Hierarchies", sub: "Connections", type: "low" },
           { name: "Connect Related Entities & IDs", sub: "Connections", type: "low" },
-          { name: "Upload Documents", sub: "Document Manager", type: "low" },
+          { name: "Upload Documents", sub: "Document Manager", type: "linked", configuratorKind: "docman" },
           { name: "Create Countries", sub: "Custom", type: "custom" },
         ],
       },
@@ -47,7 +47,7 @@ export const SEED_PHASES: SeedPhase[] = [
           { name: "Compliance Deviations", sub: "Smart checklist", type: "high" },
           { name: "Account Behaviour", sub: "Rel. & Doc Man", type: "low" },
           { name: "Capture Deal Info", sub: "Deal Proposal", type: "low" },
-          { name: "Select Products", sub: "Product Catalogue & Hierarchy", type: "low" },
+          { name: "Select Products", sub: "Product Catalogue & Hierarchy", type: "linked", configuratorKind: "product-hierarchy" },
           { name: "Advance Deal", sub: "Product Package", type: "low" },
         ],
       },
@@ -61,7 +61,7 @@ export const SEED_PHASES: SeedPhase[] = [
         cards: [
           { name: "Application Details", sub: "Product Package", type: "low" },
           { name: "Capture Economic Dependent Details", sub: "Relationship", type: "low" },
-          { name: "Select Products", sub: "Product Catalogue & Hierarchy", type: "low" },
+          { name: "Select Products", sub: "Product Catalogue & Hierarchy", type: "linked", configuratorKind: "product-hierarchy" },
           { name: "Add Loan Limits", sub: "Facility Hierarchy", type: "low" },
           { name: "Build Loan Info", sub: "Loan team, Borrowing Structure", type: "high" },
           { name: "Add Fees", sub: "Fees", type: "low" },
@@ -75,7 +75,7 @@ export const SEED_PHASES: SeedPhase[] = [
           },
           { name: "Add Collateral", sub: "Collateral", type: "low" },
           { name: "Add Conditions", sub: "Conditions", type: "low" },
-          { name: "Collect & Store Documents", sub: "Document Manager", type: "low" },
+          { name: "Collect & Store Documents", sub: "Document Manager", type: "linked", configuratorKind: "docman" },
         ],
       },
       {
@@ -137,7 +137,7 @@ export const SEED_PHASES: SeedPhase[] = [
           { name: "Generate Facility Agreement", sub: "Doc Gen", type: "low" },
           { name: "Generate Security Agreement", sub: "Doc Gen", type: "low" },
           { name: "Covenant Booking", sub: "Finacle", type: "high" },
-          { name: "Collect & Store Docs", sub: "Document Manager", type: "low" },
+          { name: "Collect & Store Docs", sub: "Document Manager", type: "linked", configuratorKind: "docman" },
           { name: "Booking Form", sub: "Doc Gen", type: "low" },
         ],
       },

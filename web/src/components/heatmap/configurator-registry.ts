@@ -14,5 +14,9 @@ export function configuratorRoute(
       return `/projects/${projectId}/covenants?cardId=${card._id}`;
     case "checklist":
       return `/projects/${projectId}/checklist?cardId=${card._id}`;
+    case "product-hierarchy":
+      return `/projects/${projectId}/product-hierarchy`;
+    case "docman":
+      return `/projects/${projectId}/docman?cardId=${card._id}`;
   }
 }

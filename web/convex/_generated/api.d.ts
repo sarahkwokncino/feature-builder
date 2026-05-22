@@ -10,8 +10,10 @@
 
 import type * as checklist from "../checklist.js";
 import type * as covenants from "../covenants.js";
+import type * as docman from "../docman.js";
 import type * as heatmap from "../heatmap.js";
 import type * as picklists from "../picklists.js";
+import type * as productHierarchy from "../productHierarchy.js";
 import type * as projects from "../projects.js";
 import type * as seedData from "../seedData.js";
 
@@ -24,8 +26,10 @@ import type {
 declare const fullApi: ApiFromModules<{
   checklist: typeof checklist;
   covenants: typeof covenants;
+  docman: typeof docman;
   heatmap: typeof heatmap;
   picklists: typeof picklists;
+  productHierarchy: typeof productHierarchy;
   projects: typeof projects;
   seedData: typeof seedData;
 }>;

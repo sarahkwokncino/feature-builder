@@ -77,3 +77,48 @@ export const remove = mutation({
     await ctx.db.delete(id);
   },
 });
+
+export const bulkImport = mutation({
+  args: {
+    cardId: v.id("cards"),
+    mode: v.union(v.literal("replace"), v.literal("append")),
+    records: v.array(
+      v.object({
+        name: v.string(),
+        category: v.optional(v.string()),
+        type: v.optional(v.string()),
+        frequency: v.optional(v.string()),
+        financialIndicator: v.optional(v.string()),
+        description: v.optional(v.string()),
+      }),
+    ),
+  },
+  handler: async (ctx, { cardId, mode, records }) => {
+    if (mode === "replace") {
+      const existing = await ctx.db
+        .query("covenants")
+        .withIndex("byCard", (q) => q.eq("cardId", cardId))
+        .collect();
+      for (const r of existing) await ctx.db.delete(r._id);
+    }
+    const allExisting = await ctx.db
+      .query("covenants")
+      .withIndex("byCard", (q) => q.eq("cardId", cardId))
+      .collect();
+    const now = Date.now();
+    let counter = allExisting.reduce((acc, r) => {
+      const m = r.autoNum.match(/COV-(\d+)/);
+      return m ? Math.max(acc, parseInt(m[1], 10)) : acc;
+    }, 0);
+    for (const rec of records) {
+      counter++;
+      await ctx.db.insert("covenants", {
+        cardId,
+        autoNum: `COV-${String(counter).padStart(6, "0")}`,
+        ...rec,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+  },
+});

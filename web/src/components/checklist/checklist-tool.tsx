@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "convex/react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,16 @@ import {
   CHECKLIST_PICKLISTS,
   CHECKLIST_PICKLIST_LABELS,
 } from "@/lib/picklist-defaults";
+import { ImportDialog, type ImportMode } from "@/components/import-dialog";
+import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
+import {
+  buildChecklistYaml,
+  downloadChecklistYaml,
+  downloadChecklistExcel,
+  parseChecklistYaml,
+  parseChecklistCsvExcel,
+  type ChecklistRecord,
+} from "@/lib/export-import";
 import { toast } from "sonner";
 
 export function ChecklistTool({
@@ -36,11 +46,12 @@ export function ChecklistTool({
   );
   const create = useMutation(api.checklist.create);
   const remove = useMutation(api.checklist.remove);
+  const bulkImport = useMutation(api.checklist.bulkImport);
 
-  const [selectedId, setSelectedId] = useState<Id<"checklistReqs"> | null>(
-    null,
-  );
+  const [selectedId, setSelectedId] = useState<Id<"checklistReqs"> | null>(null);
   const [picklistOpen, setPicklistOpen] = useState(false);
+  const [yamlOpen, setYamlOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const stored = useQuery(api.picklists.listForScope, { scope: "checklist" });
   const picklistMap = useMemo(() => {
@@ -52,19 +63,62 @@ export function ChecklistTool({
     return m;
   }, [stored]);
 
-  // Auto-select the first record when the list arrives
   useEffect(() => {
     if (!selectedId && records && records.length > 0) {
       setSelectedId(records[0]._id);
     }
-    if (
-      selectedId &&
-      records &&
-      !records.find((r) => r._id === selectedId)
-    ) {
+    if (selectedId && records && !records.find((r) => r._id === selectedId)) {
       setSelectedId(records[0]?._id ?? null);
     }
   }, [records, selectedId]);
+
+  const defaultMeta: YamlMeta = useMemo(
+    () => ({
+      storyId: "SC-CONFIG-001",
+      title: `Smart Checklist Requirements — ${project?.name ?? ""}`,
+      featureArea: "smart-checklist",
+    }),
+    [project?.name],
+  );
+
+  const checklistRows = useMemo<ChecklistRecord[]>(
+    () =>
+      (records ?? []).map((r) => ({
+        name: r.name,
+        taskType: r.taskType,
+        category: r.category,
+        assignedParty: r.assignedParty,
+        approvalProcess: r.approvalProcess,
+        requirementType: r.requirementType,
+        neededBy: r.neededBy,
+        description: r.description,
+        legalDescription: r.legalDescription,
+        stageCheck: r.stageCheck,
+        doNotAutoGenerate: r.doNotAutoGenerate,
+        criteriaUserWritten: r.criteriaUserWritten,
+        criteriaGenerated: r.criteriaGenerated,
+        placeholderName: r.placeholderName,
+      })),
+    [records],
+  );
+
+  const buildPreview = useCallback(
+    (meta: YamlMeta) => buildChecklistYaml(checklistRows, meta, picklistMap),
+    [checklistRows, picklistMap],
+  );
+
+  function parseImportFile(text: string, filename: string): ChecklistRecord[] | string {
+    if (filename.endsWith(".yaml") || filename.endsWith(".yml")) {
+      return parseChecklistYaml(text);
+    }
+    return parseChecklistCsvExcel(text);
+  }
+
+  async function handleImportConfirm(rows: ChecklistRecord[], mode: ImportMode) {
+    if (!cardId) return;
+    await bulkImport({ cardId, mode, records: rows });
+    toast.success(`Imported ${rows.length} requirement${rows.length !== 1 ? "s" : ""}`);
+  }
 
   if (!cardId) {
     return (
@@ -107,9 +161,26 @@ export function ChecklistTool({
             {records.length === 1 ? "requirement" : "requirements"}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={() => setPicklistOpen(true)}>
             Manage picklists
+          </Button>
+          <Button variant="outline" onClick={() => setImportOpen(true)}>
+            Import
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => downloadChecklistExcel(checklistRows, picklistMap)}
+            disabled={records.length === 0}
+          >
+            Export Excel
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setYamlOpen(true)}
+            disabled={records.length === 0}
+          >
+            Export YAML
           </Button>
           <Button
             onClick={handleAdd}
@@ -133,9 +204,7 @@ export function ChecklistTool({
                 <li
                   key={req._id}
                   className={`flex items-start gap-2 px-3 py-2 hover:bg-slate-50 ${
-                    req._id === selectedId
-                      ? "bg-[var(--color-blue)]/10"
-                      : ""
+                    req._id === selectedId ? "bg-[var(--color-blue)]/10" : ""
                   }`}
                 >
                   <button
@@ -193,6 +262,35 @@ export function ChecklistTool({
         labels={CHECKLIST_PICKLIST_LABELS}
         defaults={CHECKLIST_PICKLISTS}
       />
+
+      <YamlExportModal
+        open={yamlOpen}
+        onOpenChange={setYamlOpen}
+        defaultMeta={defaultMeta}
+        buildPreview={buildPreview}
+        onDownload={(meta) =>
+          downloadChecklistYaml(checklistRows, meta, picklistMap)
+        }
+      />
+
+      <ImportDialog<ChecklistRecord>
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        title="Import Checklist Requirements"
+        acceptFileTypes=".yaml,.yml,.xls,.csv"
+        parseFile={parseImportFile}
+        onConfirm={handleImportConfirm}
+        renderPreviewRow={(r, i) => (
+          <div key={i} className="border-b border-slate-100 py-1 last:border-0">
+            <span className="font-medium">{r.name}</span>
+            {r.assignedParty && (
+              <span className="ml-2 text-xs text-slate-500">
+                — {r.assignedParty}
+              </span>
+            )}
+          </div>
+        )}
+      />
     </div>
   );
 }
@@ -209,17 +307,17 @@ function RequirementDetail({
   const [name, setName] = useState(record.name);
   const [taskType, setTaskType] = useState(record.taskType ?? "");
   const [category, setCategory] = useState(record.category ?? "");
-  const [assignedParty, setAssignedParty] = useState(
-    record.assignedParty ?? "",
-  );
-  const [approvalProcess, setApprovalProcess] = useState(
-    record.approvalProcess ?? "",
-  );
-  const [requirementType, setRequirementType] = useState(
-    record.requirementType ?? "",
-  );
+  const [assignedParty, setAssignedParty] = useState(record.assignedParty ?? "");
+  const [approvalProcess, setApprovalProcess] = useState(record.approvalProcess ?? "");
+  const [requirementType, setRequirementType] = useState(record.requirementType ?? "");
   const [neededBy, setNeededBy] = useState(record.neededBy ?? "");
   const [description, setDescription] = useState(record.description ?? "");
+  const [legalDescription, setLegalDescription] = useState(record.legalDescription ?? "");
+  const [stageCheck, setStageCheck] = useState(record.stageCheck ?? false);
+  const [doNotAutoGenerate, setDoNotAutoGenerate] = useState(record.doNotAutoGenerate ?? false);
+  const [criteriaUserWritten, setCriteriaUserWritten] = useState(record.criteriaUserWritten ?? "");
+  const [criteriaGenerated, setCriteriaGenerated] = useState(record.criteriaGenerated ?? "");
+  const [placeholderName, setPlaceholderName] = useState(record.placeholderName ?? "");
 
   async function persist() {
     await update({
@@ -232,6 +330,12 @@ function RequirementDetail({
       requirementType: requirementType || undefined,
       neededBy: neededBy || undefined,
       description: description || undefined,
+      legalDescription: legalDescription || undefined,
+      stageCheck,
+      doNotAutoGenerate,
+      criteriaUserWritten: criteriaUserWritten || undefined,
+      criteriaGenerated: criteriaGenerated || undefined,
+      placeholderName: placeholderName || undefined,
     });
     toast.success("Saved");
   }
@@ -248,62 +352,88 @@ function RequirementDetail({
         />
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <PicklistField
-          id="req-task-type"
-          label="Task Type"
-          value={taskType}
-          onChange={setTaskType}
-          options={picklistMap.get("taskType") ?? []}
-        />
-        <PicklistField
-          id="req-category"
-          label="Category"
-          value={category}
-          onChange={setCategory}
-          options={picklistMap.get("category") ?? []}
-        />
+        <PicklistField id="req-task-type" label="Task Type" value={taskType} onChange={setTaskType} options={picklistMap.get("taskType") ?? []} />
+        <PicklistField id="req-category" label="Category" value={category} onChange={setCategory} options={picklistMap.get("category") ?? []} />
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <PicklistField
-          id="req-assignee"
-          label="Assignee"
-          value={assignedParty}
-          onChange={setAssignedParty}
-          options={picklistMap.get("assignedParty") ?? []}
-        />
-        <PicklistField
-          id="req-needed-by"
-          label="Needed By"
-          value={neededBy}
-          onChange={setNeededBy}
-          options={picklistMap.get("neededBy") ?? []}
-        />
+        <PicklistField id="req-assignee" label="Assignee" value={assignedParty} onChange={setAssignedParty} options={picklistMap.get("assignedParty") ?? []} />
+        <PicklistField id="req-needed-by" label="Needed By" value={neededBy} onChange={setNeededBy} options={picklistMap.get("neededBy") ?? []} />
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <PicklistField
-          id="req-approval"
-          label="Approval Process"
-          value={approvalProcess}
-          onChange={setApprovalProcess}
-          options={picklistMap.get("approvalProcess") ?? []}
-        />
-        <PicklistField
-          id="req-req-type"
-          label="Requirement Type"
-          value={requirementType}
-          onChange={setRequirementType}
-          options={picklistMap.get("requirementType") ?? []}
-        />
+        <PicklistField id="req-approval" label="Approval Process" value={approvalProcess} onChange={setApprovalProcess} options={picklistMap.get("approvalProcess") ?? []} />
+        <PicklistField id="req-req-type" label="Requirement Type" value={requirementType} onChange={setRequirementType} options={picklistMap.get("requirementType") ?? []} />
       </div>
       <div>
         <Label htmlFor="req-desc">Description</Label>
         <Textarea
           id="req-desc"
-          rows={3}
+          rows={2}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           onBlur={persist}
         />
+      </div>
+      <div>
+        <Label htmlFor="req-legal-desc">Legal Description</Label>
+        <Textarea
+          id="req-legal-desc"
+          rows={2}
+          value={legalDescription}
+          onChange={(e) => setLegalDescription(e.target.value)}
+          onBlur={persist}
+        />
+      </div>
+      <div>
+        <Label htmlFor="req-placeholder">Document Manager Placeholder</Label>
+        <Input
+          id="req-placeholder"
+          value={placeholderName}
+          onChange={(e) => setPlaceholderName(e.target.value)}
+          onBlur={persist}
+          placeholder="Placeholder name…"
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <Label htmlFor="req-criteria-written">Criteria (human-readable)</Label>
+          <Textarea
+            id="req-criteria-written"
+            rows={2}
+            value={criteriaUserWritten}
+            onChange={(e) => setCriteriaUserWritten(e.target.value)}
+            onBlur={persist}
+          />
+        </div>
+        <div>
+          <Label htmlFor="req-criteria-gen">Advanced Criteria (SOQL/formula)</Label>
+          <Textarea
+            id="req-criteria-gen"
+            rows={2}
+            value={criteriaGenerated}
+            onChange={(e) => setCriteriaGenerated(e.target.value)}
+            onBlur={persist}
+          />
+        </div>
+      </div>
+      <div className="flex gap-6 text-sm">
+        <label className="flex cursor-pointer items-center gap-2">
+          <input
+            type="checkbox"
+            checked={stageCheck}
+            onChange={(e) => setStageCheck(e.target.checked)}
+            onBlur={persist}
+          />
+          Stage Check
+        </label>
+        <label className="flex cursor-pointer items-center gap-2">
+          <input
+            type="checkbox"
+            checked={doNotAutoGenerate}
+            onChange={(e) => setDoNotAutoGenerate(e.target.checked)}
+            onBlur={persist}
+          />
+          Do Not Auto-Generate
+        </label>
       </div>
       <div className="flex justify-end pt-2">
         <Button onClick={persist}>Save</Button>
@@ -313,11 +443,7 @@ function RequirementDetail({
 }
 
 function PicklistField({
-  id,
-  label,
-  value,
-  onChange,
-  options,
+  id, label, value, onChange, options,
 }: {
   id: string;
   label: string;

@@ -40,6 +40,12 @@ export const update = mutation({
     requirementType: v.optional(v.string()),
     neededBy: v.optional(v.string()),
     description: v.optional(v.string()),
+    legalDescription: v.optional(v.string()),
+    stageCheck: v.optional(v.boolean()),
+    doNotAutoGenerate: v.optional(v.boolean()),
+    criteriaUserWritten: v.optional(v.string()),
+    criteriaGenerated: v.optional(v.string()),
+    placeholderName: v.optional(v.string()),
     placeholders: v.optional(v.array(v.string())),
   },
   handler: async (ctx, { id, ...patch }) => {
@@ -55,5 +61,48 @@ export const remove = mutation({
   args: { id: v.id("checklistReqs") },
   handler: async (ctx, { id }) => {
     await ctx.db.delete(id);
+  },
+});
+
+export const bulkImport = mutation({
+  args: {
+    cardId: v.id("cards"),
+    mode: v.union(v.literal("replace"), v.literal("append")),
+    records: v.array(
+      v.object({
+        name: v.string(),
+        taskType: v.optional(v.string()),
+        category: v.optional(v.string()),
+        assignedParty: v.optional(v.string()),
+        approvalProcess: v.optional(v.string()),
+        requirementType: v.optional(v.string()),
+        neededBy: v.optional(v.string()),
+        description: v.optional(v.string()),
+        legalDescription: v.optional(v.string()),
+        stageCheck: v.optional(v.boolean()),
+        doNotAutoGenerate: v.optional(v.boolean()),
+        criteriaUserWritten: v.optional(v.string()),
+        criteriaGenerated: v.optional(v.string()),
+        placeholderName: v.optional(v.string()),
+      }),
+    ),
+  },
+  handler: async (ctx, { cardId, mode, records }) => {
+    if (mode === "replace") {
+      const existing = await ctx.db
+        .query("checklistReqs")
+        .withIndex("byCard", (q) => q.eq("cardId", cardId))
+        .collect();
+      for (const r of existing) await ctx.db.delete(r._id);
+    }
+    const now = Date.now();
+    for (const rec of records) {
+      await ctx.db.insert("checklistReqs", {
+        cardId,
+        ...rec,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
   },
 });

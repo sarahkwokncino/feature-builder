@@ -681,7 +681,6 @@
               oninput="filterSearchSelect('cat', this.value)"
               autocomplete="off" />
             <span class="search-select-arrow">▾</span>
-            <div class="search-select-dropdown" id="cat-dropdown"></div>
           </div>
           <input type="hidden" id="f-category-val" />
         </div>
@@ -699,7 +698,6 @@
               oninput="filterSearchSelect('covtype', this.value)"
               autocomplete="off" />
             <span class="search-select-arrow">▾</span>
-            <div class="search-select-dropdown" id="covtype-dropdown"></div>
           </div>
           <input type="hidden" id="f-covtype-val" />
         </div>
@@ -741,7 +739,6 @@
               oninput="filterSearchSelect('freq', this.value)"
               autocomplete="off" />
             <span class="search-select-arrow">▾</span>
-            <div class="search-select-dropdown" id="freq-dropdown"></div>
           </div>
           <input type="hidden" id="f-freq-val" />
         </div>
@@ -765,8 +762,8 @@
         <!-- Active -->
         <div class="form-group">
           <label class="form-label">Active</label>
-          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;padding-top:2px;">
-            <input type="checkbox" id="f-active" checked style="width:14px;height:14px;accent-color:var(--sf-blue);cursor:pointer;" />
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:not-allowed;padding-top:2px;opacity:0.45;">
+            <input type="checkbox" id="f-active" checked disabled style="width:14px;height:14px;cursor:not-allowed;" />
             LLC_BI__Active__c
           </label>
         </div>
@@ -787,7 +784,7 @@
     </div>
 
     <div class="sf-modal-footer">
-      <button class="sf-btn sm" onclick="closeCreateModal()">Associate to Loans</button>
+      <button class="sf-btn sm" disabled style="opacity:0.45;cursor:not-allowed;">Associate to Loans</button>
       <button class="sf-btn sm brand" onclick="saveNewCovenant()">Create</button>
     </div>
   </div>
@@ -1047,9 +1044,9 @@ function renderTable() {
 // ══ SEARCHABLE SELECT ════════════════════════════════════════════════════════
 // Manages 3 dropdowns: cat, covtype, freq
 const searchSelects = {
-  cat:     { inputId: 'f-category-input', valId: 'f-category-val',  dropdownId: 'cat-dropdown',     getItems: () => getPL('category'),                      allowAdd: true,  addTarget: 'category' },
-  covtype: { inputId: 'f-covtype-input',  valId: 'f-covtype-val',   dropdownId: 'covtype-dropdown',  getItems: () => getTypesForCategory(getVal('f-category-val')), allowAdd: true,  addTarget: 'covtype' },
-  freq:    { inputId: 'f-freq-input',     valId: 'f-freq-val',      dropdownId: 'freq-dropdown',     getItems: () => getPL('frequency'),                     allowAdd: true,  addTarget: 'frequency' },
+  cat:     { inputId: 'f-category-input', valId: 'f-category-val',  dropdownId: 'cat-dropdown',     getItems: () => getPL('category'),                      allowAdd: false },
+  covtype: { inputId: 'f-covtype-input',  valId: 'f-covtype-val',   dropdownId: 'covtype-dropdown',  getItems: () => getTypesForCategory(getVal('f-category-val')), allowAdd: false },
+  freq:    { inputId: 'f-freq-input',     valId: 'f-freq-val',      dropdownId: 'freq-dropdown',     getItems: () => getPL('frequency'),                     allowAdd: false },
 };
 
 let activeSearchSelect = null;
@@ -1096,7 +1093,6 @@ function closeSearchSelect(key) {
 function filterSearchSelect(key, value) {
   const ss = searchSelects[key];
   const dd = document.getElementById(ss.dropdownId);
-  const input = document.getElementById(ss.inputId);
   const rect = input.getBoundingClientRect();
   dd.style.left  = rect.left + 'px';
   dd.style.top   = (rect.bottom + 2) + 'px';
@@ -1112,28 +1108,49 @@ function renderSearchSelectItems(key, selectedVal, filter) {
   const dd = document.getElementById(ss.dropdownId);
   const items = ss.getItems().filter(v => !filter || v.toLowerCase().includes(filter.toLowerCase()));
 
-  let html = '';
+  dd.innerHTML = '';
+
   if (items.length === 0 && !filter) {
-    html = `<div class="search-select-empty">No options. Add one below.</div>`;
+    const empty = document.createElement('div');
+    empty.className = 'search-select-empty';
+    empty.textContent = 'No options. Add one below.';
+    dd.appendChild(empty);
   } else if (items.length === 0) {
-    html = `<div class="search-select-empty">No matches for "${esc(filter)}"</div>`;
+    const empty = document.createElement('div');
+    empty.className = 'search-select-empty';
+    empty.textContent = `No matches for "${filter}"`;
+    dd.appendChild(empty);
   } else {
-    html = items.map(v =>
-      `<div class="search-select-item${v === selectedVal ? ' selected' : ''}" onmousedown="event.preventDefault();selectSearchItem('${key}', ${JSON.stringify(v)})">${esc(v)}</div>`
-    ).join('');
+    items.forEach(v => {
+      const item = document.createElement('div');
+      item.className = 'search-select-item' + (v === selectedVal ? ' selected' : '');
+      item.textContent = v;
+      item.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        selectSearchItem(key, v);
+      });
+      dd.appendChild(item);
+    });
   }
 
   if (ss.allowAdd) {
-    const label = filter ? `+ Add "${esc(filter)}"` : '+ Add new value…';
-    html += `<div class="search-select-item add-new" onmousedown="event.preventDefault();addSearchSelectValue('${key}', ${JSON.stringify(filter)})">${label}</div>`;
+    const addItem = document.createElement('div');
+    addItem.className = 'search-select-item add-new';
+    addItem.textContent = filter ? `+ Add "${filter}"` : '+ Add new value…';
+    addItem.addEventListener('mousedown', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      addSearchSelectValue(key, filter);
+    });
+    dd.appendChild(addItem);
   }
-
-  dd.innerHTML = html;
 }
 
 function selectSearchItem(key, val) {
   const ss = searchSelects[key];
-  document.getElementById(ss.inputId).value = val;
+  const input = document.getElementById(ss.inputId);
+  input.value = val;
   document.getElementById(ss.valId).value = val;
   closeSearchSelect(key);
 
@@ -1445,11 +1462,10 @@ function buildYaml() {
   named.forEach(rec => {
     y += `  - object: LLC_BI__Covenant_Type__c\n    fields:\n`;
     y += `      Name: "${yamlStr(rec.covenantType)}"\n`;
-    if (rec.category)   y += `      Category__c: "${yamlStr(rec.category)}"\n`;
+    if (rec.category)    y += `      LLC_BI__Category__c: "${yamlStr(rec.category)}"\n`;
     if (rec.description) y += `      LLC_BI__Description__c: "${yamlStr(rec.description)}"\n`;
-    if (rec.frequency)  y += `      LLC_BI__Frequency__c: "${yamlStr(rec.frequency)}"\n`;
+    if (rec.frequency)   y += `      LLC_BI__Frequency__c: "${yamlStr(rec.frequency)}"\n`;
     y += `      LLC_BI__Active__c: ${rec.active}\n`;
-    y += `      LLC_BI__Auto_Generate__c: ${rec.autoGenerate}\n`;
     y += `\n`;
   });
   return y;
@@ -1479,11 +1495,10 @@ document.getElementById('yaml-modal').addEventListener('click', function(e) { if
 // ══ CSV EXPORT ════════════════════════════════════════════════════════════════
 const CSV_COLS = [
   { key: 'covenantType', label: 'Name' },
-  { key: 'category',     label: 'Category__c' },
+  { key: 'category',     label: 'LLC_BI__Category__c' },
   { key: 'description',  label: 'LLC_BI__Description__c' },
   { key: 'frequency',    label: 'LLC_BI__Frequency__c' },
   { key: 'active',       label: 'LLC_BI__Active__c' },
-  { key: 'autoGenerate', label: 'LLC_BI__Auto_Generate__c' },
 ];
 function csvCell(v) {
   if (v === undefined || v === null) return '';
@@ -1531,11 +1546,10 @@ function parseYamlImport(text) {
     const gF = label => { const m = block.match(new RegExp(`${label}:\\s*"([^"]*)"`, 'i')); return m ? m[1].replace(/\\n/g,'\n').replace(/\\"/g,'"') : ''; };
     const gB = label => { const m = block.match(new RegExp(`${label}:\\s*(true|false)`, 'i')); return m ? m[1]==='true' : false; };
     rec.covenantType = gF('Name'); rec.name = rec.covenantType;
-    rec.category     = gF('Category__c');
+    rec.category     = gF('LLC_BI__Category__c');
     rec.description  = gF('LLC_BI__Description__c');
     rec.frequency    = gF('LLC_BI__Frequency__c');
     rec.active       = gB('LLC_BI__Active__c');
-    rec.autoGenerate = gB('LLC_BI__Auto_Generate__c');
     if (rec.covenantType) parsed.push(rec);
   });
   if (!parsed.length) { showImportError('No LLC_BI__Covenant_Type__c records found.'); return; }
@@ -1644,5 +1658,10 @@ loadFromStorage();
 loadCategoryTypeMap();
 render();
 </script>
+
+<!-- Searchable dropdowns at body level to escape modal stacking context -->
+<div class="search-select-dropdown" id="cat-dropdown"></div>
+<div class="search-select-dropdown" id="covtype-dropdown"></div>
+<div class="search-select-dropdown" id="freq-dropdown"></div>
 </body>
 </html>

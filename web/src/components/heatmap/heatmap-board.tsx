@@ -12,7 +12,7 @@ import {
 } from "@dnd-kit/core";
 import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
 import { HeatmapCard } from "./heatmap-card";
@@ -31,6 +31,17 @@ export function HeatmapBoard({ projectId }: { projectId: Id<"projects"> }) {
   const project = useQuery(api.projects.get, { id: projectId });
   const moveCard = useMutation(api.heatmap.moveCard);
   const router = useRouter();
+
+  const migrateSelectProducts = useMutation(api.heatmap.migrateSelectProductsCards);
+  const migrateDocman = useMutation(api.heatmap.migrateDocmanCards);
+  const migrated = useRef(false);
+  useEffect(() => {
+    if (!migrated.current) {
+      migrated.current = true;
+      migrateSelectProducts({});
+      migrateDocman({});
+    }
+  }, [migrateSelectProducts, migrateDocman]);
 
   const [activeCard, setActiveCard] = useState<Card | null>(null);
   const [detailsCard, setDetailsCard] = useState<Card | null>(null);

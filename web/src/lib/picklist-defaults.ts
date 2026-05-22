@@ -21,6 +21,10 @@ export const COVENANT_PICKLIST_LABELS: Record<string, string> = {
   financialIndicator: "Financial Indicator",
 };
 
+// Covenant type lists are stored per-category in the picklists table under
+// keys like "covType:Financial". This prefix identifies those rows.
+export const COV_TYPE_KEY_PREFIX = "covType:";
+
 export const COVENANT_CATEGORY_TYPE_MAP: Record<string, string[]> = {
   Financial: [
     "Cash Flow Forecast",

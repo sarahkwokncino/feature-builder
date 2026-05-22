@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "convex/react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,17 @@ import {
   COVENANT_PICKLISTS,
   COVENANT_PICKLIST_LABELS,
 } from "@/lib/picklist-defaults";
+import { ImportDialog, type ImportMode } from "@/components/import-dialog";
+import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
+import {
+  buildCovenantsYaml,
+  downloadCovenantsYaml,
+  downloadCovenantsCsv,
+  parseCovenantsYaml,
+  parseCovenantsCSv,
+  type CovenantRecord,
+} from "@/lib/export-import";
+import { toast } from "sonner";
 
 export function CovenantsTool({
   projectId,
@@ -25,12 +36,14 @@ export function CovenantsTool({
     cardId ? { cardId } : "skip",
   );
   const removeRecord = useMutation(api.covenants.remove);
+  const bulkImport = useMutation(api.covenants.bulkImport);
 
   const [editing, setEditing] = useState<Doc<"covenants"> | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [picklistOpen, setPicklistOpen] = useState(false);
+  const [yamlOpen, setYamlOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
-  // Picklist values: from Convex (overrides defaults)
   const storedPicklists = useQuery(api.picklists.listForScope, {
     scope: "covenants",
   });
@@ -44,6 +57,46 @@ export function CovenantsTool({
     }
     return m;
   }, [storedPicklists]);
+
+  const defaultMeta: YamlMeta = useMemo(
+    () => ({
+      storyId: "COV-CONFIG-001",
+      title: `Covenant Types — ${project?.name ?? ""}`,
+      featureArea: "covenants",
+    }),
+    [project?.name],
+  );
+
+  const covenantRows = useMemo<CovenantRecord[]>(
+    () =>
+      (records ?? []).map((r) => ({
+        name: r.name,
+        category: r.category,
+        type: r.type,
+        frequency: r.frequency,
+        financialIndicator: r.financialIndicator,
+        description: r.description,
+      })),
+    [records],
+  );
+
+  const buildPreview = useCallback(
+    (meta: YamlMeta) => buildCovenantsYaml(covenantRows, meta),
+    [covenantRows],
+  );
+
+  function parseImportFile(text: string, filename: string): CovenantRecord[] | string {
+    if (filename.endsWith(".yaml") || filename.endsWith(".yml")) {
+      return parseCovenantsYaml(text);
+    }
+    return parseCovenantsCSv(text);
+  }
+
+  async function handleImportConfirm(rows: CovenantRecord[], mode: ImportMode) {
+    if (!cardId) return;
+    await bulkImport({ cardId, mode, records: rows });
+    toast.success(`Imported ${rows.length} covenant${rows.length !== 1 ? "s" : ""}`);
+  }
 
   if (!cardId) {
     return (
@@ -77,9 +130,26 @@ export function CovenantsTool({
             {records.length} {records.length === 1 ? "item" : "items"}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={() => setPicklistOpen(true)}>
             Manage picklists
+          </Button>
+          <Button variant="outline" onClick={() => setImportOpen(true)}>
+            Import
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => downloadCovenantsCsv(covenantRows)}
+            disabled={records.length === 0}
+          >
+            Export CSV
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setYamlOpen(true)}
+            disabled={records.length === 0}
+          >
+            Export YAML
           </Button>
           <Button
             onClick={() => setCreateOpen(true)}
@@ -173,6 +243,31 @@ export function CovenantsTool({
         scope="covenants"
         labels={COVENANT_PICKLIST_LABELS}
         defaults={COVENANT_PICKLISTS}
+      />
+
+      <YamlExportModal
+        open={yamlOpen}
+        onOpenChange={setYamlOpen}
+        defaultMeta={defaultMeta}
+        buildPreview={buildPreview}
+        onDownload={(meta) => downloadCovenantsYaml(covenantRows, meta)}
+      />
+
+      <ImportDialog<CovenantRecord>
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        title="Import Covenant Types"
+        acceptFileTypes=".yaml,.yml,.csv"
+        parseFile={parseImportFile}
+        onConfirm={handleImportConfirm}
+        renderPreviewRow={(r, i) => (
+          <div key={i} className="border-b border-slate-100 py-1 last:border-0">
+            <span className="font-medium">{r.name}</span>
+            {r.category && (
+              <span className="ml-2 text-xs text-slate-500">{r.category}</span>
+            )}
+          </div>
+        )}
       />
     </div>
   );

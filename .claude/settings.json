@@ -1,0 +1,17 @@
+{
+
+  "env": {
+
+    "CLAUDE_CODE_USE_BEDROCK": "true",
+
+    "AWS_PROFILE": "genai",
+
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "arn:aws:bedrock:us-east-1:714322698969:application-inference-profile/urw99tete2ot",
+
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "arn:aws:bedrock:us-east-1:714322698969:application-inference-profile/urw99tete2ot"
+
+  },
+
+  "awsAuthRefresh": "aws sso login --profile genai"
+
+}

@@ -1,12 +1,11 @@
-// Visual styles per card type — ports the legacy Heatmap card colour scheme.
-// type: 'low' | 'high' | 'manual' | 'custom' | 'linked'
+// Visual styles per card type.
+// All non-linked cards are dark grey. Linked cards (with a feature builder screen) are yellow.
 export const CARD_TYPE_STYLES: Record<string, string> = {
-  low: "bg-[var(--color-card-native-low)] text-slate-900",
-  high: "bg-[var(--color-card-native-high)] text-slate-900",
-  manual: "bg-[var(--color-card-manual)] text-slate-900",
-  custom:
-    "bg-[var(--color-card-custom-bg)] text-slate-900 border-l-4 border-l-[var(--color-card-custom-border)]",
-  linked: "bg-[var(--color-card-native-low)] text-slate-900",
+  low: "bg-[var(--color-card-native-low)] text-white",
+  high: "bg-[var(--color-card-native-high)] text-white",
+  manual: "bg-[var(--color-card-manual)] text-white",
+  custom: "bg-[var(--color-card-custom-bg)] text-white border-l-4 border-l-[var(--color-card-custom-border)]",
+  linked: "bg-[var(--color-card-linked)] text-slate-900",
 };
 
 export const CARD_TYPE_LABELS: Record<string, string> = {
