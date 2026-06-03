@@ -29,8 +29,11 @@ import {
   parseChecklistYaml,
   parseChecklistCsvExcel,
   type ChecklistRecord,
+  type ChecklistLevel,
 } from "@/lib/export-import";
 import { toast } from "sonner";
+
+const CHECKLIST_LEVELS: ChecklistLevel[] = ["Loan", "Relationship"];
 
 export function ChecklistTool({
   projectId,
@@ -45,9 +48,11 @@ export function ChecklistTool({
     cardId ? { cardId } : "skip",
   );
   const create = useMutation(api.checklist.create);
+  const update = useMutation(api.checklist.update);
   const remove = useMutation(api.checklist.remove);
   const bulkImport = useMutation(api.checklist.bulkImport);
 
+  const [activeLevel, setActiveLevel] = useState<ChecklistLevel>("Loan");
   const [selectedId, setSelectedId] = useState<Id<"checklistReqs"> | null>(null);
   const [picklistOpen, setPicklistOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
@@ -63,14 +68,19 @@ export function ChecklistTool({
     return m;
   }, [stored]);
 
+  const visibleRecords = useMemo(
+    () => (records ?? []).filter((r) => (r.checklistLevel ?? "Loan") === activeLevel),
+    [records, activeLevel],
+  );
+
   useEffect(() => {
-    if (!selectedId && records && records.length > 0) {
-      setSelectedId(records[0]._id);
+    if (!selectedId && visibleRecords.length > 0) {
+      setSelectedId(visibleRecords[0]._id);
     }
-    if (selectedId && records && !records.find((r) => r._id === selectedId)) {
-      setSelectedId(records[0]?._id ?? null);
+    if (selectedId && !visibleRecords.find((r) => r._id === selectedId)) {
+      setSelectedId(visibleRecords[0]?._id ?? null);
     }
-  }, [records, selectedId]);
+  }, [visibleRecords, selectedId]);
 
   const defaultMeta: YamlMeta = useMemo(
     () => ({
@@ -85,11 +95,9 @@ export function ChecklistTool({
     () =>
       (records ?? []).map((r) => ({
         name: r.name,
-        taskType: r.taskType,
+        checklistLevel: (r.checklistLevel as ChecklistLevel | undefined) ?? "Loan",
         category: r.category,
         assignedParty: r.assignedParty,
-        approvalProcess: r.approvalProcess,
-        requirementType: r.requirementType,
         neededBy: r.neededBy,
         description: r.description,
         legalDescription: r.legalDescription,
@@ -140,6 +148,7 @@ export function ChecklistTool({
   async function handleAdd() {
     if (!cardId) return;
     const id = await create({ cardId, name: "Untitled requirement" });
+    await update({ id, checklistLevel: activeLevel });
     setSelectedId(id);
     toast.success("Requirement added");
   }
@@ -151,16 +160,10 @@ export function ChecklistTool({
 
   return (
     <div className="flex h-full flex-col p-6">
-      <div className="mb-4 flex items-baseline justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-slate-900">
-            Smart Checklist — {project.name}
-          </h2>
-          <p className="text-xs text-slate-500">
-            {records.length}{" "}
-            {records.length === 1 ? "requirement" : "requirements"}
-          </p>
-        </div>
+      <div className="mb-3 flex items-baseline justify-between">
+        <h2 className="text-xl font-semibold text-slate-900">
+          Smart Checklist — {project.name}
+        </h2>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={() => setPicklistOpen(true)}>
             Manage picklists
@@ -191,16 +194,36 @@ export function ChecklistTool({
         </div>
       </div>
 
+      {/* Level tabs */}
+      <div className="mb-4 flex gap-1 border-b border-slate-200">
+        {CHECKLIST_LEVELS.map((level) => {
+          const count = (records ?? []).filter((r) => (r.checklistLevel ?? "Loan") === level).length;
+          return (
+            <button
+              key={level}
+              onClick={() => setActiveLevel(level)}
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
+                activeLevel === level
+                  ? "border-b-2 border-[var(--color-blue)] text-[var(--color-blue)]"
+                  : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              {level} <span className="ml-1 text-xs text-slate-400">({count})</span>
+            </button>
+          );
+        })}
+      </div>
+
       <div className="grid flex-1 gap-4 overflow-hidden lg:grid-cols-[280px_1fr]">
         {/* List */}
         <div className="overflow-auto rounded-lg border border-slate-200 bg-white shadow-sm">
-          {records.length === 0 ? (
+          {visibleRecords.length === 0 ? (
             <div className="p-6 text-center text-sm text-slate-500">
-              No requirements yet.
+              No {activeLevel.toLowerCase()} requirements yet.
             </div>
           ) : (
             <ul className="divide-y divide-slate-100">
-              {records.map((req) => (
+              {visibleRecords.map((req) => (
                 <li
                   key={req._id}
                   className={`flex items-start gap-2 px-3 py-2 hover:bg-slate-50 ${
@@ -220,11 +243,6 @@ export function ChecklistTool({
                     >
                       {req.name.trim() || "Untitled requirement"}
                     </div>
-                    {req.taskType ? (
-                      <div className="text-[11px] text-slate-500">
-                        {req.taskType}
-                      </div>
-                    ) : null}
                   </button>
                   <button
                     onClick={() => handleDelete(req._id)}
@@ -245,6 +263,7 @@ export function ChecklistTool({
             <RequirementDetail
               key={selected._id}
               record={selected}
+              allRecords={records}
               picklistMap={picklistMap}
             />
           ) : (
@@ -297,19 +316,18 @@ export function ChecklistTool({
 
 function RequirementDetail({
   record,
+  allRecords,
   picklistMap,
 }: {
   record: Doc<"checklistReqs">;
+  allRecords: Doc<"checklistReqs">[];
   picklistMap: Map<string, string[]>;
 }) {
   const update = useMutation(api.checklist.update);
 
   const [name, setName] = useState(record.name);
-  const [taskType, setTaskType] = useState(record.taskType ?? "");
   const [category, setCategory] = useState(record.category ?? "");
   const [assignedParty, setAssignedParty] = useState(record.assignedParty ?? "");
-  const [approvalProcess, setApprovalProcess] = useState(record.approvalProcess ?? "");
-  const [requirementType, setRequirementType] = useState(record.requirementType ?? "");
   const [neededBy, setNeededBy] = useState(record.neededBy ?? "");
   const [description, setDescription] = useState(record.description ?? "");
   const [legalDescription, setLegalDescription] = useState(record.legalDescription ?? "");
@@ -320,14 +338,26 @@ function RequirementDetail({
   const [placeholderName, setPlaceholderName] = useState(record.placeholderName ?? "");
 
   async function persist() {
+    const trimmed = name.trim();
+    if (!trimmed) {
+      toast.error("Name is required.");
+      return;
+    }
+    const level = record.checklistLevel ?? "Loan";
+    const duplicate = allRecords.find(
+      (r) => r._id !== record._id &&
+        (r.checklistLevel ?? "Loan") === level &&
+        r.name.trim().toLowerCase() === trimmed.toLowerCase(),
+    );
+    if (duplicate) {
+      toast.error(`A ${level} requirement named "${trimmed}" already exists.`);
+      return;
+    }
     await update({
       id: record._id,
-      name: name.trim() || "Untitled requirement",
-      taskType: taskType || undefined,
+      name: trimmed,
       category: category || undefined,
       assignedParty: assignedParty || undefined,
-      approvalProcess: approvalProcess || undefined,
-      requirementType: requirementType || undefined,
       neededBy: neededBy || undefined,
       description: description || undefined,
       legalDescription: legalDescription || undefined,
@@ -343,25 +373,23 @@ function RequirementDetail({
   return (
     <div className="space-y-3">
       <div>
-        <Label htmlFor="req-name">Name</Label>
+        <Label htmlFor="req-name">Name <span className="text-red-500">*</span></Label>
         <Input
           id="req-name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           onBlur={persist}
+          className={!name.trim() ? "border-red-400 focus:border-red-400" : ""}
         />
+        {!name.trim() && (
+          <p className="mt-1 text-xs text-red-500">Name is required.</p>
+        )}
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        <PicklistField id="req-task-type" label="Task Type" value={taskType} onChange={setTaskType} options={picklistMap.get("taskType") ?? []} />
+      <div>
         <PicklistField id="req-category" label="Category" value={category} onChange={setCategory} options={picklistMap.get("category") ?? []} />
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <div>
         <PicklistField id="req-assignee" label="Assignee" value={assignedParty} onChange={setAssignedParty} options={picklistMap.get("assignedParty") ?? []} />
-        <PicklistField id="req-needed-by" label="Needed By" value={neededBy} onChange={setNeededBy} options={picklistMap.get("neededBy") ?? []} />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <PicklistField id="req-approval" label="Approval Process" value={approvalProcess} onChange={setApprovalProcess} options={picklistMap.get("approvalProcess") ?? []} />
-        <PicklistField id="req-req-type" label="Requirement Type" value={requirementType} onChange={setRequirementType} options={picklistMap.get("requirementType") ?? []} />
       </div>
       <div>
         <Label htmlFor="req-desc">Description</Label>
@@ -384,14 +412,7 @@ function RequirementDetail({
         />
       </div>
       <div>
-        <Label htmlFor="req-placeholder">Document Manager Placeholder</Label>
-        <Input
-          id="req-placeholder"
-          value={placeholderName}
-          onChange={(e) => setPlaceholderName(e.target.value)}
-          onBlur={persist}
-          placeholder="Placeholder name…"
-        />
+        <PicklistField id="req-placeholder" label="Document Manager Placeholder" value={placeholderName} onChange={setPlaceholderName} options={picklistMap.get("placeholderName") ?? []} />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
@@ -420,10 +441,14 @@ function RequirementDetail({
           <input
             type="checkbox"
             checked={stageCheck}
-            onChange={(e) => setStageCheck(e.target.checked)}
+            onChange={(e) => {
+              const checked = e.target.checked;
+              setStageCheck(checked);
+              if (!checked) setNeededBy("");
+            }}
             onBlur={persist}
           />
-          Stage Check
+          Hard Stop
         </label>
         <label className="flex cursor-pointer items-center gap-2">
           <input
@@ -435,6 +460,9 @@ function RequirementDetail({
           Do Not Auto-Generate
         </label>
       </div>
+      {stageCheck && (
+        <PicklistField id="req-needed-by" label="Needed By" value={neededBy} onChange={setNeededBy} options={picklistMap.get("neededBy") ?? []} />
+      )}
       <div className="flex justify-end pt-2">
         <Button onClick={persist}>Save</Button>
       </div>

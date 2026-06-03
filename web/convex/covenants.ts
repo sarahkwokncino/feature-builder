@@ -30,6 +30,8 @@ export const create = mutation({
     frequency: v.optional(v.string()),
     financialIndicator: v.optional(v.string()),
     description: v.optional(v.string()),
+    effectiveDate: v.optional(v.string()),
+    graceDays: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
@@ -46,6 +48,8 @@ export const create = mutation({
       frequency: args.frequency,
       financialIndicator: args.financialIndicator,
       description: args.description,
+      effectiveDate: args.effectiveDate,
+      graceDays: args.graceDays,
       createdAt: now,
       updatedAt: now,
     });
@@ -61,6 +65,8 @@ export const update = mutation({
     frequency: v.optional(v.string()),
     financialIndicator: v.optional(v.string()),
     description: v.optional(v.string()),
+    effectiveDate: v.optional(v.string()),
+    graceDays: v.optional(v.number()),
   },
   handler: async (ctx, { id, ...patch }) => {
     const filtered: Record<string, unknown> = { updatedAt: Date.now() };

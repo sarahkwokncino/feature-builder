@@ -66,62 +66,89 @@ export type CovenantRecord = {
   category?: string;
   type?: string;
   frequency?: string;
-  financialIndicator?: string;
   description?: string;
 };
 
+export type CovenantPicklists = {
+  categories: string[];
+  covenantTypesByCategory: Record<string, string[]>;
+  frequencies: string[];
+};
+
 export function buildCovenantsYaml(
-  records: CovenantRecord[],
+  picklists: CovenantPicklists,
   meta: { storyId: string; title: string; featureArea: string },
 ): string {
-  const named = records.filter((r) => r.name.trim());
   let y = `story_id: "${meta.storyId}"\ntitle: "${yamlStr(meta.title)}"\nfeature_area: ${meta.featureArea}\n`;
   y += `source:\n  type: covenant-type-builder\n  ref: "covenant-type-builder@${today()}"\n\nrecords:\n\n`;
-  if (!named.length) {
-    y += "  # No covenant types configured yet.\n";
-    return y;
+
+  // One LLC_BI__Covenant_Type__c entry per category × covenant type
+  for (const cat of picklists.categories) {
+    const types = picklists.covenantTypesByCategory[cat] ?? [];
+    if (!types.length) continue;
+    y += `  # ${cat}\n`;
+    for (const t of types) {
+      y += `  - object: LLC_BI__Covenant_Type__c\n`;
+      y += `    fields:\n`;
+      y += `      Name: "${yamlStr(t)}"\n`;
+      y += `      LLC_BI__Category__c: "${yamlStr(cat)}"\n`;
+      y += `      LLC_BI__Active__c: true\n\n`;
+    }
   }
-  for (const rec of named) {
-    y += `  - object: LLC_BI__Covenant_Type__c\n    fields:\n`;
-    y += `      Name: "${yamlStr(rec.name)}"\n`;
-    if (rec.category) y += `      LLC_BI__Category__c: "${yamlStr(rec.category)}"\n`;
-    if (rec.description) y += `      LLC_BI__Description__c: "${yamlStr(rec.description)}"\n`;
-    if (rec.frequency) y += `      LLC_BI__Frequency__c: "${yamlStr(rec.frequency)}"\n`;
-    y += `      LLC_BI__Active__c: true\n`;
-    y += `\n`;
+
+  // Frequency / Date Templates
+  if (picklists.frequencies.length) {
+    y += `  # Frequency Templates (LLC_BI__Date_Template__c — referenced via LLC_BI__Date_Template__r.Name)\n`;
+    for (const freq of picklists.frequencies) {
+      y += `  - object: LLC_BI__Date_Template__c\n`;
+      y += `    fields:\n`;
+      y += `      Name: "${yamlStr(freq)}"\n\n`;
+    }
   }
+
   return y;
 }
 
 export function downloadCovenantsYaml(
-  records: CovenantRecord[],
+  picklists: CovenantPicklists,
   meta: { storyId: string; title: string; featureArea: string },
 ) {
-  const yaml = buildCovenantsYaml(records, meta);
+  const yaml = buildCovenantsYaml(picklists, meta);
   downloadBlob(
     new Blob([yaml], { type: "text/yaml" }),
     `${slugify(meta.storyId || "covenants")}.yaml`,
   );
 }
 
-const COVENANT_CSV_COLS: { key: keyof CovenantRecord; label: string }[] = [
-  { key: "name", label: "Name" },
-  { key: "category", label: "LLC_BI__Category__c" },
-  { key: "description", label: "LLC_BI__Description__c" },
-  { key: "frequency", label: "LLC_BI__Frequency__c" },
-  { key: "financialIndicator", label: "Financial_Indicator__c" },
-];
-
-export function downloadCovenantsCsv(records: CovenantRecord[]) {
-  const named = records.filter((r) => r.name.trim());
-  const rows = [COVENANT_CSV_COLS.map((c) => c.label)];
-  for (const rec of named) {
-    rows.push(COVENANT_CSV_COLS.map((c) => csvCell(rec[c.key] ?? "")));
+export function downloadCovenantsExcel(picklists: CovenantPicklists) {
+  // Sheet 1: one row per category × covenant type → LLC_BI__Covenant_Type__c
+  const typeRows: unknown[][] = [
+    ["LLC_BI__Category__c", "Name", "LLC_BI__Active__c"],
+  ];
+  for (const cat of picklists.categories) {
+    for (const t of picklists.covenantTypesByCategory[cat] ?? []) {
+      typeRows.push([cat, t, "true"]);
+    }
   }
-  const csv = rows.map((r) => r.join(",")).join("\r\n");
+
+  // Sheet 2: Frequency Templates → LLC_BI__Date_Template__c
+  const freqRows: unknown[][] = [
+    ["Name"],
+    ...picklists.frequencies.map((f) => [f]),
+  ];
+
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<?mso-application progid="Excel.Sheet"?>` +
+    `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">` +
+    `<Styles><Style ss:ID="h"><Font ss:Bold="1"/></Style></Styles>` +
+    buildXlsxSheet(typeRows, "Covenant Types") +
+    buildXlsxSheet(freqRows, "Frequency Templates") +
+    `</Workbook>`;
+
   downloadBlob(
-    new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }),
-    "covenant-types.csv",
+    new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" }),
+    "covenant-picklists.xls",
   );
 }
 
@@ -170,7 +197,6 @@ export function parseCovenantsCSv(text: string): CovenantRecord[] | string {
       category: get("category") || undefined,
       description: get("description") || undefined,
       frequency: get("frequency") || undefined,
-      financialIndicator: get("financialIndicator") || undefined,
     });
   }
   if (!parsed.length) return "No data rows found.";
@@ -179,13 +205,13 @@ export function parseCovenantsCSv(text: string): CovenantRecord[] | string {
 
 // ── Smart Checklist ────────────────────────────────────────────────────────────
 
+export type ChecklistLevel = "Loan" | "Relationship";
+
 export type ChecklistRecord = {
   name: string;
-  taskType?: string;
+  checklistLevel?: ChecklistLevel;
   category?: string;
   assignedParty?: string;
-  approvalProcess?: string;
-  requirementType?: string;
   neededBy?: string;
   description?: string;
   legalDescription?: string;
@@ -200,11 +226,6 @@ const CHECKLIST_PICKLIST_FIELD_MAP: Record<
   string,
   { object: string; field: string; label: string }
 > = {
-  taskType: {
-    object: "LLC_BI__Requirement__c",
-    field: "Task_Type__c",
-    label: "Task Type",
-  },
   category: {
     object: "LLC_BI__Requirement__c",
     field: "LLC_BI__Category__c",
@@ -228,7 +249,7 @@ function getCustomPicklistValues(
 ): Map<string, Set<string>> {
   const custom = new Map<string, Set<string>>();
   for (const req of records) {
-    for (const key of ["taskType", "category", "assignedParty", "neededBy"] as const) {
+    for (const key of ["category", "assignedParty", "neededBy"] as const) {
       const val = req[key];
       const defaults = userPicklists.get(key) ?? CHECKLIST_PICKLISTS[key] ?? [];
       if (val && !defaults.includes(val)) {
@@ -240,23 +261,24 @@ function getCustomPicklistValues(
   return custom;
 }
 
-export function buildChecklistYaml(
-  records: ChecklistRecord[],
-  meta: { storyId: string; title: string; featureArea: string },
-  userPicklists: Map<string, string[]>,
-): string {
-  const named = records.filter((r) => r.name.trim());
-  let y = `story_id: "${meta.storyId}"\ntitle: "${yamlStr(meta.title)}"\nfeature_area: ${meta.featureArea}\n`;
-  y += `source:\n  type: smart-checklist-builder\n  ref: "smart-checklist-builder@${today()}"\n\nrecords:\n\n`;
-  if (!named.length) {
-    y += "  # No named requirements yet.\n";
-    return y;
-  }
-  for (const req of named) {
+const CHECKLIST_LEVEL_CONFIG: Record<ChecklistLevel, { checklistName: string }> = {
+  Loan: { checklistName: "LLC_BI__Loan__c" },
+  Relationship: { checklistName: "Account" },
+};
+
+function buildChecklistYamlSection(reqs: ChecklistRecord[], level: ChecklistLevel): string {
+  const { checklistName } = CHECKLIST_LEVEL_CONFIG[level];
+  let y = `# ${"─".repeat(70)}\n`;
+  y += `# ${level.toUpperCase()} LEVEL REQUIREMENTS\n`;
+  y += `# Checklist lookup: SELECT Id FROM LLC_BI__Checklist__c\n`;
+  y += `#                   WHERE LLC_BI__Checklist__r.Name = '${checklistName}'\n`;
+  y += `# Set LLC_BI__Requirement__c.LLC_BI__Checklist__c to the Id found above.\n`;
+  y += `# ${"─".repeat(70)}\n\n`;
+  for (const req of reqs) {
     y += `  - object: LLC_BI__Requirement__c\n    fields:\n`;
     y += `      Name: "${yamlStr(req.name)}"\n`;
     y += `      LLC_BI__Is_Template__c: true\n`;
-    if (req.taskType) y += `      Task_Type__c: "${yamlStr(req.taskType)}"\n`;
+    y += `      # LLC_BI__Checklist__c: <Id of LLC_BI__Checklist__c where Name = '${checklistName}'>\n`;
     if (req.category) y += `      LLC_BI__Category__c: "${yamlStr(req.category)}"\n`;
     if (req.description) y += `      LLC_BI__Description__c: "${yamlStr(req.description)}"\n`;
     if (req.legalDescription) y += `      LLC_BI__Legal_Description__c: "${yamlStr(req.legalDescription)}"\n`;
@@ -274,6 +296,25 @@ export function buildChecklistYaml(
     }
     y += `\n`;
   }
+  return y;
+}
+
+export function buildChecklistYaml(
+  records: ChecklistRecord[],
+  meta: { storyId: string; title: string; featureArea: string },
+  userPicklists: Map<string, string[]>,
+): string {
+  const named = records.filter((r) => r.name.trim());
+  let y = `story_id: "${meta.storyId}"\ntitle: "${yamlStr(meta.title)}"\nfeature_area: ${meta.featureArea}\n`;
+  y += `source:\n  type: smart-checklist-builder\n  ref: "smart-checklist-builder@${today()}"\n\nrecords:\n\n`;
+  if (!named.length) {
+    y += "  # No named requirements yet.\n";
+    return y;
+  }
+  const loanReqs = named.filter((r) => (r.checklistLevel ?? "Loan") === "Loan");
+  const relReqs = named.filter((r) => r.checklistLevel === "Relationship");
+  if (loanReqs.length) y += buildChecklistYamlSection(loanReqs, "Loan");
+  if (relReqs.length) y += buildChecklistYamlSection(relReqs, "Relationship");
 
   const customValues = getCustomPicklistValues(named, userPicklists);
   if (customValues.size) {
@@ -289,6 +330,22 @@ export function buildChecklistYaml(
       y += `#\n#   Object: ${info.object}\n#   Field:  ${info.field}\n#   New values to add:\n`;
       for (const v of vals) y += `#     - "${v}"\n`;
     }
+    y += `# ${"═".repeat(70)}\n`;
+  }
+
+  const placeholderList = [
+    ...(CHECKLIST_PICKLISTS.placeholderName ?? []),
+    ...(userPicklists.get("placeholderName") ?? []),
+  ];
+  const uniquePlaceholders = [...new Set(placeholderList)];
+  if (uniquePlaceholders.length) {
+    y += `\n# ${"═".repeat(70)}\n`;
+    y += `# DOCUMENT MANAGER PLACEHOLDERS — VERIFY BEFORE DEPLOYING\n`;
+    y += `# The following placeholders are referenced by requirements above.\n`;
+    y += `# Ensure each exists in Document Manager before importing,\n`;
+    y += `# or create it first.\n`;
+    y += `# ${"═".repeat(70)}\n`;
+    for (const p of uniquePlaceholders) y += `#   - "${p}"\n`;
     y += `# ${"═".repeat(70)}\n`;
   }
   return y;
@@ -308,7 +365,7 @@ export function downloadChecklistYaml(
 
 const EXCEL_COLS: { key: keyof ChecklistRecord; label: string }[] = [
   { key: "name", label: "Name" },
-  { key: "taskType", label: "Task_Type__c" },
+  { key: "checklistLevel", label: "Checklist_Level__c" },
   { key: "category", label: "LLC_BI__Category__c" },
   { key: "description", label: "LLC_BI__Description__c" },
   { key: "legalDescription", label: "LLC_BI__Legal_Description__c" },
@@ -319,6 +376,10 @@ const EXCEL_COLS: { key: keyof ChecklistRecord; label: string }[] = [
   { key: "placeholderName", label: "LLC_BI__Document_Manager_Placeholder__c" },
   { key: "criteriaUserWritten", label: "Criteria_User_Written__c" },
   { key: "criteriaGenerated", label: "LLC_BI__Advanced_Criteria__c" },
+];
+
+const EXCEL_FIXED_COLS: { label: string; value: string }[] = [
+  { label: "LLC_BI__Is_Template__c", value: "Y" },
 ];
 
 function xlsxEsc(v: unknown): string {
@@ -349,19 +410,34 @@ function buildXlsxSheet(rows: unknown[][], sheetName: string): string {
   return xml;
 }
 
+function buildRequirementSheet(reqs: ChecklistRecord[], level: ChecklistLevel): string {
+  const { checklistName } = CHECKLIST_LEVEL_CONFIG[level];
+  const sheetName = level === "Loan" ? "Loan Requirements" : "Relationship Requirements";
+  const rows: unknown[][] = [
+    [`Checklist lookup: SELECT Id FROM LLC_BI__Checklist__c WHERE LLC_BI__Checklist__r.Name = '${checklistName}' — set LLC_BI__Requirement__c.LLC_BI__Checklist__c to that Id`],
+    [...EXCEL_COLS.map((c) => c.label), ...EXCEL_FIXED_COLS.map((c) => c.label)],
+  ];
+  for (const req of reqs) {
+    rows.push([
+      ...EXCEL_COLS.map((c) => String(req[c.key] ?? "")),
+      ...EXCEL_FIXED_COLS.map((c) => c.value),
+    ]);
+  }
+  return buildXlsxSheet(rows, sheetName);
+}
+
 export function downloadChecklistExcel(
   records: ChecklistRecord[],
   userPicklists: Map<string, string[]>,
 ) {
   const named = records.filter((r) => r.name.trim());
-  const reqRows: unknown[][] = [EXCEL_COLS.map((c) => c.label)];
-  for (const req of named) {
-    reqRows.push(EXCEL_COLS.map((c) => String(req[c.key] ?? "")));
-  }
-  const sheet1 = buildXlsxSheet(reqRows, "Requirements");
+  const loanReqs = named.filter((r) => (r.checklistLevel ?? "Loan") === "Loan");
+  const relReqs = named.filter((r) => r.checklistLevel === "Relationship");
+  const sheet1 = buildRequirementSheet(loanReqs, "Loan");
+  const sheet2 = buildRequirementSheet(relReqs, "Relationship");
 
   const customValues = getCustomPicklistValues(named, userPicklists);
-  let sheet2 = "";
+  let sheetCustom = "";
   if (customValues.size) {
     const customRows: unknown[][] = [
       [
@@ -381,8 +457,19 @@ export function downloadChecklistExcel(
         }
       }
     }
-    sheet2 = buildXlsxSheet(customRows, "Custom Picklist Values");
+    sheetCustom = buildXlsxSheet(customRows, "Custom Picklist Values");
   }
+
+  const placeholderList: string[] = [
+    ...(CHECKLIST_PICKLISTS.placeholderName ?? []),
+    ...(userPicklists.get("placeholderName") ?? []),
+  ];
+  const uniquePlaceholders = [...new Set(placeholderList)];
+  const phRows: unknown[][] = [
+    ["Document Manager Placeholder Name", "Action Required"],
+    ...uniquePlaceholders.map((p) => [p, "Verify placeholder exists in Document Manager, or create it before importing."]),
+  ];
+  const sheetPlaceholders = buildXlsxSheet(phRows, "Document Manager Placeholders");
 
   const xml =
     `<?xml version="1.0" encoding="UTF-8"?>` +
@@ -391,6 +478,8 @@ export function downloadChecklistExcel(
     `<Styles><Style ss:ID="h"><Font ss:Bold="1"/></Style></Styles>` +
     sheet1 +
     sheet2 +
+    sheetCustom +
+    sheetPlaceholders +
     `</Workbook>`;
 
   downloadBlob(
@@ -417,13 +506,10 @@ export function parseChecklistYaml(text: string): ChecklistRecord[] | string {
     const ph = gF("LLC_BI__Document_Manager_Placeholder__c");
     parsed.push({
       name,
-      taskType: gF("Task_Type__c") || undefined,
       category: gF("LLC_BI__Category__c") || undefined,
       description: gF("LLC_BI__Description__c") || undefined,
       legalDescription: gF("LLC_BI__Legal_Description__c") || undefined,
       assignedParty: gF("LLC_BI__Assigned_Party__c") || undefined,
-      approvalProcess: gF("LLC_BI__Approval_Process__c") || undefined,
-      requirementType: gF("LLC_BI__Requirement_Type__c") || undefined,
       neededBy: gF("LLC_BI__Needed_By__c") || undefined,
       doNotAutoGenerate: gB("LLC_BI__Do_Not_Auto_Generate__c"),
       stageCheck: gB("LLC_BI__Stage_Check__c"),
@@ -459,15 +545,15 @@ export function parseChecklistCsvExcel(
     const name = get("name");
     if (!name) continue;
     const ph = get("placeholderName");
+    const levelRaw = get("checklistLevel");
+    const level: ChecklistLevel = levelRaw === "Relationship" ? "Relationship" : "Loan";
     parsed.push({
       name,
-      taskType: get("taskType") || undefined,
+      checklistLevel: level,
       category: get("category") || undefined,
       description: get("description") || undefined,
       legalDescription: get("legalDescription") || undefined,
       assignedParty: get("assignedParty") || undefined,
-      approvalProcess: get("approvalProcess") || undefined,
-      requirementType: get("requirementType") || undefined,
       neededBy: get("neededBy") || undefined,
       doNotAutoGenerate: getBool("doNotAutoGenerate"),
       stageCheck: getBool("stageCheck"),

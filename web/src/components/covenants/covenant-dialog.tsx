@@ -49,28 +49,28 @@ export function CovenantDialog({
   // Load all covenants-scope picklist rows so we can derive the covType: entries
   const storedPicklists = useQuery(api.picklists.listForScope, { scope: "covenants" });
 
-  const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [type, setType] = useState("");
   const [frequency, setFrequency] = useState("");
-  const [financialIndicator, setFinancialIndicator] = useState("");
   const [description, setDescription] = useState("");
+  const [effectiveDate, setEffectiveDate] = useState("");
+  const [graceDays, setGraceDays] = useState("");
 
   useEffect(() => {
     if (record) {
-      setName(record.name);
       setCategory(record.category ?? "");
       setType(record.type ?? "");
       setFrequency(record.frequency ?? "");
-      setFinancialIndicator(record.financialIndicator ?? "");
       setDescription(record.description ?? "");
+      setEffectiveDate(record.effectiveDate ?? "");
+      setGraceDays(record.graceDays !== undefined ? String(record.graceDays) : "");
     } else if (open) {
-      setName("");
       setCategory("");
       setType("");
       setFrequency("");
-      setFinancialIndicator("");
       setDescription("");
+      setEffectiveDate("");
+      setGraceDays("");
     }
   }, [record, open]);
 
@@ -90,35 +90,32 @@ export function CovenantDialog({
 
   const categoryOptions = picklistMap.get("category") ?? [];
   const frequencyOptions = picklistMap.get("frequency") ?? [];
-  const financialIndicatorOptions = picklistMap.get("financialIndicator") ?? [];
   const typeOptions = category ? (categoryTypeMap[category] ?? []) : [];
 
   async function handleSave() {
-    const trimmed = name.trim();
-    if (!trimmed) {
-      toast.error("Name is required");
-      return;
-    }
+    const derivedName = type || category || "Untitled";
     if (record) {
       await update({
         id: record._id,
-        name: trimmed,
+        name: derivedName,
         category: category || undefined,
         type: type || undefined,
         frequency: frequency || undefined,
-        financialIndicator: financialIndicator || undefined,
         description: description || undefined,
+        effectiveDate: effectiveDate || undefined,
+        graceDays: graceDays ? Number(graceDays) : undefined,
       });
       toast.success("Covenant updated");
     } else {
       await create({
         cardId,
-        name: trimmed,
+        name: derivedName,
         category: category || undefined,
         type: type || undefined,
         frequency: frequency || undefined,
-        financialIndicator: financialIndicator || undefined,
         description: description || undefined,
+        effectiveDate: effectiveDate || undefined,
+        graceDays: graceDays ? Number(graceDays) : undefined,
       });
       toast.success("Covenant created");
     }
@@ -134,15 +131,6 @@ export function CovenantDialog({
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-3">
-          <div>
-            <Label htmlFor="cov-name">Name *</Label>
-            <Input
-              id="cov-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Quarterly DSCR"
-            />
-          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label htmlFor="cov-category">Category</Label>
@@ -189,57 +177,46 @@ export function CovenantDialog({
               </Select>
             </div>
           </div>
+          <div>
+            <Label htmlFor="cov-freq">Frequency Template</Label>
+            <Select
+              value={frequency || null}
+              onValueChange={(v: string | null) => setFrequency(v ?? "")}
+            >
+              <SelectTrigger id="cov-freq" className="w-full">
+                <SelectValue placeholder="Select…" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={null}>—</SelectItem>
+                {frequencyOptions.map((f) => (
+                  <SelectItem key={f} value={f}>
+                    {f}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label htmlFor="cov-freq">Frequency Template</Label>
-              <Select
-                value={frequency || null}
-                onValueChange={(v: string | null) => setFrequency(v ?? "")}
-              >
-                <SelectTrigger id="cov-freq" className="w-full">
-                  <SelectValue placeholder="Select…" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={null}>—</SelectItem>
-                  {frequencyOptions.map((f) => (
-                    <SelectItem key={f} value={f}>
-                      {f}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="cov-effective-date">Effective Date</Label>
+              <Input
+                id="cov-effective-date"
+                type="date"
+                value={effectiveDate}
+                onChange={(e) => setEffectiveDate(e.target.value)}
+              />
             </div>
             <div>
-              <Label htmlFor="cov-fi">Financial Indicator</Label>
-              <Select
-                value={financialIndicator || null}
-                onValueChange={(v: string | null) =>
-                  setFinancialIndicator(v ?? "")
-                }
-              >
-                <SelectTrigger id="cov-fi" className="w-full">
-                  <SelectValue placeholder="Select…" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={null}>—</SelectItem>
-                  {financialIndicatorOptions.map((i) => (
-                    <SelectItem key={i} value={i}>
-                      {i}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="cov-grace-days">Grace Days</Label>
+              <Input
+                id="cov-grace-days"
+                type="number"
+                min={0}
+                value={graceDays}
+                onChange={(e) => setGraceDays(e.target.value)}
+                placeholder="0"
+              />
             </div>
-          </div>
-          <div>
-            <Label htmlFor="cov-desc">Description</Label>
-            <Textarea
-              id="cov-desc"
-              rows={3}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Covenant type description…"
-            />
           </div>
         </div>
         <DialogFooter>

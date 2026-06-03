@@ -32,6 +32,7 @@ export const create = mutation({
 export const update = mutation({
   args: {
     id: v.id("checklistReqs"),
+    checklistLevel: v.optional(v.union(v.literal("Loan"), v.literal("Relationship"))),
     name: v.optional(v.string()),
     taskType: v.optional(v.string()),
     category: v.optional(v.string()),
@@ -71,7 +72,7 @@ export const bulkImport = mutation({
     records: v.array(
       v.object({
         name: v.string(),
-        taskType: v.optional(v.string()),
+        checklistLevel: v.optional(v.union(v.literal("Loan"), v.literal("Relationship"))),
         category: v.optional(v.string()),
         assignedParty: v.optional(v.string()),
         approvalProcess: v.optional(v.string()),

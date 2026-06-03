@@ -30,7 +30,7 @@ function CovTypesEditor({
   storedRows: { key: string; values: string[] }[];
 }) {
   const addValue = useMutation(api.picklists.addValue);
-  const removeValue = useMutation(api.picklists.removeValue);
+  const setValues = useMutation(api.picklists.setValues);
   const [newTypeInputs, setNewTypeInputs] = useState<Record<string, string>>({});
 
   function typesForCategory(cat: string): string[] {
@@ -46,7 +46,12 @@ function CovTypesEditor({
   }
 
   async function handleRemoveType(cat: string, val: string) {
-    await removeValue({ scope: "covenants", key: COV_TYPE_KEY_PREFIX + cat, value: val });
+    const current = typesForCategory(cat);
+    await setValues({
+      scope: "covenants",
+      key: COV_TYPE_KEY_PREFIX + cat,
+      values: current.filter((v) => v !== val),
+    });
   }
 
   // If the category has no stored row yet, seed it from defaults on first add
@@ -151,7 +156,7 @@ export function PicklistEditor({
 }) {
   const stored = useQuery(api.picklists.listForScope, { scope });
   const addValue = useMutation(api.picklists.addValue);
-  const removeValue = useMutation(api.picklists.removeValue);
+  const setValues = useMutation(api.picklists.setValues);
 
   const isCovenants = scope === "covenants";
   const regularKeys = Object.keys(labels);
@@ -200,7 +205,8 @@ export function PicklistEditor({
   }
 
   async function handleRemove(value: string) {
-    await removeValue({ scope, key: activeKey, value });
+    const current = valueMap.get(activeKey) ?? [];
+    await setValues({ scope, key: activeKey, values: current.filter((v) => v !== value) });
   }
 
   return (

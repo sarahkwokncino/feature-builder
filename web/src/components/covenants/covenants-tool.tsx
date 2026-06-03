@@ -16,11 +16,16 @@ import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
 import {
   buildCovenantsYaml,
   downloadCovenantsYaml,
-  downloadCovenantsCsv,
+  downloadCovenantsExcel,
   parseCovenantsYaml,
   parseCovenantsCSv,
   type CovenantRecord,
+  type CovenantPicklists,
 } from "@/lib/export-import";
+import {
+  COVENANT_CATEGORY_TYPE_MAP,
+  COV_TYPE_KEY_PREFIX,
+} from "@/lib/picklist-defaults";
 import { toast } from "sonner";
 
 export function CovenantsTool({
@@ -67,22 +72,20 @@ export function CovenantsTool({
     [project?.name],
   );
 
-  const covenantRows = useMemo<CovenantRecord[]>(
-    () =>
-      (records ?? []).map((r) => ({
-        name: r.name,
-        category: r.category,
-        type: r.type,
-        frequency: r.frequency,
-        financialIndicator: r.financialIndicator,
-        description: r.description,
-      })),
-    [records],
-  );
+  const covenantPicklists = useMemo<CovenantPicklists>(() => {
+    const categories = picklistMap.get("category") ?? [];
+    const frequencies = picklistMap.get("frequency") ?? [];
+    const covenantTypesByCategory: Record<string, string[]> = {};
+    for (const cat of categories) {
+      const stored = storedPicklists?.find((p) => p.key === `${COV_TYPE_KEY_PREFIX}${cat}`);
+      covenantTypesByCategory[cat] = stored?.values ?? COVENANT_CATEGORY_TYPE_MAP[cat] ?? [];
+    }
+    return { categories, covenantTypesByCategory, frequencies };
+  }, [picklistMap, storedPicklists]);
 
   const buildPreview = useCallback(
-    (meta: YamlMeta) => buildCovenantsYaml(covenantRows, meta),
-    [covenantRows],
+    (meta: YamlMeta) => buildCovenantsYaml(covenantPicklists, meta),
+    [covenantPicklists],
   );
 
   function parseImportFile(text: string, filename: string): CovenantRecord[] | string {
@@ -139,15 +142,13 @@ export function CovenantsTool({
           </Button>
           <Button
             variant="outline"
-            onClick={() => downloadCovenantsCsv(covenantRows)}
-            disabled={records.length === 0}
+            onClick={() => downloadCovenantsExcel(covenantPicklists)}
           >
-            Export CSV
+            Export Excel
           </Button>
           <Button
             variant="outline"
             onClick={() => setYamlOpen(true)}
-            disabled={records.length === 0}
           >
             Export YAML
           </Button>
@@ -169,14 +170,13 @@ export function CovenantsTool({
               <th className="px-3 py-2">Category</th>
               <th className="px-3 py-2">Type</th>
               <th className="px-3 py-2">Frequency</th>
-              <th className="px-3 py-2">Financial Indicator</th>
               <th className="px-3 py-2 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {records.length === 0 ? (
               <tr>
-                <td colSpan={7} className="p-8 text-center text-slate-500">
+                <td colSpan={6} className="p-8 text-center text-slate-500">
                   No covenants yet. Click <strong>+ Create Covenant</strong> to
                   add one.
                 </td>
@@ -201,7 +201,6 @@ export function CovenantsTool({
                   <td className="px-3 py-2">{rec.category || "—"}</td>
                   <td className="px-3 py-2">{rec.type || "—"}</td>
                   <td className="px-3 py-2">{rec.frequency || "—"}</td>
-                  <td className="px-3 py-2">{rec.financialIndicator || "—"}</td>
                   <td className="px-3 py-2 text-right">
                     <button
                       onClick={() => setEditing(rec)}
@@ -250,7 +249,7 @@ export function CovenantsTool({
         onOpenChange={setYamlOpen}
         defaultMeta={defaultMeta}
         buildPreview={buildPreview}
-        onDownload={(meta) => downloadCovenantsYaml(covenantRows, meta)}
+        onDownload={(meta) => downloadCovenantsYaml(covenantPicklists, meta)}
       />
 
       <ImportDialog<CovenantRecord>

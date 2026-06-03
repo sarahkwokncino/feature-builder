@@ -69,6 +69,8 @@ export default defineSchema({
     frequency: v.optional(v.string()),
     financialIndicator: v.optional(v.string()),
     description: v.optional(v.string()),
+    effectiveDate: v.optional(v.string()), // ISO date string YYYY-MM-DD
+    graceDays: v.optional(v.number()),
     createdAt: v.number(),
     updatedAt: v.number(),
   }).index("byCard", ["cardId"]),
@@ -76,6 +78,7 @@ export default defineSchema({
   // Smart Checklist requirements — ports smart-checklist-builder-v1
   checklistReqs: defineTable({
     cardId: v.id("cards"),
+    checklistLevel: v.optional(v.union(v.literal("Loan"), v.literal("Relationship"))),
     name: v.string(),
     taskType: v.optional(v.string()),
     category: v.optional(v.string()),
