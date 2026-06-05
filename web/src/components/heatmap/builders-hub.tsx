@@ -11,6 +11,7 @@ const KIND_ORDER: Record<string, number> = {
   checklist: 1,
   covenants: 2,
   docman: 3,
+  collateral: 4,
 };
 
 const KIND_LABEL: Record<string, string> = {
@@ -18,6 +19,7 @@ const KIND_LABEL: Record<string, string> = {
   covenants: "Covenant Type Builder",
   "product-hierarchy": "Product Hierarchy Builder",
   docman: "Document Manager Builder",
+  collateral: "Collateral Management Builder",
 };
 
 const KIND_DESCRIPTION: Record<string, string> = {
@@ -25,6 +27,7 @@ const KIND_DESCRIPTION: Record<string, string> = {
   covenants: "Configure covenant types, categories, and frequency templates.",
   "product-hierarchy": "Configure product lines, types, and products.",
   docman: "Configure document manager placeholders and conditional groups.",
+  collateral: "Configure collateral types and management settings.",
 };
 
 export function BuildersHub({ projectId }: { projectId: Id<"projects"> }) {
@@ -48,6 +51,15 @@ export function BuildersHub({ projectId }: { projectId: Id<"projects"> }) {
         if (route) seen.set(card.configuratorKind, { cardName: card.name, route });
       }
     }
+  }
+
+  // Project-level builders always shown regardless of heatmap cards
+  const PROJECT_LEVEL_BUILDERS: { kind: string; route: string }[] = [
+    { kind: "product-hierarchy", route: `/projects/${projectId}/product-hierarchy` },
+    { kind: "collateral", route: `/projects/${projectId}/collateral` },
+  ];
+  for (const { kind, route } of PROJECT_LEVEL_BUILDERS) {
+    if (!seen.has(kind)) seen.set(kind, { cardName: "", route });
   }
 
   const builders = [...seen.entries()].sort(

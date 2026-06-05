@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-const SCOPE = v.union(v.literal("covenants"), v.literal("checklist"));
+const SCOPE = v.union(v.literal("covenants"), v.literal("checklist"), v.literal("collateral"));
 
 export const listForScope = query({
   args: { scope: SCOPE },

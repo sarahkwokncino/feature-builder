@@ -8,7 +8,7 @@ export interface SeedCard {
   name: string;
   sub: string;
   type: SeedCardType;
-  configuratorKind?: "covenants" | "checklist" | "product-hierarchy" | "docman";
+  configuratorKind?: "covenants" | "checklist" | "product-hierarchy" | "docman" | "collateral";
 }
 
 export interface SeedSubphase {
@@ -73,7 +73,7 @@ export const SEED_PHASES: SeedPhase[] = [
             type: "linked",
             configuratorKind: "covenants",
           },
-          { name: "Add Collateral", sub: "Collateral", type: "low" },
+          { name: "Add Collateral", sub: "Collateral", type: "linked", configuratorKind: "collateral" },
           { name: "Add Conditions", sub: "Conditions", type: "low" },
           { name: "Collect & Store Documents", sub: "Document Manager", type: "linked", configuratorKind: "docman" },
         ],

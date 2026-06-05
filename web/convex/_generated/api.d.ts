@@ -9,6 +9,7 @@
  */
 
 import type * as checklist from "../checklist.js";
+import type * as collateral from "../collateral.js";
 import type * as covenants from "../covenants.js";
 import type * as docman from "../docman.js";
 import type * as heatmap from "../heatmap.js";
@@ -25,6 +26,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   checklist: typeof checklist;
+  collateral: typeof collateral;
   covenants: typeof covenants;
   docman: typeof docman;
   heatmap: typeof heatmap;

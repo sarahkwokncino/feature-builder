@@ -566,6 +566,165 @@ export function parseChecklistCsvExcel(
   return parsed;
 }
 
+// ── Collateral Management ─────────────────────────────────────────────────────
+
+export type CollateralPicklists = {
+  types: string[];
+  subtypesByType: Record<string, string[]>;
+};
+
+export function buildCollateralYaml(
+  picklists: CollateralPicklists,
+  meta: { storyId: string; title: string; featureArea: string },
+): string {
+  let y = `story_id: "${meta.storyId}"\ntitle: "${yamlStr(meta.title)}"\nfeature_area: ${meta.featureArea}\n`;
+  y += `source:\n  type: collateral-management-builder\n  ref: "collateral-management-builder@${today()}"\n\n`;
+  y += `# Object: LLC_BI__Collateral_Type__c\n# Fields: LLC_BI__Type__c (Type), LLC_BI__Subtype__c (Sub Type)\n\nrecords:\n\n`;
+  for (const type of picklists.types) {
+    const subtypes = picklists.subtypesByType[type] ?? [];
+    if (!subtypes.length) continue;
+    y += `  # ${type}\n`;
+    for (const subtype of subtypes) {
+      y += `  - object: LLC_BI__Collateral_Type__c\n`;
+      y += `    fields:\n`;
+      y += `      LLC_BI__Type__c: "${yamlStr(type)}"\n`;
+      y += `      LLC_BI__Subtype__c: "${yamlStr(subtype)}"\n\n`;
+    }
+  }
+  return y;
+}
+
+export function downloadCollateralYaml(
+  picklists: CollateralPicklists,
+  meta: { storyId: string; title: string; featureArea: string },
+) {
+  const yaml = buildCollateralYaml(picklists, meta);
+  downloadBlob(new Blob([yaml], { type: "text/yaml" }), `${slugify(meta.storyId || "collateral")}.yaml`);
+}
+
+export type CollateralFieldConfig = {
+  collateralType: string;
+  collateralSubtype: string;
+  sections: { name: string; fields: { name: string; fieldType: string; picklistValues?: string[] }[] }[];
+};
+
+export function downloadCollateralExcel(
+  picklists: CollateralPicklists,
+  fieldConfigs?: CollateralFieldConfig[],
+) {
+  const rows: unknown[][] = [
+    ["LLC_BI__Type__c", "LLC_BI__Subtype__c"],
+  ];
+  for (const type of picklists.types) {
+    for (const subtype of picklists.subtypesByType[type] ?? []) {
+      rows.push([type, subtype]);
+    }
+  }
+  if (rows.length === 1) rows.push(["# No collateral types defined", ""]);
+
+  // One sheet per type-subtype combo
+  const comboSheets: string[] = [];
+  const usedSheetNames = new Set<string>();
+
+  const uniqueSheetName = (raw: string): string => {
+    // Strip Excel-invalid chars, truncate to 31
+    const base = raw.replace(/[/\\?*[\]:]/g, "-").slice(0, 31);
+    if (!usedSheetNames.has(base)) { usedSheetNames.add(base); return base; }
+    // Append incrementing suffix until unique
+    for (let i = 2; i < 1000; i++) {
+      const suffix = ` (${i})`;
+      const candidate = base.slice(0, 31 - suffix.length) + suffix;
+      if (!usedSheetNames.has(candidate)) { usedSheetNames.add(candidate); return candidate; }
+    }
+    return base; // fallback (won't happen in practice)
+  };
+
+  for (const type of picklists.types) {
+    for (const subtype of picklists.subtypesByType[type] ?? []) {
+      const config = fieldConfigs?.find(
+        (c) => c.collateralType === type && c.collateralSubtype === subtype,
+      );
+      const sheetName = uniqueSheetName(`${type} - ${subtype}`);
+
+      const sheetRows: unknown[][] = [
+        [`Type: ${type}`, `Sub Type: ${subtype}`],
+        [""],
+      ];
+
+      if (!config || config.sections.length === 0) {
+        sheetRows.push(["(No field configuration saved for this combo)"]);
+      } else {
+        for (const section of config.sections) {
+          sheetRows.push([section.name, "", ""]);
+          sheetRows.push(["Field Name", "Salesforce Type", "Picklist Values"]);
+          if (section.fields.length === 0) {
+            sheetRows.push(["(No fields)", "", ""]);
+          } else {
+            for (const field of section.fields) {
+              sheetRows.push([
+                field.name,
+                field.fieldType,
+                (field.picklistValues ?? []).join(", "),
+              ]);
+            }
+          }
+          sheetRows.push([""]); // blank spacer between sections
+        }
+      }
+
+      comboSheets.push(buildXlsxSheet(sheetRows, sheetName));
+    }
+  }
+
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<?mso-application progid="Excel.Sheet"?>` +
+    `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">` +
+    `<Styles><Style ss:ID="h"><Font ss:Bold="1"/></Style></Styles>` +
+    buildXlsxSheet(rows, "Collateral Types") +
+    comboSheets.join("") +
+    `</Workbook>`;
+  downloadBlob(new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" }), "collateral-types.xls");
+}
+
+export type CollateralRow = { type: string; subtype: string };
+
+export function parseCollateralYaml(text: string): CollateralRow[] | string {
+  const blocks = text.split(/\n  - object: LLC_BI__Collateral_Type__c/);
+  blocks.shift();
+  const parsed: CollateralRow[] = [];
+  for (const block of blocks) {
+    const getF = (label: string) => {
+      const m = block.match(new RegExp(`${label}:\\s*"([^"]*)"`, "i"));
+      return m ? m[1] : "";
+    };
+    const type = getF("LLC_BI__Type__c");
+    const subtype = getF("LLC_BI__Subtype__c");
+    if (type && subtype) parsed.push({ type, subtype });
+  }
+  if (!parsed.length) return "No LLC_BI__Collateral_Type__c records found.";
+  return parsed;
+}
+
+export function parseCollateralCsv(text: string): CollateralRow[] | string {
+  const raw = text.replace(/^\uFEFF/, "");
+  const lines = raw.split(/\r?\n/).filter((l) => l.trim());
+  if (lines.length < 2) return "File appears empty.";
+  const headers = parseCsvRow(lines[0]).map((h) => h.trim());
+  const typeIdx = headers.findIndex((h) => h === "LLC_BI__Type__c" || h.toLowerCase() === "type");
+  const subtypeIdx = headers.findIndex((h) => h === "LLC_BI__Subtype__c" || h.toLowerCase() === "sub type" || h.toLowerCase() === "subtype");
+  if (typeIdx === -1 || subtypeIdx === -1) return 'Could not find "LLC_BI__Type__c" and "LLC_BI__Subtype__c" columns.';
+  const parsed: CollateralRow[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = parseCsvRow(lines[i]);
+    const type = (cells[typeIdx] ?? "").trim();
+    const subtype = (cells[subtypeIdx] ?? "").trim();
+    if (type && subtype) parsed.push({ type, subtype });
+  }
+  if (!parsed.length) return "No data rows found.";
+  return parsed;
+}
+
 // ── Document Manager ───────────────────────────────────────────────────────────
 
 export type DocmanLevel = "Relationships" | "Loans" | "Collateral" | "Product Package";

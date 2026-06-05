@@ -18,5 +18,7 @@ export function configuratorRoute(
       return `/projects/${projectId}/product-hierarchy`;
     case "docman":
       return `/projects/${projectId}/docman?cardId=${card._id}`;
+    case "collateral":
+      return `/projects/${projectId}/collateral`;
   }
 }

@@ -42,6 +42,17 @@ export const COVENANT_CATEGORY_TYPE_MAP: Record<string, string[]> = {
   Other: ["Ad Hoc", "Custom"],
 };
 
+// Collateral — types and subtypes per type
+export const COLLATERAL_TYPE_SUBTYPE_MAP: Record<string, string[]> = {
+  "Property Non Development": ["Residential", "Commercial", "Industrial", "Agricultural", "Mixed Use"],
+  "Property Development": ["Residential Development", "Commercial Development"],
+  "Financial Assets": ["Cash Deposit", "Shares", "Bonds", "Life Policy"],
+  "Guarantees": ["Personal Guarantee", "Corporate Guarantee", "Government Guarantee"],
+  "Other": ["Plant & Equipment", "Debenture", "Other"],
+};
+
+export const COLLATERAL_SUBTYPE_KEY_PREFIX = "collateralSubtype:";
+
 export const CHECKLIST_PICKLISTS: Record<string, string[]> = {
   category: ["General", "Residential", "Commercial", "Development"],
   assignedParty: [

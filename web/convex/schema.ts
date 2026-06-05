@@ -53,6 +53,7 @@ export default defineSchema({
         v.literal("checklist"),
         v.literal("product-hierarchy"),
         v.literal("docman"),
+        v.literal("collateral"),
       ),
     ),
   }).index("bySubphase", ["subphaseId"]),
@@ -175,9 +176,33 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("byCard", ["cardId"]),
 
+  // Collateral field config — one row per projectId + type + subtype
+  collateralFieldConfigs: defineTable({
+    projectId: v.id("projects"),
+    collateralType: v.string(),
+    collateralSubtype: v.string(),
+    sections: v.array(
+      v.object({
+        id: v.string(),
+        name: v.string(),
+        fields: v.array(v.object({
+          name: v.string(),
+          fieldType: v.string(),
+          picklistValues: v.optional(v.array(v.string())),
+        })),
+      }),
+    ),
+    linkedTo: v.optional(v.object({
+      collateralType: v.string(),
+      collateralSubtype: v.string(),
+    })),
+    updatedAt: v.number(),
+  }).index("byProject", ["projectId"])
+    .index("byProjectTypeSubtype", ["projectId", "collateralType", "collateralSubtype"]),
+
   // Picklist values, scoped per configurator
   picklists: defineTable({
-    scope: v.union(v.literal("covenants"), v.literal("checklist")),
+    scope: v.union(v.literal("covenants"), v.literal("checklist"), v.literal("collateral")),
     key: v.string(),
     values: v.array(v.string()),
   }).index("byScopeKey", ["scope", "key"]),
