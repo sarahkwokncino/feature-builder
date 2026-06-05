@@ -703,16 +703,31 @@ export function downloadDocmanYaml(
 }
 
 export function downloadDocmanExcel(data: DocmanExport) {
-  // Sheet 1: LLC_BI__DocType__c records
+  // Sheet 1: All placeholders
+  const phRows: unknown[][] = [
+    ["Level (UI)", "Category", "Name", "Is Default Docman Placeholder", "Criteria"],
+    ...data.placeholders.map((p) => {
+      const criteria = data.groups
+        .filter((g) => g.level === p.level && g.placeholderNames.includes(p.name))
+        .map((g) => g.criteriaUserWritten ?? g.criteriaFormgen ?? "")
+        .filter(Boolean)
+        .join(" | ");
+      return [p.level, p.category ?? "", p.name, p.isDefault ? "true" : "false", criteria];
+    }),
+  ];
+  if (!data.placeholders.length) phRows.push(["# No placeholders defined", "", "", "", ""]);
+  const sheet1 = buildXlsxSheet(phRows, "Placeholders");
+
+  // Sheet 2: LLC_BI__DocType__c records
   const docTypes = getDocTypes(data.placeholders);
   const dtRows: unknown[][] = [
     ["object", "Name", "LLC_BI__docManager__c (DocManager Type__c value)"],
     ...docTypes.map((dt) => ["LLC_BI__DocType__c", dt.name, LEVEL_TYPE_MAP[dt.level]]),
   ];
   if (!docTypes.length) dtRows.push(["", "# No categories defined", ""]);
-  const sheet1 = buildXlsxSheet(dtRows, "DocTypes (Categories)");
+  const sheet2a = buildXlsxSheet(dtRows, "DocTypes (Categories)");
 
-  // Sheet 2: LLC_BI__ClosingChecklist__c — Default Templates
+  // Sheet 3: LLC_BI__ClosingChecklist__c — Default Docman Placeholders
   const defaults = data.placeholders.filter((p) => p.isDefault);
   const defRows: unknown[][] = [
     ["object", "Name", "LLC_BI__docManager__c", "LLC_BI__docType__c (Category)", "LLC_BI__Criteria__c", "Level (UI)", "Notes"],
@@ -727,9 +742,9 @@ export function downloadDocmanExcel(data: DocmanExport) {
     ]),
   ];
   if (!defaults.length) defRows.push(["", "# No default templates", "", "", "", "", ""]);
-  const sheet2 = buildXlsxSheet(defRows, "Default Templates");
+  const sheet3 = buildXlsxSheet(defRows, "Default Docman Placeholders");
 
-  // Sheet 3: LLC_BI__ClosingChecklist__c — Conditional Templates
+  // Sheet 4: LLC_BI__ClosingChecklist__c — Conditional Templates
   const condRows: unknown[][] = [
     ["object", "Name", "LLC_BI__docManager__c", "LLC_BI__docType__c (Category)", "LLC_BI__Criteria__c", "Criteria (Plain English)", "Level (UI)", "Condition Group"],
   ];
@@ -749,21 +764,21 @@ export function downloadDocmanExcel(data: DocmanExport) {
     }
   }
   if (condRows.length === 1) condRows.push(["", "# No conditional templates", "", "", "", "", "", ""]);
-  const sheet3 = buildXlsxSheet(condRows, "Conditional Templates");
+  const sheet4 = buildXlsxSheet(condRows, "Conditional Templates");
 
-  // Sheet 4: Level reference
+  // Sheet 5: Level reference
   const refRows: unknown[][] = [
     ["UI Level", "LLC_BI__DocManager__c.LLC_BI__Type__c value"],
     ...DOCMAN_LEVELS.map((l) => [l, LEVEL_TYPE_MAP[l]]),
   ];
-  const sheet4 = buildXlsxSheet(refRows, "Level Reference");
+  const sheet5 = buildXlsxSheet(refRows, "Level Reference");
 
   const xml =
     `<?xml version="1.0" encoding="UTF-8"?>` +
     `<?mso-application progid="Excel.Sheet"?>` +
     `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">` +
     `<Styles><Style ss:ID="h"><Font ss:Bold="1"/></Style></Styles>` +
-    sheet1 + sheet2 + sheet3 + sheet4 +
+    sheet1 + sheet2a + sheet3 + sheet4 + sheet5 +
     `</Workbook>`;
 
   downloadBlob(
@@ -835,7 +850,8 @@ export function parseDocmanExcel(text: string): DocmanExport | string {
   const nameIdx = headers.findIndex((h) => h === "Name");
   const levelIdx = headers.findIndex((h) => h === "Level (UI)");
   const categoryIdx = headers.findIndex((h) => h.includes("docType") || h.toLowerCase().includes("category"));
-  const criteriaIdx = headers.findIndex((h) => h === "LLC_BI__Criteria__c");
+  const isDefaultIdx = headers.findIndex((h) => h.toLowerCase().includes("is default"));
+  const criteriaIdx = headers.findIndex((h) => h === "LLC_BI__Criteria__c" || h.toLowerCase() === "criteria");
   const criteriaPlainIdx = headers.findIndex((h) => h.toLowerCase().includes("plain english"));
   const groupIdx = headers.findIndex((h) => h === "Condition Group");
 
@@ -855,9 +871,12 @@ export function parseDocmanExcel(text: string): DocmanExport | string {
     const criteria = criteriaIdx !== -1 ? (cells[criteriaIdx] ?? "").trim() || undefined : undefined;
     const criteriaPlain = criteriaPlainIdx !== -1 ? (cells[criteriaPlainIdx] ?? "").trim() || undefined : undefined;
     const groupName = groupIdx !== -1 ? (cells[groupIdx] ?? "").trim() || undefined : undefined;
+    const isDefault = isDefaultIdx !== -1
+      ? (cells[isDefaultIdx] ?? "").trim().toLowerCase() === "true"
+      : false;
 
     if (!placeholders.find((p) => p.name === name && p.level === level)) {
-      placeholders.push({ name, level, category, isDefault: !criteria || undefined });
+      placeholders.push({ name, level, category, isDefault: isDefault || undefined });
     }
     if (criteria) {
       const key = `${level}|${criteria}`;

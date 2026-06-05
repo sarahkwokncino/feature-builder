@@ -175,7 +175,6 @@ function PlaceholderBuilderDialog({
           <div className="flex flex-col">
             <div className="bg-blue-50 border-b border-slate-200 px-3 py-2">
               <p className="text-[11px] font-semibold uppercase tracking-wide text-blue-700">Level</p>
-              <p className="text-[10px] text-slate-400 mt-0.5">Maps to LLC_BI__DocManager__c</p>
             </div>
             <ul className="flex-1 p-1.5 space-y-0.5">
               {LEVELS.map((level) => {
@@ -192,7 +191,6 @@ function PlaceholderBuilderDialog({
                   >
                     <div>
                       <div>{level}</div>
-                      <div className="text-[10px] font-normal text-slate-400">{LEVEL_FIELD_MAP[level]}</div>
                     </div>
                     {count > 0 && (
                       <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${LEVEL_COLOURS[level].badge}`}>
@@ -209,7 +207,6 @@ function PlaceholderBuilderDialog({
           <div className="flex flex-col">
             <div className={`border-b border-slate-200 px-3 py-2 ${LEVEL_COLOURS[selectedLevel].header}`}>
               <p className="text-[11px] font-semibold uppercase tracking-wide">Category</p>
-              <p className="text-[10px] opacity-70 mt-0.5">Exported as LLC_BI__DocType__c</p>
             </div>
             <ul className="flex-1 overflow-auto p-1.5 space-y-0.5">
               {/* "No category" option */}
@@ -339,6 +336,7 @@ function ConditionalGroupEditor({
   group,
   levelPlaceholders,
   defaultPlaceholderIds,
+  allGroups,
   onDelete,
 }: {
   group: Group;
@@ -444,9 +442,9 @@ function ConditionalGroupEditor({
           {/* Locked defaults */}
           {defaultPhs.length > 0 && (
             <div>
-              <Label className="text-xs">Always included (default templates)</Label>
+              <Label className="text-xs">Always included (default placeholders)</Label>
               <p className="text-[10px] text-slate-400 mb-1.5 leading-relaxed">
-                These are included in every condition. To remove one, unmark it in <strong>Default Templates</strong> above, then add it manually here.
+                These always generate and cannot have criteria. To assign one to a condition instead, remove it from <strong>Default Docman Placeholders</strong> above first.
               </p>
               <ul className="space-y-1">
                 {defaultPhs.map((p) => (
@@ -467,30 +465,50 @@ function ConditionalGroupEditor({
             </Label>
             <p className="text-[10px] text-slate-400 mb-1.5">
               {defaultPhs.length > 0
-                ? "Select extra documents to generate when this criteria is met."
-                : "Select which documents fire when this criteria is met."}
+                ? "Select additional placeholders to generate when this condition is met. A placeholder can belong to multiple groups."
+                : "Select which placeholders generate when this condition is met. A placeholder can belong to multiple groups."}
             </p>
             {optionalPhs.length === 0 && levelPlaceholders.length === 0 ? (
               <p className="text-xs text-slate-400 italic">No placeholders defined for this level yet — add them in Placeholder Builder.</p>
             ) : optionalPhs.length === 0 ? (
-              <p className="text-xs text-slate-400 italic">All placeholders for this level are marked as defaults.</p>
+              <p className="text-xs text-slate-400 italic">All placeholders for this level are set as defaults — remove them from Default Docman Placeholders to use them here.</p>
             ) : (
-              <ul className="space-y-1.5">
-                {optionalPhs.map((p) => (
-                  <li key={p._id}>
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.has(p._id)}
-                        onChange={() => { togglePlaceholder(p._id); }}
-                        onBlur={persist}
-                        className="rounded border-slate-300 text-[var(--color-blue)]"
-                      />
-                      <span className="text-sm text-slate-800 group-hover:text-slate-900">{p.name}</span>
-                    </label>
-                  </li>
-                ))}
-              </ul>
+              <>
+                <div className="flex justify-end mb-1">
+                  <button
+                    onClick={() => {
+                      const allSelected = optionalPhs.every((p) => selectedIds.has(p._id));
+                      setSelectedIds((prev) => {
+                        const next = new Set(prev);
+                        for (const p of optionalPhs) {
+                          if (allSelected) next.delete(p._id); else next.add(p._id);
+                        }
+                        return next;
+                      });
+                    }}
+                    onBlur={persist}
+                    className="text-xs text-slate-500 hover:text-slate-800"
+                  >
+                    {optionalPhs.every((p) => selectedIds.has(p._id)) ? "Deselect all" : "Select all"}
+                  </button>
+                </div>
+                <ul className="space-y-1.5">
+                  {optionalPhs.map((p) => (
+                    <li key={p._id}>
+                      <label className="flex items-center gap-2 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(p._id)}
+                          onChange={() => togglePlaceholder(p._id)}
+                          onBlur={persist}
+                          className="rounded border-slate-300 text-[var(--color-blue)]"
+                        />
+                        <span className="text-sm text-slate-800 group-hover:text-slate-900">{p.name}</span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+              </>
             )}
           </div>
         </div>
@@ -513,6 +531,7 @@ function LevelPanel({
   cardId: Id<"cards">;
 }) {
   const updatePlaceholder = useMutation(api.docman.updatePlaceholder);
+  const updateGroup = useMutation(api.docman.updateGroup);
   const createGroup = useMutation(api.docman.createGroup);
   const deleteGroup = useMutation(api.docman.deleteGroup);
 
@@ -525,7 +544,7 @@ function LevelPanel({
     [defaultPhs.map((p) => p._id).join(",")], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
-  const [addingDefault, setAddingDefault] = useState(false);
+  const [defaultSearch, setDefaultSearch] = useState("");
   const [activeGroupId, setActiveGroupId] = useState<string | null>(null);
 
   // Keep active tab in sync: if current selection is deleted, fall back to first
@@ -533,7 +552,12 @@ function LevelPanel({
 
   async function markDefault(p: Placeholder) {
     await updatePlaceholder({ id: p._id, isDefault: true });
-    setAddingDefault(false);
+    // Remove from any conditional group it belongs to
+    for (const g of levelGroups) {
+      if (g.placeholderIds.includes(p._id)) {
+        await updateGroup({ id: g._id, placeholderIds: g.placeholderIds.filter((id) => id !== p._id) });
+      }
+    }
   }
 
   async function unmarkDefault(p: Placeholder) {
@@ -558,89 +582,81 @@ function LevelPanel({
 
   return (
     <div className="space-y-6">
-      {/* Default Templates */}
+      {/* Default Docman Placeholders */}
       <div>
         <div className="mb-2 flex items-baseline gap-3">
-          <h3 className="text-sm font-semibold text-slate-800">Default Templates</h3>
-          <span className="text-xs text-slate-400">Always generated for every {level.toLowerCase()} record — included automatically in every conditional group</span>
+          <h3 className="text-sm font-semibold text-slate-800">Default Docman Placeholders</h3>
+          <span className="text-xs text-slate-400">Always generated — cannot be in a conditional group. A placeholder can only be default or conditional, not both.</span>
         </div>
 
-        <div className="rounded-lg border border-slate-200 bg-white p-3">
-          <div className="flex flex-wrap gap-1.5 min-h-[28px]">
-            {defaultPhs.length === 0 && !addingDefault && (
-              <span className="text-xs text-slate-400 italic self-center">No defaults set — click + to add one.</span>
-            )}
-            {defaultPhs.map((p) => (
-              <span
-                key={p._id}
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${colours.badge}`}
-              >
-                {p.name}
-                <button
-                  onClick={() => unmarkDefault(p)}
-                  className="ml-0.5 rounded-full hover:opacity-70 text-[11px] leading-none"
-                  title="Remove from defaults"
-                >
-                  ×
-                </button>
-              </span>
-            ))}
-
-            {addingDefault ? (
-              <div className="relative">
-                <div className="absolute top-7 left-0 z-10 w-56 rounded-lg border border-slate-200 bg-white shadow-lg py-1">
-                  {nonDefaultPhs.length === 0 ? (
-                    <p className="px-3 py-2 text-xs text-slate-400 italic">All placeholders are already defaults.</p>
-                  ) : (
-                    nonDefaultPhs.map((p) => (
-                      <button
-                        key={p._id}
-                        onClick={() => markDefault(p)}
-                        className="w-full text-left px-3 py-1.5 text-sm hover:bg-slate-50 text-slate-800"
-                      >
-                        {p.name}
-                      </button>
-                    ))
-                  )}
-                  <div className="border-t border-slate-100 mt-1 pt-1">
-                    <button
-                      onClick={() => setAddingDefault(false)}
-                      className="w-full text-left px-3 py-1 text-xs text-slate-400 hover:text-slate-600"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setAddingDefault(false)}
-                  className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium border border-dashed border-current ${colours.tab}`}
-                >
-                  + Add default
-                </button>
-              </div>
-            ) : levelPlaceholders.length > 0 ? (
-              <button
-                onClick={() => setAddingDefault(true)}
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium border border-dashed border-current ${colours.tab} hover:opacity-80`}
-              >
-                + Add default
-              </button>
-            ) : null}
+        {levelPlaceholders.length === 0 ? (
+          <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-400">
+            No placeholders exist for this level yet — add them in <strong>Placeholder Builder</strong> first.
           </div>
-
-          {levelPlaceholders.length === 0 && (
-            <p className="mt-2 text-[11px] text-slate-400">
-              No placeholders exist for this level yet — add them in <strong>Placeholder Builder</strong> first.
-            </p>
-          )}
-        </div>
+        ) : (
+          <div className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+            {/* Search + select all */}
+            <div className="border-b border-slate-200 px-3 py-2 flex items-center gap-2">
+              <Input
+                value={defaultSearch}
+                onChange={(e) => setDefaultSearch(e.target.value)}
+                placeholder="Search placeholders…"
+                className="h-7 text-xs flex-1"
+              />
+              <button
+                onClick={async () => {
+                  const visible = levelPlaceholders.filter((p) => !defaultSearch || p.name.toLowerCase().includes(defaultSearch.toLowerCase()));
+                  const allChecked = visible.every((p) => p.isDefault);
+                  for (const p of visible) {
+                    if (allChecked) { if (p.isDefault) await unmarkDefault(p); }
+                    else { if (!p.isDefault) await markDefault(p); }
+                  }
+                }}
+                className="shrink-0 text-xs text-slate-500 hover:text-slate-800 whitespace-nowrap"
+              >
+                {levelPlaceholders
+                  .filter((p) => !defaultSearch || p.name.toLowerCase().includes(defaultSearch.toLowerCase()))
+                  .every((p) => p.isDefault)
+                  ? "Deselect all"
+                  : "Select all"}
+              </button>
+            </div>
+            {/* Scrollable checkbox list */}
+            <ul className="max-h-44 overflow-y-auto divide-y divide-slate-100">
+              {levelPlaceholders
+                .filter((p) => !defaultSearch || p.name.toLowerCase().includes(defaultSearch.toLowerCase()))
+                .map((p) => {
+                  const isDefault = !!p.isDefault;
+                  return (
+                    <li key={p._id}>
+                      <label className="flex items-center gap-2.5 px-3 py-2 cursor-pointer hover:bg-slate-50">
+                        <input
+                          type="checkbox"
+                          checked={isDefault}
+                          onChange={() => isDefault ? unmarkDefault(p) : markDefault(p)}
+                          className="rounded border-slate-300"
+                        />
+                        <span className="text-sm text-slate-800">{p.name}</span>
+                        {p.category && (
+                          <span className="ml-auto text-[10px] text-slate-400">{p.category}</span>
+                        )}
+                      </label>
+                    </li>
+                  );
+                })}
+              {levelPlaceholders.filter((p) => !defaultSearch || p.name.toLowerCase().includes(defaultSearch.toLowerCase())).length === 0 && (
+                <li className="px-3 py-2 text-xs text-slate-400 italic">No matches.</li>
+              )}
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* Conditional Groups — tabbed */}
       <div>
         <div className="mb-2 flex items-baseline gap-3">
           <h3 className="text-sm font-semibold text-slate-800">Conditional Groups</h3>
-          <span className="text-xs text-slate-400">Placeholders only generate when the condition is met</span>
+          <span className="text-xs text-slate-400">Placeholders that generate only when the condition is met. Each placeholder can belong to one group only.</span>
         </div>
 
         {/* Tab bar */}
@@ -833,12 +849,6 @@ export function DocmanTool({
           );
         })}
       </div>
-
-      {/* Level field label */}
-      <p className="mb-4 text-[11px] text-slate-400">
-        <span className={`mr-2 rounded px-1.5 py-0.5 text-[10px] font-semibold ${colours.badge}`}>{activeLevel}</span>
-        Maps to <code className="font-mono">{LEVEL_FIELD_MAP[activeLevel]}</code> on LLC_BI__DocManager__c
-      </p>
 
       {/* Level content */}
       <div className="flex-1 overflow-auto">
