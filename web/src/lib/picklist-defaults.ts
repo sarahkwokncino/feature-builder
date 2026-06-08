@@ -87,3 +87,39 @@ export const CHECKLIST_PICKLIST_LABELS: Record<string, string> = {
   neededBy: "Needed By",
   placeholderName: "Document Manager Placeholder",
 };
+
+export const CONDITIONS_PICKLISTS: Record<string, string[]> = {
+  category: ["General", "Residential", "Commercial", "Development"],
+  assignedParty: [
+    "Credit Analyst / Underwriter",
+    "Credit Manager",
+    "Relationship Manager",
+    "Packaging Analyst",
+    "Compliance Officer",
+    "Legal",
+    "Solicitor",
+    "Surveyor",
+    "Other",
+  ],
+};
+
+export const CONDITIONS_PICKLIST_LABELS: Record<string, string> = {
+  category: "Category",
+  assignedParty: "Assigned Party",
+};
+
+export const POLICY_EXCEPTION_TYPES: string[] = [
+  "Collateral",
+  "Company Financial Strength",
+  "Document",
+  "Environmental",
+  "Lending Policy",
+  "Other",
+];
+
+export const FEES_PICKLISTS: Record<string, string[]> = {
+  feePaidBy: ["Borrower", "Lender"],
+  calculationType: ["Flat Amount", "Percentage"],
+  basisSource: ["Loan Amount"],
+  collectionMethod: ["Deducted from Loan", "Add to Loan", "Cash"],
+};

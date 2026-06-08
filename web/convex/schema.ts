@@ -54,6 +54,9 @@ export default defineSchema({
         v.literal("product-hierarchy"),
         v.literal("docman"),
         v.literal("collateral"),
+        v.literal("conditions"),
+        v.literal("policy-exceptions"),
+        v.literal("fees"),
       ),
     ),
   }).index("bySubphase", ["subphaseId"]),
@@ -200,9 +203,63 @@ export default defineSchema({
   }).index("byProject", ["projectId"])
     .index("byProjectTypeSubtype", ["projectId", "collateralType", "collateralSubtype"]),
 
+  // Loan Conditions — LLC_BI__Requirement__c with conditionType "Condition Precedent" / "Condition Subsequent"
+  conditionReqs: defineTable({
+    projectId: v.id("projects"),
+    conditionType: v.union(v.literal("Condition Precedent"), v.literal("Condition Subsequent")),
+    name: v.string(),
+    taskType: v.optional(v.string()),
+    category: v.optional(v.string()),
+    assignedParty: v.optional(v.string()),
+    description: v.optional(v.string()),
+    legalDescription: v.optional(v.string()),
+    stageCheck: v.optional(v.boolean()),
+    doNotAutoGenerate: v.optional(v.boolean()),
+    criteriaUserWritten: v.optional(v.string()),
+    criteriaGenerated: v.optional(v.string()),
+    placeholderName: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("byProject", ["projectId"]),
+
+  // Policy Exceptions — LLC_BI__PolicyException__c + mitigation reasons
+  policyExceptions: defineTable({
+    projectId: v.id("projects"),
+    type: v.string(),           // group/type (e.g. "Collateral")
+    name: v.string(),           // exception name
+    severities: v.array(v.string()),  // subset of ["Minor", "Major", "Critical"]
+    mitigationReasons: v.array(
+      v.object({
+        reason: v.string(),
+        commentRequired: v.boolean(),
+      }),
+    ),
+    order: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("byProject", ["projectId"]),
+
+  // Fees — LLC_BI__Fee__c preconfigured fee templates
+  fees: defineTable({
+    projectId: v.id("projects"),
+    name: v.string(),
+    feePaidBy: v.optional(v.string()),
+    calculationType: v.optional(v.union(v.literal("Flat Amount"), v.literal("Percentage"))),
+    basisSource: v.optional(v.string()),
+    percentage: v.optional(v.number()),
+    amount: v.optional(v.number()),
+    collectionMethod: v.optional(v.string()),
+    autoApply: v.optional(v.boolean()),
+    appliedToProducts: v.optional(v.array(v.string())),
+    notes: v.optional(v.string()),
+    order: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("byProject", ["projectId"]),
+
   // Picklist values, scoped per configurator
   picklists: defineTable({
-    scope: v.union(v.literal("covenants"), v.literal("checklist"), v.literal("collateral")),
+    scope: v.union(v.literal("covenants"), v.literal("checklist"), v.literal("collateral"), v.literal("conditions"), v.literal("policy-exceptions"), v.literal("fees")),
     key: v.string(),
     values: v.array(v.string()),
   }).index("byScopeKey", ["scope", "key"]),

@@ -1,0 +1,863 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Version>16.00</Version>
+ </DocumentProperties>
+ <OfficeDocumentSettings xmlns="urn:schemas-microsoft-com:office:office">
+  <AllowPNG/>
+ </OfficeDocumentSettings>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>6780</WindowHeight>
+  <WindowWidth>16457</WindowWidth>
+  <WindowTopX>32767</WindowTopX>
+  <WindowTopY>32767</WindowTopY>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Fee Templates">
+  <Table ss:ExpandedColumnCount="11" ss:ExpandedRowCount="28" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultColumnWidth="51.428571428571431"
+   ss:DefaultRowHeight="14.571428571428571">
+   <Column ss:Width="144.42857142857142"/>
+   <Column ss:Width="100.28571428571428"/>
+   <Column ss:Width="159.42857142857144"/>
+   <Column ss:Width="165.42857142857142"/>
+   <Column ss:Width="191.14285714285714"/>
+   <Column ss:Width="120.85714285714286"/>
+   <Column ss:Width="111"/>
+   <Column ss:Width="204.42857142857144"/>
+   <Column ss:Width="145.28571428571428"/>
+   <Column ss:Width="1424.5714285714284"/>
+   <Row>
+    <Cell><Data ss:Type="String">object</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Category__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Picklist_1__c (Fee Name)</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Picklist_2__c (Fee Paid By)</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Picklist_4__c (Calculation Type)</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Basis_Source__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Percentage__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Currency_Field_1__c (Flat Amount)</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Collection_Method__c</Data></Cell>
+    <Cell><Data ss:Type="String">Applied To Products (reference — product wiring done in Product Hierarchy Builder)</Data></Cell>
+    <Cell><Data ss:Type="String">Notes</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell><Data ss:Type="String">Loan Amount</Data></Cell>
+    <Cell><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:Index="9"><Data ss:Type="String">Deducted from Loan</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate-Commercial-Term Loan;Residential-Unregulated Bridge-Purchase;Residential-Unregulated Bridge-Remortgage;Residential-Unregulated Bridge-Further Advance;Residential-Unregulated Bridge-Change of Contract;Residential-Regulated Bridge-Purchase;Residential-Regulated Bridge-Remortgage;Residential-Regulated Bridge-Further Advance;Residential-Regulated Bridge-Change of Contract;Residential-Refurbishment Loan-Purchase;Residential-Refurbishment Loan-Remortgage;Residential-Refurbishment Loan-Further Advance;Residential-Refurbishment Loan-Change of Contract;Residential-Enviro-let Loan-Purchase;Residential-Enviro-let Loan-Remortgage;Residential-Enviro-let Loan-Further Advance;Residential-Enviro-let Loan-Rate Switch;Residential-Enviro-let Loan-Change of Contract;Residential-Buy-to-Let-Purchase;Residential-Buy-to-Let-Remortgage;Residential-Buy-to-Let-Further Advance;Residential-Buy-to-Let-Rate Switch;Residential-Buy-to-Let-Change of Contract;Real Estate-Development-Development Loan;Real Estate-Commercial-Amortised Term;Real Estate-Development-GHA;Real Estate-Development-Bridge with Works;Real Estate-Development-Peak Debt Loan</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Percentage</Data></Cell>
+    <Cell><Data ss:Type="String">Loan Amount</Data></Cell>
+    <Cell><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:Index="9"><Data ss:Type="String">Deducted from Loan</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate-Commercial-Term Loan;Residential-Unregulated Bridge-Purchase;Residential-Unregulated Bridge-Remortgage;Residential-Unregulated Bridge-Further Advance;Residential-Unregulated Bridge-Change of Contract;Residential-Regulated Bridge-Purchase;Residential-Regulated Bridge-Remortgage;Residential-Regulated Bridge-Further Advance;Residential-Regulated Bridge-Change of Contract;Residential-Refurbishment Loan-Purchase;Residential-Refurbishment Loan-Remortgage;Residential-Refurbishment Loan-Further Advance;Residential-Refurbishment Loan-Change of Contract;Residential-Enviro-let Loan-Purchase;Residential-Enviro-let Loan-Remortgage;Residential-Enviro-let Loan-Further Advance;Residential-Enviro-let Loan-Rate Switch;Residential-Enviro-let Loan-Change of Contract;Residential-Buy-to-Let-Purchase;Residential-Buy-to-Let-Remortgage;Residential-Buy-to-Let-Further Advance;Residential-Buy-to-Let-Rate Switch;Residential-Buy-to-Let-Change of Contract;Real Estate-Development-Development Loan;Real Estate-Commercial-Amortised Term;Real Estate-Development-GHA;Real Estate-Development-Bridge with Works;Real Estate-Development-Peak Debt Loan</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">AVM Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Broker Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Broker Fee (Regulated) </Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Commitment Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">10000</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Completion Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Percentage</Data></Cell>
+    <Cell><Data ss:Type="String">Loan Amount</Data></Cell>
+    <Cell><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:Index="9"><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Exit Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="7"><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:Index="9"><Data ss:Type="String">Cash</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">1020</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Fee (incl. VAT)</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">1020</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">ORE Legal Costs for Redemption</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell><Data ss:Type="String">Loan Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">200</Data></Cell>
+    <Cell><Data ss:Type="String">Cash</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Procuration Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Percentage</Data></Cell>
+    <Cell ss:Index="7"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:Index="9"><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Redemption Administration Charge</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Retained Amount</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Retained Interest</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Percentage</Data></Cell>
+    <Cell><Data ss:Type="String">Loan Amount</Data></Cell>
+    <Cell><Data ss:Type="Number">0</Data></Cell>
+    <Cell ss:Index="9"><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Security Release Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="String">Cash</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Telegraphic Transfer Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">300</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Title Indemnity Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">67.2</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="String">Cash</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Extension Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Professional Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Quantity Surveyor Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Asset Manager Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Standstill Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Management</Data></Cell>
+    <Cell><Data ss:Type="String">Penalty Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Flat Amount</Data></Cell>
+    <Cell ss:Index="8"><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="String">Deducted from Loan</Data></Cell>
+   </Row>
+   <Row ss:Index="28" ss:AutoFitHeight="0" ss:Height="12.857142857142858"/>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Selected/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>23</ActiveRow>
+     <ActiveCol>4</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Product Assignments">
+  <Table ss:ExpandedColumnCount="6" ss:ExpandedRowCount="57" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultColumnWidth="51.428571428571431"
+   ss:DefaultRowHeight="14.571428571428571">
+   <Column ss:Width="167.14285714285717"/>
+   <Column ss:AutoFitWidth="0" ss:Width="158.57142857142858"/>
+   <Row>
+    <Cell><Data ss:Type="String">object</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c (fee name — resolve to Id)</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Product__r.Name</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Product__r.LLC_BI__Product_Line_Name__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Product__r.LLC_BI__Product_Type_Name__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Product__c (resolve Id by matching all three product fields above)</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Term Loan</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate</Data></Cell>
+    <Cell><Data ss:Type="String">Commercial</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Purchase</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Unregulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Remortgage</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Unregulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Further Advance</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Unregulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Change of Contract</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Unregulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Purchase</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Regulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Remortgage</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Regulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Further Advance</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Regulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Change of Contract</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Regulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Purchase</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Refurbishment Loan</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Remortgage</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Refurbishment Loan</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Further Advance</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Refurbishment Loan</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Change of Contract</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Refurbishment Loan</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">let Loan-Purchase</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Enviro</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">let Loan-Remortgage</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Enviro</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">let Loan-Further Advance</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Enviro</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">let Loan-Rate Switch</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Enviro</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">let Loan-Change of Contract</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Enviro</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">to-Let-Purchase</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Buy</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">to-Let-Remortgage</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Buy</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">to-Let-Further Advance</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Buy</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">to-Let-Rate Switch</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Buy</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">to-Let-Change of Contract</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Buy</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Development Loan</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate</Data></Cell>
+    <Cell><Data ss:Type="String">Development</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Amortised Term</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate</Data></Cell>
+    <Cell><Data ss:Type="String">Commercial</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">GHA</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate</Data></Cell>
+    <Cell><Data ss:Type="String">Development</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Bridge with Works</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate</Data></Cell>
+    <Cell><Data ss:Type="String">Development</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Admin Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Peak Debt Loan</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate</Data></Cell>
+    <Cell><Data ss:Type="String">Development</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Term Loan</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate</Data></Cell>
+    <Cell><Data ss:Type="String">Commercial</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Purchase</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Unregulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Remortgage</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Unregulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Further Advance</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Unregulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Change of Contract</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Unregulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Purchase</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Regulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Remortgage</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Regulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Further Advance</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Regulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Change of Contract</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Regulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Purchase</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Refurbishment Loan</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Remortgage</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Refurbishment Loan</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Further Advance</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Refurbishment Loan</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Change of Contract</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Refurbishment Loan</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">let Loan-Purchase</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Enviro</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">let Loan-Remortgage</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Enviro</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">let Loan-Further Advance</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Enviro</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">let Loan-Rate Switch</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Enviro</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">let Loan-Change of Contract</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Enviro</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">to-Let-Purchase</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Buy</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">to-Let-Remortgage</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Buy</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">to-Let-Further Advance</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Buy</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">to-Let-Rate Switch</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Buy</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">to-Let-Change of Contract</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">Buy</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Development Loan</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate</Data></Cell>
+    <Cell><Data ss:Type="String">Development</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Amortised Term</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate</Data></Cell>
+    <Cell><Data ss:Type="String">Commercial</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">GHA</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate</Data></Cell>
+    <Cell><Data ss:Type="String">Development</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Bridge with Works</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate</Data></Cell>
+    <Cell><Data ss:Type="String">Development</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">Arrangement Fee</Data></Cell>
+    <Cell><Data ss:Type="String">Peak Debt Loan</Data></Cell>
+    <Cell><Data ss:Type="String">Real Estate</Data></Cell>
+    <Cell><Data ss:Type="String">Development</Data></Cell>
+    <Cell><Data ss:Type="String">&lt;resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match&gt;</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>69</ActiveRow>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="SF Object Reference">
+  <Table ss:ExpandedColumnCount="3" ss:ExpandedRowCount="14" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultColumnWidth="51.428571428571431"
+   ss:DefaultRowHeight="14.571428571428571">
+   <Row>
+    <Cell><Data ss:Type="String">Object</Data></Cell>
+    <Cell><Data ss:Type="String">Field (API Name)</Data></Cell>
+    <Cell><Data ss:Type="String">Description</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Category__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fixed value: &quot;Fee Management&quot;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Picklist_1__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee name</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Picklist_2__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fee Paid By (Borrower | Lender)</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Picklist_4__c</Data></Cell>
+    <Cell><Data ss:Type="String">Calculation Type (Flat Amount | Percentage)</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Basis_Source__c</Data></Cell>
+    <Cell><Data ss:Type="String">Basis for percentage calculation (e.g. Loan Amount) — only when Calculation Type = Percentage</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Percentage__c</Data></Cell>
+    <Cell><Data ss:Type="String">Percentage value — only when Calculation Type = Percentage</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Collection_Method__c</Data></Cell>
+    <Cell><Data ss:Type="String">How the fee is collected (Deducted from Loan | Add to Loan | Cash)</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Template_Records__c</Data></Cell>
+    <Cell><Data ss:Type="String">Lookup to the fee template record (LLC_BI__Template_Records__c)</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Product__c</Data></Cell>
+    <Cell><Data ss:Type="String">Lookup to LLC_BI__Product__c — resolve Id by matching LLC_BI__Product__r.Name + LLC_BI__Product__r.LLC_BI__Product_Line_Name__c + LLC_BI__Product__r.LLC_BI__Product_Type_Name__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Product__r.Name</Data></Cell>
+    <Cell><Data ss:Type="String">Product name (for resolution only)</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Product__r.LLC_BI__Product_Line_Name__c</Data></Cell>
+    <Cell><Data ss:Type="String">Product Line name (for resolution only)</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Template_Join__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Product__r.LLC_BI__Product_Type_Name__c</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type name (for resolution only)</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>

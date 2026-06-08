@@ -1056,6 +1056,742 @@ export function parseDocmanExcel(text: string): DocmanExport | string {
   return { placeholders, groups: [...conditionalMap.values()] };
 }
 
+// ── Conditions Builder ─────────────────────────────────────────────────────────
+
+export type ConditionType = "Condition Precedent" | "Condition Subsequent";
+
+export type ConditionRecord = {
+  name: string;
+  conditionType: ConditionType;
+  category?: string;
+  assignedParty?: string;
+  description?: string;
+  legalDescription?: string;
+};
+
+const CONDITION_EXCEL_COLS: { key: keyof ConditionRecord; label: string }[] = [
+  { key: "name", label: "Name" },
+  { key: "conditionType", label: "LLC_BI__Requirement_Type__c" },
+  { key: "category", label: "LLC_BI__Category__c" },
+  { key: "description", label: "LLC_BI__Description__c" },
+  { key: "legalDescription", label: "LLC_BI__Legal_Description__c" },
+  { key: "assignedParty", label: "LLC_BI__Assigned_Party__c" },
+];
+
+const CONDITION_EXCEL_FIXED_COLS: { label: string; value: string }[] = [];
+
+const CONDITION_TYPES: ConditionType[] = ["Condition Precedent", "Condition Subsequent"];
+
+function buildConditionsYamlSection(reqs: ConditionRecord[], conditionType: ConditionType): string {
+  let y = `# ${"─".repeat(70)}\n`;
+  y += `# ${conditionType.toUpperCase()} CONDITIONS\n`;
+  y += `# ${"─".repeat(70)}\n\n`;
+  for (const req of reqs) {
+    y += `  - object: LLC_BI__Requirement__c\n    fields:\n`;
+    y += `      Name: "${yamlStr(req.name)}"\n`;
+    y += `      LLC_BI__Requirement_Type__c: "${yamlStr(req.conditionType)}"\n`;
+    if (req.category) y += `      LLC_BI__Category__c: "${yamlStr(req.category)}"\n`;
+    if (req.assignedParty) y += `      LLC_BI__Assigned_Party__c: "${yamlStr(req.assignedParty)}"\n`;
+    if (req.description) y += `      LLC_BI__Description__c: "${yamlStr(req.description)}"\n`;
+    if (req.legalDescription) y += `      LLC_BI__Legal_Description__c: "${yamlStr(req.legalDescription)}"\n`;
+    y += `\n`;
+  }
+  return y;
+}
+
+export function buildConditionsYaml(
+  records: ConditionRecord[],
+  meta: { storyId: string; title: string; featureArea: string },
+): string {
+  const named = records.filter((r) => r.name.trim());
+  let y = `story_id: "${meta.storyId}"\ntitle: "${yamlStr(meta.title)}"\nfeature_area: ${meta.featureArea}\n`;
+  y += `source:\n  type: conditions-builder\n  ref: "conditions-builder@${today()}"\n\nrecords:\n\n`;
+  if (!named.length) {
+    y += "  # No named conditions yet.\n";
+    return y;
+  }
+  const precedentReqs = named.filter((r) => r.conditionType === "Condition Precedent");
+  const subsequentReqs = named.filter((r) => r.conditionType === "Condition Subsequent");
+  if (precedentReqs.length) y += buildConditionsYamlSection(precedentReqs, "Condition Precedent");
+  if (subsequentReqs.length) y += buildConditionsYamlSection(subsequentReqs, "Condition Subsequent");
+  return y;
+}
+
+export function downloadConditionsYaml(
+  records: ConditionRecord[],
+  meta: { storyId: string; title: string; featureArea: string },
+) {
+  const yaml = buildConditionsYaml(records, meta);
+  downloadBlob(
+    new Blob([yaml], { type: "text/yaml" }),
+    `${slugify(meta.storyId || "conditions")}.yaml`,
+  );
+}
+
+function buildConditionSheet(reqs: ConditionRecord[], conditionType: ConditionType): string {
+  const sheetName =
+    conditionType === "Condition Precedent" ? "Condition Precedent" : "Condition Subsequent";
+  const rows: unknown[][] = [
+    [...CONDITION_EXCEL_COLS.map((c) => c.label), ...CONDITION_EXCEL_FIXED_COLS.map((c) => c.label)],
+  ];
+  for (const req of reqs) {
+    rows.push([
+      ...CONDITION_EXCEL_COLS.map((c) => String(req[c.key] ?? "")),
+      ...CONDITION_EXCEL_FIXED_COLS.map((c) => c.value),
+    ]);
+  }
+  return buildXlsxSheet(rows, sheetName);
+}
+
+export function downloadConditionsExcel(records: ConditionRecord[]) {
+  const named = records.filter((r) => r.name.trim());
+  const precedentReqs = named.filter((r) => r.conditionType === "Condition Precedent");
+  const subsequentReqs = named.filter((r) => r.conditionType === "Condition Subsequent");
+  const sheet1 = buildConditionSheet(precedentReqs, "Condition Precedent");
+  const sheet2 = buildConditionSheet(subsequentReqs, "Condition Subsequent");
+
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<?mso-application progid="Excel.Sheet"?>` +
+    `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">` +
+    `<Styles><Style ss:ID="h"><Font ss:Bold="1"/></Style></Styles>` +
+    sheet1 +
+    sheet2 +
+    `</Workbook>`;
+
+  downloadBlob(
+    new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" }),
+    "conditions.xls",
+  );
+}
+
+export function parseConditionsYaml(text: string): ConditionRecord[] | string {
+  const blocks = text.split(/\n  - object: LLC_BI__Requirement__c/);
+  blocks.shift();
+  const parsed: ConditionRecord[] = [];
+  for (const block of blocks) {
+    const gF = (label: string) => {
+      const m = block.match(new RegExp(`${label}:\\s*"([^"]*)"`, "i"));
+      return m ? m[1].replace(/\\n/g, "\n").replace(/\\"/g, '"') : "";
+    };
+    const gB = (label: string) => {
+      const m = block.match(new RegExp(`${label}:\\s*(true|false)`, "i"));
+      return m ? m[1] === "true" : false;
+    };
+    const name = gF("Name");
+    if (!name) continue;
+    const conditionTypeRaw = gF("LLC_BI__Requirement_Type__c");
+    // Skip records that are not condition types (e.g. plain checklist reqs)
+    if (conditionTypeRaw && !CONDITION_TYPES.includes(conditionTypeRaw as ConditionType)) continue;
+    const conditionType: ConditionType =
+      conditionTypeRaw === "Condition Subsequent"
+        ? "Condition Subsequent"
+        : "Condition Precedent";
+    parsed.push({
+      name,
+      conditionType,
+      category: gF("LLC_BI__Category__c") || undefined,
+      assignedParty: gF("LLC_BI__Assigned_Party__c") || undefined,
+      description: gF("LLC_BI__Description__c") || undefined,
+      legalDescription: gF("LLC_BI__Legal_Description__c") || undefined,
+    });
+  }
+  if (!parsed.length) return "No LLC_BI__Requirement__c condition records found.";
+  return parsed;
+}
+
+export function parseConditionsCsvExcel(text: string): ConditionRecord[] | string {
+  const raw = text.replace(/^\uFEFF/, "");
+
+  // SpreadsheetML XML (exported by this tool, possibly re-saved by Excel)
+  if (raw.trimStart().startsWith("<?xml") || raw.trimStart().startsWith("<Workbook")) {
+    return parseConditionsSpreadsheetML(raw);
+  }
+
+  // Plain CSV fallback
+  const lines = raw.split(/\r?\n/).filter((l) => l.trim());
+  if (lines.length < 2) return "File appears empty or has no data rows.";
+  const headers = parseCsvRow(lines[0]).map((h) => h.trim());
+  const colIdx: Partial<Record<keyof ConditionRecord, number>> = {};
+  for (const col of CONDITION_EXCEL_COLS) {
+    const i = headers.indexOf(col.label);
+    if (i !== -1) colIdx[col.key] = i;
+  }
+  if (colIdx["name"] === undefined)
+    return 'Could not find a "Name" column. Make sure the file was exported from this tool.';
+  const parsed: ConditionRecord[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = parseCsvRow(lines[i]);
+    const get = (key: keyof ConditionRecord) =>
+      colIdx[key] !== undefined ? (cells[colIdx[key]!] || "").trim() : "";
+    const name = get("name");
+    if (!name) continue;
+    const conditionTypeRaw = get("conditionType");
+    const conditionType: ConditionType =
+      conditionTypeRaw === "Condition Subsequent" ? "Condition Subsequent" : "Condition Precedent";
+    parsed.push({
+      name,
+      conditionType,
+      category: get("category") || undefined,
+      assignedParty: get("assignedParty") || undefined,
+      description: get("description") || undefined,
+      legalDescription: get("legalDescription") || undefined,
+    });
+  }
+  if (!parsed.length) return "No rows with a Name value found.";
+  return parsed;
+}
+
+function parseConditionsSpreadsheetML(xml: string): ConditionRecord[] | string {
+  // Decode XML entities
+  const decode = (s: string) =>
+    s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+     .replace(/&quot;/g, '"').replace(/&#160;/g, " ").replace(/&apos;/g, "'").trim();
+
+  // Extract all rows from all worksheets as arrays of cell strings
+  const rowPattern = /<Row[^>]*>([\s\S]*?)<\/Row>/gi;
+  const cellPattern = /<Cell[^>]*>[\s\S]*?<Data[^>]*>([\s\S]*?)<\/Data>[\s\S]*?<\/Cell>/gi;
+
+  const allRows: string[][] = [];
+  let rowMatch;
+  while ((rowMatch = rowPattern.exec(xml)) !== null) {
+    const rowXml = rowMatch[1];
+    const cells: string[] = [];
+    let cellMatch;
+    const cellRe = new RegExp(cellPattern.source, "gi");
+    while ((cellMatch = cellRe.exec(rowXml)) !== null) {
+      cells.push(decode(cellMatch[1]));
+    }
+    if (cells.length > 0) allRows.push(cells);
+  }
+
+  if (allRows.length < 2) return "File appears empty or has no data rows.";
+
+  // Find the header row (first row containing "Name")
+  const headerRowIdx = allRows.findIndex((r) => r.includes("Name"));
+  if (headerRowIdx === -1) return 'Could not find a "Name" column. Make sure the file was exported from this tool.';
+
+  const headers = allRows[headerRowIdx];
+  const colIdx: Partial<Record<keyof ConditionRecord, number>> = {};
+  for (const col of CONDITION_EXCEL_COLS) {
+    const i = headers.indexOf(col.label);
+    if (i !== -1) colIdx[col.key] = i;
+  }
+
+  const parsed: ConditionRecord[] = [];
+  for (let i = headerRowIdx + 1; i < allRows.length; i++) {
+    const cells = allRows[i];
+    const get = (key: keyof ConditionRecord) =>
+      colIdx[key] !== undefined ? (cells[colIdx[key]!] ?? "").trim() : "";
+    const name = get("name");
+    if (!name) continue;
+    const conditionTypeRaw = get("conditionType");
+    const conditionType: ConditionType =
+      conditionTypeRaw === "Condition Subsequent" ? "Condition Subsequent" : "Condition Precedent";
+    parsed.push({
+      name,
+      conditionType,
+      category: get("category") || undefined,
+      assignedParty: get("assignedParty") || undefined,
+      description: get("description") || undefined,
+      legalDescription: get("legalDescription") || undefined,
+    });
+  }
+  if (!parsed.length) return "No condition rows found in file.";
+  return parsed;
+}
+
+// ── Policy Exceptions Builder ──────────────────────────────────────────────────
+
+export type PolicyExceptionMitigationReason = {
+  reason: string;
+  commentRequired: boolean;
+};
+
+export type PolicyExceptionRecord = {
+  type: string;
+  name: string;
+  severities: string[];
+  mitigationReasons: PolicyExceptionMitigationReason[];
+};
+
+export function buildPolicyExceptionsYaml(
+  records: PolicyExceptionRecord[],
+  meta: { storyId: string; title: string; featureArea: string },
+): string {
+  const named = records.filter((r) => r.name.trim());
+  let y = `story_id: "${meta.storyId}"\ntitle: "${yamlStr(meta.title)}"\nfeature_area: ${meta.featureArea}\n`;
+  y += `source:\n  type: policy-exceptions-builder\n  ref: "policy-exceptions-builder@${today()}"\n\n`;
+  y += `# ── Salesforce object reference ─────────────────────────────────────────\n`;
+  y += `# Templates  → LLC_BI__Policy_Exception_Template__c\n`;
+  y += `#   Name                  → Name\n`;
+  y += `#   Type                  → LLC_BI__Type__c\n`;
+  y += `#   Severities            → LLC_BI__Severities__c  (semicolon-separated, e.g. Minor;Major;Critical)\n`;
+  y += `#\n`;
+  y += `# Mitigation reasons → LLC_BI__Policy_Exception_Mitigation_Reason__c\n`;
+  y += `#   One record per reason; lookup to template via LLC_BI__Policy_Exception_Template__c\n`;
+  y += `#   Reason text           → LLC_BI__Reason__c\n`;
+  y += `#   Comment required flag → LLC_BI__Comment_Required__c\n`;
+  y += `# ────────────────────────────────────────────────────────────────────────\n\n`;
+  y += `records:\n\n`;
+
+  if (!named.length) {
+    y += "  # No policy exceptions configured yet.\n";
+    return y;
+  }
+
+  for (const exc of named) {
+    y += `  # Template record\n`;
+    y += `  - object: LLC_BI__Policy_Exception_Template__c\n`;
+    y += `    fields:\n`;
+    y += `      Name: "${yamlStr(exc.name)}"\n`;
+    y += `      LLC_BI__Type__c: "${yamlStr(exc.type)}"\n`;
+    if (exc.severities.length) {
+      y += `      LLC_BI__Severities__c: "${exc.severities.join(";")}"\n`;
+    }
+    y += `\n`;
+    if (exc.mitigationReasons.length) {
+      y += `  # Mitigation reasons for "${yamlStr(exc.name)}" (lookup: LLC_BI__Policy_Exception_Template__c)\n`;
+      for (const mr of exc.mitigationReasons) {
+        if (!mr.reason.trim()) continue;
+        y += `  - object: LLC_BI__Policy_Exception_Mitigation_Reason__c\n`;
+        y += `    fields:\n`;
+        y += `      LLC_BI__Policy_Exception_Template__c: ref:Name:"${yamlStr(exc.name)}"\n`;
+        y += `      LLC_BI__Reason__c: "${yamlStr(mr.reason)}"\n`;
+        y += `      LLC_BI__Comment_Required__c: ${mr.commentRequired}\n`;
+        y += `\n`;
+      }
+    }
+  }
+  return y;
+}
+
+export function downloadPolicyExceptionsYaml(
+  records: PolicyExceptionRecord[],
+  meta: { storyId: string; title: string; featureArea: string },
+) {
+  const yaml = buildPolicyExceptionsYaml(records, meta);
+  downloadBlob(
+    new Blob([yaml], { type: "text/yaml" }),
+    `${slugify(meta.storyId || "policy-exceptions")}.yaml`,
+  );
+}
+
+export function downloadPolicyExceptionsExcel(records: PolicyExceptionRecord[]) {
+  const named = records.filter((r) => r.name.trim());
+
+  // Sheet 1: LLC_BI__Policy_Exception_Template__c
+  const excRows: unknown[][] = [
+    ["object", "Name", "LLC_BI__Type__c", "LLC_BI__Severities__c"],
+    ...named.map((r) => [
+      "LLC_BI__Policy_Exception_Template__c",
+      r.name,
+      r.type,
+      r.severities.join(";"),
+    ]),
+  ];
+  if (named.length === 0) excRows.push(["# No exceptions defined", "", "", ""]);
+
+  // Sheet 2: LLC_BI__Policy_Exception_Mitigation_Reason__c (one row per reason)
+  const mrRows: unknown[][] = [
+    ["object", "LLC_BI__Policy_Exception_Template__c (Name lookup)", "LLC_BI__Reason__c", "LLC_BI__Comment_Required__c"],
+  ];
+  for (const exc of named) {
+    for (const mr of exc.mitigationReasons) {
+      if (!mr.reason.trim()) continue;
+      mrRows.push([
+        "LLC_BI__Policy_Exception_Mitigation_Reason__c",
+        exc.name,
+        mr.reason,
+        mr.commentRequired ? "true" : "false",
+      ]);
+    }
+  }
+  if (mrRows.length === 1) mrRows.push(["# No mitigation reasons defined", "", "", ""]);
+
+  // Sheet 3: Salesforce object reference
+  const refRows: unknown[][] = [
+    ["Object", "Field (API Name)", "Description"],
+    ["LLC_BI__Policy_Exception_Template__c", "Name", "Exception name"],
+    ["LLC_BI__Policy_Exception_Template__c", "LLC_BI__Type__c", "Exception type"],
+    ["LLC_BI__Policy_Exception_Template__c", "LLC_BI__Severities__c", "Severities (semicolon-separated, e.g. Minor;Major;Critical)"],
+    ["LLC_BI__Policy_Exception_Mitigation_Reason__c", "LLC_BI__Policy_Exception_Template__c", "Lookup to LLC_BI__Policy_Exception_Template__c (by Name)"],
+    ["LLC_BI__Policy_Exception_Mitigation_Reason__c", "LLC_BI__Reason__c", "Mitigation reason text"],
+    ["LLC_BI__Policy_Exception_Mitigation_Reason__c", "LLC_BI__Comment_Required__c", "Boolean — whether a comment is required when selecting this reason"],
+  ];
+
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<?mso-application progid="Excel.Sheet"?>` +
+    `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">` +
+    `<Styles><Style ss:ID="h"><Font ss:Bold="1"/></Style></Styles>` +
+    buildXlsxSheet(excRows, "Policy Exception Templates") +
+    buildXlsxSheet(mrRows, "Mitigation Reasons") +
+    buildXlsxSheet(refRows, "SF Object Reference") +
+    `</Workbook>`;
+
+  downloadBlob(
+    new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" }),
+    "policy-exceptions.xls",
+  );
+}
+
+// ── Fees Builder ──────────────────────────────────────────────────────────────
+
+function parseProductName(prod: string): { productLine: string; productType: string; productName: string } {
+  const firstDash = prod.indexOf("-");
+  const lastDash = prod.lastIndexOf("-");
+  if (firstDash === -1 || firstDash === lastDash) {
+    return { productLine: prod.trim(), productType: "", productName: "" };
+  }
+  return {
+    productLine: prod.slice(0, firstDash).trim(),
+    productType: prod.slice(firstDash + 1, lastDash).trim(),
+    productName: prod.slice(lastDash + 1).trim(),
+  };
+}
+
+export type FeeRecord = {
+  name: string;
+  feePaidBy?: string;
+  calculationType?: "Flat Amount" | "Percentage";
+  basisSource?: string;
+  percentage?: number;
+  amount?: number;
+  collectionMethod?: string;
+  autoApply?: boolean;
+  appliedToProducts?: string[];
+  notes?: string;
+};
+
+export function buildFeesYaml(
+  records: FeeRecord[],
+  meta: { storyId: string; title: string; featureArea: string },
+): string {
+  const named = records.filter((r) => r.name.trim());
+  let y = `story_id: "${meta.storyId}"\ntitle: "${yamlStr(meta.title)}"\nfeature_area: ${meta.featureArea}\n`;
+  y += `source:\n  type: fees-builder\n  ref: "fees-builder@${today()}"\n\n`;
+  y += `# ── Salesforce object reference ─────────────────────────────────────────\n`;
+  y += `# Step 1 — Fee templates: LLC_BI__Template_Records__c\n`;
+  y += `#   LLC_BI__Category__c          → "Fee Management"  (fixed value)\n`;
+  y += `#   LLC_BI__Picklist_1__c        → Fee Name\n`;
+  y += `#   LLC_BI__Picklist_2__c        → Fee Paid By\n`;
+  y += `#   LLC_BI__Picklist_4__c        → Calculation Type  ("Flat Amount" | "Percentage")\n`;
+  y += `#   LLC_BI__Basis_Source__c      → Basis Source  (only when Calculation Type = Percentage)\n`;
+  y += `#   LLC_BI__Percentage__c        → Percentage  (only when Calculation Type = Percentage)\n`;
+  y += `#   LLC_BI__Collection_Method__c → Collection Method\n`;
+  y += `#\n`;
+  y += `# Step 2 — Product assignments: LLC_BI__Product_Template_Join__c\n`;
+  y += `#   One record per fee × product combination.\n`;
+  y += `#   LLC_BI__Template_Records__c  → lookup to the fee template (by LLC_BI__Picklist_1__c / Name)\n`;
+  y += `#   LLC_BI__Product__c           → lookup to LLC_BI__Product__c resolved by matching all three:\n`;
+  y += `#                                   LLC_BI__Product__r.LLC_BI__Product_Line_Name__c\n`;
+  y += `#                                   LLC_BI__Product__r.LLC_BI__Product_Type_Name__c\n`;
+  y += `#                                   LLC_BI__Product__r.Name\n`;
+  y += `# ────────────────────────────────────────────────────────────────────────\n\n`;
+  y += `records:\n\n`;
+
+  if (!named.length) {
+    y += "  # No fees configured yet.\n";
+    return y;
+  }
+
+  // Step 1: fee template records
+  y += `  # ${"─".repeat(66)}\n`;
+  y += `  # STEP 1 — Fee Templates (LLC_BI__Template_Records__c)\n`;
+  y += `  # ${"─".repeat(66)}\n\n`;
+
+  for (const fee of named) {
+    y += `  - object: LLC_BI__Template_Records__c\n`;
+    y += `    fields:\n`;
+    y += `      LLC_BI__Category__c: "Fee Management"\n`;
+    y += `      LLC_BI__Picklist_1__c: "${yamlStr(fee.name)}"\n`;
+    if (fee.feePaidBy) y += `      LLC_BI__Picklist_2__c: "${yamlStr(fee.feePaidBy)}"\n`;
+    if (fee.calculationType) y += `      LLC_BI__Picklist_4__c: "${yamlStr(fee.calculationType)}"\n`;
+    if (fee.calculationType === "Percentage") {
+      if (fee.basisSource) y += `      LLC_BI__Basis_Source__c: "${yamlStr(fee.basisSource)}"\n`;
+      if (fee.percentage !== undefined) y += `      LLC_BI__Percentage__c: ${fee.percentage}\n`;
+    }
+    if (fee.calculationType === "Flat Amount" && fee.amount !== undefined) {
+      y += `      LLC_BI__Currency_Field_1__c: ${fee.amount}\n`;
+    }
+    if (fee.collectionMethod) y += `      LLC_BI__Collection_Method__c: "${yamlStr(fee.collectionMethod)}"\n`;
+    if (fee.notes) y += `      # Notes: ${yamlStr(fee.notes)}\n`;
+    y += `\n`;
+  }
+
+  // Step 2: product template join records
+  const joinFees = named.filter((f) => f.autoApply && f.appliedToProducts && f.appliedToProducts.length > 0);
+  if (joinFees.length) {
+    y += `  # ${"─".repeat(66)}\n`;
+    y += `  # STEP 2 — Product Assignments (LLC_BI__Product_Template_Join__c)\n`;
+    y += `  # Populate LLC_BI__Product__c by querying LLC_BI__Product__c where\n`;
+    y += `  # LLC_BI__Product_Line_Name__c, LLC_BI__Product_Type_Name__c, and Name all match.\n`;
+    y += `  # ${"─".repeat(66)}\n\n`;
+
+    for (const fee of joinFees) {
+      for (const prod of fee.appliedToProducts!) {
+        const { productLine, productType, productName } = parseProductName(prod);
+        y += `  - object: LLC_BI__Product_Template_Join__c\n`;
+        y += `    fields:\n`;
+        y += `      LLC_BI__Template_Records__c: ref:LLC_BI__Picklist_1__c:"${yamlStr(fee.name)}"  # fee template\n`;
+        y += `      LLC_BI__Product__r.LLC_BI__Product_Line_Name__c: "${yamlStr(productLine)}"\n`;
+        y += `      LLC_BI__Product__r.LLC_BI__Product_Type_Name__c: "${yamlStr(productType)}"\n`;
+        y += `      LLC_BI__Product__r.Name: "${yamlStr(productName || prod)}"\n`;
+        y += `      LLC_BI__Product__c: ref:Name:"${yamlStr(productName || prod)}"  # resolve Id by matching all three fields above\n`;
+        y += `\n`;
+      }
+    }
+  }
+
+  return y;
+}
+
+export function downloadFeesYaml(
+  records: FeeRecord[],
+  meta: { storyId: string; title: string; featureArea: string },
+) {
+  const yaml = buildFeesYaml(records, meta);
+  downloadBlob(
+    new Blob([yaml], { type: "text/yaml" }),
+    `${slugify(meta.storyId || "fees")}.yaml`,
+  );
+}
+
+export function downloadFeesExcel(records: FeeRecord[]) {
+  const named = records.filter((r) => r.name.trim());
+
+  // Sheet 1: Fees — one row per fee with SF API column headers
+  const feeRows: unknown[][] = [
+    [
+      "object",
+      "LLC_BI__Category__c",
+      "LLC_BI__Picklist_1__c (Fee Name)",
+      "LLC_BI__Picklist_2__c (Fee Paid By)",
+      "LLC_BI__Picklist_4__c (Calculation Type)",
+      "LLC_BI__Basis_Source__c",
+      "LLC_BI__Percentage__c",
+      "LLC_BI__Collection_Method__c",
+      "LLC_BI__Currency_Field_1__c (Flat Amount)",
+      "Applied To Products (reference — product wiring done in Product Hierarchy Builder)",
+      "Notes",
+    ],
+  ];
+
+  for (const fee of named) {
+    feeRows.push([
+      "LLC_BI__Template_Records__c",
+      "Fee Management",
+      fee.name,
+      fee.feePaidBy ?? "",
+      fee.calculationType ?? "",
+      fee.calculationType === "Percentage" ? (fee.basisSource ?? "") : "",
+      fee.calculationType === "Percentage" && fee.percentage !== undefined ? fee.percentage : "",
+      fee.collectionMethod ?? "",
+      fee.calculationType === "Flat Amount" && fee.amount !== undefined ? fee.amount : "",
+      fee.autoApply && fee.appliedToProducts ? fee.appliedToProducts.join(";") : "",
+      fee.notes ?? "",
+    ]);
+  }
+  if (named.length === 0) {
+    feeRows.push(["# No fees defined", "", "", "", "", "", "", "", "", "", ""]);
+  }
+
+  // Sheet 2: Product Template Join records — one row per fee × product
+  const joinRows: unknown[][] = [
+    [
+      "object",
+      "LLC_BI__Template_Records__c (fee name — resolve to Id)",
+      "LLC_BI__Product__r.Name",
+      "LLC_BI__Product__r.LLC_BI__Product_Line_Name__c",
+      "LLC_BI__Product__r.LLC_BI__Product_Type_Name__c",
+      "LLC_BI__Product__c (resolve Id by matching all three product fields above)",
+    ],
+  ];
+  for (const fee of named) {
+    if (!fee.autoApply || !fee.appliedToProducts?.length) continue;
+    for (const prod of fee.appliedToProducts) {
+      const { productLine, productType, productName } = parseProductName(prod);
+      joinRows.push([
+        "LLC_BI__Product_Template_Join__c",
+        fee.name,
+        productName || prod,
+        productLine,
+        productType,
+        "<resolve: query LLC_BI__Product__c where Name, Product Line Name, and Product Type Name all match>",
+      ]);
+    }
+  }
+  if (joinRows.length === 1) joinRows.push(["# No product assignments defined", "", "", "", "", ""]);
+
+  // Sheet 3: SF Object Reference
+  const refRows: unknown[][] = [
+    ["Object", "Field (API Name)", "Description"],
+    ["LLC_BI__Template_Records__c", "LLC_BI__Category__c", "Fixed value: \"Fee Management\""],
+    ["LLC_BI__Template_Records__c", "LLC_BI__Picklist_1__c", "Fee name"],
+    ["LLC_BI__Template_Records__c", "LLC_BI__Picklist_2__c", "Fee Paid By (Borrower | Lender)"],
+    ["LLC_BI__Template_Records__c", "LLC_BI__Picklist_4__c", "Calculation Type (Flat Amount | Percentage)"],
+    ["LLC_BI__Template_Records__c", "LLC_BI__Basis_Source__c", "Basis for percentage calculation (e.g. Loan Amount) — only when Calculation Type = Percentage"],
+    ["LLC_BI__Template_Records__c", "LLC_BI__Percentage__c", "Percentage value — only when Calculation Type = Percentage"],
+    ["LLC_BI__Template_Records__c", "LLC_BI__Collection_Method__c", "How the fee is collected (Deducted from Loan | Add to Loan | Cash)"],
+    ["LLC_BI__Template_Records__c", "LLC_BI__Currency_Field_1__c", "Flat amount value — only when Calculation Type = Flat Amount"],
+    ["", "", ""],
+    ["LLC_BI__Product_Template_Join__c", "LLC_BI__Template_Records__c", "Lookup to the fee template record (LLC_BI__Template_Records__c)"],
+    ["LLC_BI__Product_Template_Join__c", "LLC_BI__Product__c", "Lookup to LLC_BI__Product__c — resolve Id by matching LLC_BI__Product__r.Name + LLC_BI__Product__r.LLC_BI__Product_Line_Name__c + LLC_BI__Product__r.LLC_BI__Product_Type_Name__c"],
+    ["LLC_BI__Product_Template_Join__c", "LLC_BI__Product__r.Name", "Product name (for resolution only)"],
+    ["LLC_BI__Product_Template_Join__c", "LLC_BI__Product__r.LLC_BI__Product_Line_Name__c", "Product Line name (for resolution only)"],
+    ["LLC_BI__Product_Template_Join__c", "LLC_BI__Product__r.LLC_BI__Product_Type_Name__c", "Product Type name (for resolution only)"],
+  ];
+
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<?mso-application progid="Excel.Sheet"?>` +
+    `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">` +
+    `<Styles><Style ss:ID="h"><Font ss:Bold="1"/></Style></Styles>` +
+    buildXlsxSheet(feeRows, "Fee Templates") +
+    buildXlsxSheet(joinRows, "Product Assignments") +
+    buildXlsxSheet(refRows, "SF Object Reference") +
+    `</Workbook>`;
+
+  downloadBlob(
+    new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" }),
+    "fees.xls",
+  );
+}
+
+function parseFeesRows(rows: string[][]): FeeRecord[] | string {
+  if (rows.length < 2) return "File appears empty or has no data rows.";
+
+  // Find header row — look for the fee name column
+  const headerRowIdx = rows.findIndex((r) =>
+    r.some((c) => c.includes("LLC_BI__Picklist_1__c")),
+  );
+  if (headerRowIdx === -1)
+    return 'Could not find "LLC_BI__Picklist_1__c (Fee Name)" column. Make sure the file was exported from this tool.';
+
+  const headers = rows[headerRowIdx];
+  const col = (label: string) => headers.findIndex((h) => h === label);
+
+  const nameIdx = col("LLC_BI__Picklist_1__c (Fee Name)");
+  const feePaidByIdx = col("LLC_BI__Picklist_2__c (Fee Paid By)");
+  const calcTypeIdx = col("LLC_BI__Picklist_4__c (Calculation Type)");
+  const basisIdx = col("LLC_BI__Basis_Source__c");
+  const pctIdx = col("LLC_BI__Percentage__c");
+  const collectionIdx = col("LLC_BI__Collection_Method__c");
+  const amountIdx = col("LLC_BI__Currency_Field_1__c (Flat Amount)");
+  const productsIdx = col("Applied To Products (reference — product wiring done in Product Hierarchy Builder)");
+  const notesIdx = col("Notes");
+
+  const get = (cells: string[], idx: number) => idx !== -1 ? (cells[idx] ?? "").trim() : "";
+
+  const parsed: FeeRecord[] = [];
+  for (let i = headerRowIdx + 1; i < rows.length; i++) {
+    const cells = rows[i];
+    const name = get(cells, nameIdx);
+    if (!name || name.startsWith("#")) continue;
+    const calcTypeRaw = get(cells, calcTypeIdx);
+    const calculationType =
+      calcTypeRaw === "Flat Amount" || calcTypeRaw === "Percentage" ? calcTypeRaw : undefined;
+    const pctRaw = get(cells, pctIdx);
+    const amountRaw = get(cells, amountIdx);
+    const productsRaw = get(cells, productsIdx);
+    parsed.push({
+      name,
+      feePaidBy: get(cells, feePaidByIdx) || undefined,
+      calculationType,
+      basisSource: calculationType === "Percentage" ? get(cells, basisIdx) || undefined : undefined,
+      percentage: calculationType === "Percentage" && pctRaw ? parseFloat(pctRaw) : undefined,
+      amount: calculationType === "Flat Amount" && amountRaw ? parseFloat(amountRaw) : undefined,
+      collectionMethod: get(cells, collectionIdx) || undefined,
+      autoApply: productsRaw ? true : undefined,
+      appliedToProducts: productsRaw ? productsRaw.split(";").map((p) => p.trim()).filter(Boolean) : undefined,
+      notes: get(cells, notesIdx) || undefined,
+    });
+  }
+  if (!parsed.length) return "No fee rows found.";
+  return parsed;
+}
+
+function parseFeesSpreadsheetML(xml: string): FeeRecord[] | string {
+  const decode = (s: string) =>
+    s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+     .replace(/&quot;/g, '"').replace(/&#160;/g, " ").replace(/&apos;/g, "'").trim();
+
+  // Extract only the "Fee Templates" worksheet — ignore Product Assignments, SF Object Reference, etc.
+  const worksheetPattern = /<Worksheet[^>]*ss:Name="([^"]*)"[^>]*>([\s\S]*?)<\/Worksheet>/gi;
+  let feeTemplatesXml: string | null = null;
+  let wsMatch;
+  while ((wsMatch = worksheetPattern.exec(xml)) !== null) {
+    if (wsMatch[1] === "Fee Templates") {
+      feeTemplatesXml = wsMatch[2];
+      break;
+    }
+  }
+  // Fall back to full xml if sheet not found (e.g. single-sheet upload)
+  const sourceXml = feeTemplatesXml ?? xml;
+
+  const rowPattern = /<Row[^>]*>([\s\S]*?)<\/Row>/gi;
+  const cellPattern = /<Cell[^>]*>[\s\S]*?<Data[^>]*>([\s\S]*?)<\/Data>[\s\S]*?<\/Cell>/gi;
+
+  const allRows: string[][] = [];
+  let rowMatch;
+  while ((rowMatch = rowPattern.exec(sourceXml)) !== null) {
+    const cells: string[] = [];
+    let cellMatch;
+    const cellRe = new RegExp(cellPattern.source, "gi");
+    while ((cellMatch = cellRe.exec(rowMatch[1])) !== null) {
+      cells.push(decode(cellMatch[1]));
+    }
+    if (cells.length > 0) allRows.push(cells);
+  }
+  return parseFeesRows(allRows);
+}
+
+function parseFeesYaml(text: string): FeeRecord[] | string {
+  const blocks = text.split(/\n  - object: LLC_BI__Template_Records__c/);
+  blocks.shift();
+  const parsed: FeeRecord[] = [];
+  for (const block of blocks) {
+    const gF = (label: string) => {
+      const m = block.match(new RegExp(`${label}:\\s*"([^"]*)"`, "i"));
+      return m ? m[1].replace(/\\n/g, "\n").replace(/\\"/g, '"') : "";
+    };
+    const gN = (label: string) => {
+      const m = block.match(new RegExp(`${label}:\\s*([\\d.]+)`, "i"));
+      return m ? parseFloat(m[1]) : undefined;
+    };
+    const name = gF("LLC_BI__Picklist_1__c");
+    if (!name) continue;
+    const calcTypeRaw = gF("LLC_BI__Picklist_4__c");
+    const calculationType =
+      calcTypeRaw === "Flat Amount" || calcTypeRaw === "Percentage" ? calcTypeRaw : undefined;
+    parsed.push({
+      name,
+      feePaidBy: gF("LLC_BI__Picklist_2__c") || undefined,
+      calculationType,
+      basisSource: calculationType === "Percentage" ? gF("LLC_BI__Basis_Source__c") || undefined : undefined,
+      percentage: calculationType === "Percentage" ? gN("LLC_BI__Percentage__c") : undefined,
+      amount: calculationType === "Flat Amount" ? gN("LLC_BI__Currency_Field_1__c") : undefined,
+      collectionMethod: gF("LLC_BI__Collection_Method__c") || undefined,
+    });
+  }
+  if (!parsed.length) return "No LLC_BI__Template_Records__c fee records found.";
+  return parsed;
+}
+
+export function parseFeesFile(text: string, filename: string): FeeRecord[] | string {
+  const raw = text.replace(/^\uFEFF/, "");
+  if (filename.endsWith(".yaml") || filename.endsWith(".yml")) {
+    return parseFeesYaml(raw);
+  }
+  if (raw.trimStart().startsWith("<?xml") || raw.trimStart().startsWith("<Workbook")) {
+    return parseFeesSpreadsheetML(raw);
+  }
+  // Plain CSV
+  const lines = raw.split(/\r?\n/).filter((l) => l.trim());
+  return parseFeesRows(lines.map(parseCsvRow));
+}
+
 // Legacy — kept so old callers don't break; remove once confirmed unused
 export function _parseDocmanExcelLegacy(text: string): DocmanExport | string {
   const raw = text.replace(/^\uFEFF/, "");

@@ -18,7 +18,7 @@ import {
   COVENANT_CATEGORY_TYPE_MAP,
 } from "@/lib/picklist-defaults";
 
-type Scope = "covenants" | "checklist";
+type Scope = "covenants" | "checklist" | "collateral" | "conditions";
 
 // ── Covenant-Types sub-editor (shown when activeKey === "__covtypes__") ────────
 

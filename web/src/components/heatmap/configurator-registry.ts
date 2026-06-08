@@ -20,5 +20,9 @@ export function configuratorRoute(
       return `/projects/${projectId}/docman?cardId=${card._id}`;
     case "collateral":
       return `/projects/${projectId}/collateral`;
+    case "conditions":
+      return `/projects/${projectId}/conditions?cardId=${card._id}`;
+    case "policy-exceptions":
+      return `/projects/${projectId}/policy-exceptions`;
   }
 }

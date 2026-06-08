@@ -9,13 +9,19 @@ import { configuratorRoute } from "./configurator-registry";
 const KIND_ORDER: Record<string, number> = {
   "product-hierarchy": 0,
   checklist: 1,
-  covenants: 2,
-  docman: 3,
-  collateral: 4,
+  conditions: 2,
+  "policy-exceptions": 3,
+  fees: 4,
+  covenants: 5,
+  docman: 6,
+  collateral: 7,
 };
 
 const KIND_LABEL: Record<string, string> = {
   checklist: "Smart Checklist Builder",
+  conditions: "Conditions Builder",
+  "policy-exceptions": "Policy Exceptions Builder",
+  fees: "Fees Builder",
   covenants: "Covenant Type Builder",
   "product-hierarchy": "Product Hierarchy Builder",
   docman: "Document Manager Builder",
@@ -24,6 +30,9 @@ const KIND_LABEL: Record<string, string> = {
 
 const KIND_DESCRIPTION: Record<string, string> = {
   checklist: "Configure smart checklist requirements for loan and relationship levels.",
+  conditions: "Configure loan conditions precedent and subsequent.",
+  "policy-exceptions": "Configure policy exception types, severities, and mitigation reasons.",
+  fees: "Configure fee types, amounts, and application rules.",
   covenants: "Configure covenant types, categories, and frequency templates.",
   "product-hierarchy": "Configure product lines, types, and products.",
   docman: "Configure document manager placeholders and conditional groups.",
@@ -57,6 +66,9 @@ export function BuildersHub({ projectId }: { projectId: Id<"projects"> }) {
   const PROJECT_LEVEL_BUILDERS: { kind: string; route: string }[] = [
     { kind: "product-hierarchy", route: `/projects/${projectId}/product-hierarchy` },
     { kind: "collateral", route: `/projects/${projectId}/collateral` },
+    { kind: "conditions", route: `/projects/${projectId}/conditions` },
+    { kind: "policy-exceptions", route: `/projects/${projectId}/policy-exceptions` },
+    { kind: "fees", route: `/projects/${projectId}/fees` },
   ];
   for (const { kind, route } of PROJECT_LEVEL_BUILDERS) {
     if (!seen.has(kind)) seen.set(kind, { cardName: "", route });

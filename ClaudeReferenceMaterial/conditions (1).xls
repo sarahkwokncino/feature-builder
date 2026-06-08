@@ -1,0 +1,1287 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <LastAuthor>Sarah Kwok</LastAuthor>
+  <LastSaved>2026-06-08T10:43:27Z</LastSaved>
+  <Version>16.00</Version>
+ </DocumentProperties>
+ <OfficeDocumentSettings xmlns="urn:schemas-microsoft-com:office:office">
+  <AllowPNG/>
+ </OfficeDocumentSettings>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>11143</WindowHeight>
+  <WindowWidth>24686</WindowWidth>
+  <WindowTopX>32767</WindowTopX>
+  <WindowTopY>32767</WindowTopY>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="s26" ss:Name="Good">
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#008000"/>
+   <Interior ss:Color="#C6EFCE" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s62">
+   <Borders/>
+  </Style>
+  <Style ss:ID="s63">
+   <Alignment ss:Vertical="Center"/>
+   <Borders/>
+  </Style>
+  <Style ss:ID="s65" ss:Parent="s26">
+   <Borders/>
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+   <Interior/>
+  </Style>
+  <Style ss:ID="s66">
+   <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="12" ss:Color="#000000"
+    ss:Italic="1"/>
+  </Style>
+  <Style ss:ID="s67">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Borders/>
+  </Style>
+  <Style ss:ID="s68">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="12"
+    ss:Color="#000000" ss:Italic="1"/>
+  </Style>
+  <Style ss:ID="s69" ss:Parent="s26">
+   <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+   <Interior/>
+  </Style>
+  <Style ss:ID="s70">
+   <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"
+    ss:Italic="1"/>
+  </Style>
+  <Style ss:ID="s71" ss:Parent="s26">
+   <Alignment ss:Vertical="Center"/>
+   <Borders/>
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+   <Interior/>
+  </Style>
+  <Style ss:ID="s72">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders/>
+  </Style>
+  <Style ss:ID="s73">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="12" ss:Color="#000000"
+    ss:Italic="1"/>
+  </Style>
+  <Style ss:ID="s74" ss:Parent="s26">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+   <Interior/>
+  </Style>
+  <Style ss:ID="s75">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+  </Style>
+  <Style ss:ID="s76" ss:Parent="s26">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders/>
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+   <Interior/>
+  </Style>
+  <Style ss:ID="s77">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="12" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s78">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Condition Precedent">
+  <Table ss:ExpandedColumnCount="6" ss:ExpandedRowCount="134" x:FullColumns="1"
+   x:FullRows="1" ss:StyleID="s62" ss:DefaultColumnWidth="51.428571428571431"
+   ss:DefaultRowHeight="14.464285714285715">
+   <Column ss:StyleID="s62" ss:Width="229.71428571428572"/>
+   <Column ss:StyleID="s62" ss:Width="143.57142857142858"/>
+   <Column ss:Index="4" ss:StyleID="s62" ss:AutoFitWidth="0"
+    ss:Width="353.57142857142856"/>
+   <Column ss:StyleID="s62" ss:Width="759"/>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">Name</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Requirement_Type__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Category__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Description__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Legal_Description__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Assigned_Party__c</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">AIP from exit lender</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">AIP to be provided from the exit lender to demonstrate the client has the ability to refinance and to show that there are sufficient funds available to cover our gross loan.&#160;</Data></Cell>
+    <Cell><Data ss:Type="String">AIP to be provided from the exit lender to demonstrate the client has the ability to refinance and to show that there are sufficient funds available to cover our gross loan.&#160;</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">Archaeological Report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Development</Data></Cell>
+    <Cell><Data ss:Type="String">Provide a copy of the Archaeological Report. We will require a Letter of Reliance for this report.</Data></Cell>
+    <Cell><Data ss:Type="String">Provide a copy of the Archaeological Report. We will require a Letter of Reliance for this report.</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="285.53571428571428">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Asset &amp; Liability Statement</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Full Assets &amp; Liabilities Statement(s) from parties that are providing a guarantee. Please advise us if you require a form template for this.&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Full Assets &amp; Liabilities Statement(s) from parties that are providing a guarantee. Please advise us if you require a form template for this.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="58.285714285714285">
+    <Cell><Data ss:Type="String">Asset manager desktop report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Asset Manager Desktop Report</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Asset Manager Desktop Report</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="174.53571428571428">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Asset Manager Report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require an Asset Manager Visit and Report. We will schedule this with the client.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require an Asset Manager Visit and Report. We will schedule this with the client.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="174.75">
+    <Cell><Data ss:Type="String">Asset manager sales price</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Octopus Asset Manager to agree sales price and suitable sales strategy for exit property(ies).</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Octopus Asset Manager to agree sales price and suitable sales strategy for exit property(ies).</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="204">
+    <Cell><Data ss:Type="String">Asset manager schedule</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Octopus Asset Manager to review schedule of works and confirm works &amp; sale can be completed within X months.</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Octopus Asset Manager to review schedule of works and confirm works &amp; sale can be completed within X months.</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="58.285714285714285">
+    <Cell><Data ss:Type="String">Asset manager visit and report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Asset Manager Visit and Report</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Asset Manager Visit and Report</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="102">
+    <Cell><Data ss:Type="String">Asset manager visit AVM</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Asset Manager Visit and Report (as an AVM has been used).</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Asset Manager Visit and Report (as an AVM has been used).</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="333">
+    <Cell><Data ss:Type="String">Automated Valuation</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">We will carry out an Automated Valuation (AVM) on this deal. The AVM will need to meet a minimum confidence level or a full valuation will be required.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">We will carry out an Automated Valuation (AVM) on this deal. The AVM will need to meet a minimum confidence level or a full valuation will be required.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="222">
+    <Cell><Data ss:Type="String">Bank statement/Source of Deposit</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Proof (need original Bank statements or copies certified by the solicitor) of the source of the deposit.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Proof (need original Bank statements or copies certified by the solicitor) of the source of the deposit.</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="126.75">
+    <Cell ss:StyleID="s69"><Data ss:Type="String">Board Minutes including ICD (if applicable)</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require Board Minutes</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require Board Minutes including ICD, if applicable.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="145.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Borrower exchange and completion date</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s70"><Data ss:Type="String">Confirm if the borrower has exchanged and the contractual completion date. </Data></Cell>
+    <Cell ss:StyleID="s70"><Data ss:Type="String">Confirm if the borrower has exchanged and the contractual completion date.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="269.46428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Borrower project experience</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Evidence of the applicant's previous experience with similar projects and details of the contractor carrying out the works.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Evidence of the applicant's previous experience with similar projects and details of the contractor carrying out the works.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Borrowing Company structure chart</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please provide the borrowing company’s structure chart including details for all shareholders and directors.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Provide the borrowing company’s structure chart including details for all shareholders and directors. The structure chart should cover the entire corporate structure so that the Ultimate Beneficial Owners are confirmed.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell><Data ss:Type="String">BTL Valuation report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Standard / Enhanced Indemnity / HMO / Enhanced Indemnity HMO / Semi-Commercial BTL Valuation report on a 180-day basis. Valuer to confirm if the property is within an Article 4 area. This report is valid for 90 days from inspection. Please confirm you are happy for us to instruct the valuation/obtain valuation quotes and our Valuer will contact the borrower to arrange.&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Standard / Enhanced Indemnity / HMO / Enhanced Indemnity HMO / Semi-Commercial BTL Valuation report on a 180-day basis. Valuer to confirm if the property is within an Article 4 area. This report is valid for 90 days from inspection. Please confirm you are happy for us to instruct the valuation/obtain valuation quotes and our Valuer will contact the borrower to arrange.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="95.25">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Build Contract Assignment</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Assignment over the build contract is required.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Assignment over the build contract is required.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="190.28571428571428">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Build Procurement Route </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development </Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Please confirm the proposed build procurement route (i.e. Self build/ Design &amp; Build JCT)</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Confirm the proposed build procurement route (i.e. Self build/ Design &amp; Build JCT)</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="253.71428571428572">
+    <Cell><Data ss:Type="String">Buildings Insurance with Fern</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Buildings Insurance policy with BridgeCo Limited, Fern Trading Group Limited and Nino Limited noted as an interested party.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Buildings Insurance policy with BridgeCo Limited, Fern Trading Group Limited and Nino Limited noted as an interested party.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="174.53571428571428">
+    <Cell><Data ss:Type="String">Buildings Insurance with Octopus</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Buildings Insurance policy with Octopus Investments Ltd noted as an interested party.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Buildings Insurance policy with Octopus Investments Ltd noted as an interested party.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="269.46428571428572">
+    <Cell><Data ss:Type="String">CAR Insurance</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">CAR Insurance with Bridgeco Ltd, Fern Trading Group Ltd &amp; Nino Ltd’s interest noted. Site address should be added to CAR.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">CAR Insurance with Bridgeco Ltd, Fern Trading Group Ltd &amp; Nino Ltd’s interest noted. Site address should be added to CAR.</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="111">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Certified Build Contract</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">The full certified copy of the build contract is to be provided.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">The full certified copy of the build contract is to be provided.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="253.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Certified KYC</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Certified KYC – 1 x proof of name, 2 x proof of address – shareholders over 25%, directors and equity providers.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Certified KYC – 1 x proof of name, 2 x proof of address – shareholders over 25%, directors and equity providers.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="95.25">
+    <Cell><Data ss:Type="String">CIL/S106 agreement</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">CIL/S106 agreement to be provided to our QS.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">CIL/S106 agreement to be provided to our QS.</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.464285714285715">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">CIL/S106 Liability</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Confirm CIL/S106 liability from the borrower</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Confirm CIL/S106 liability.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="253.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Collateral Warranties</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Collateral Warranties in favour of the funder provided by the consultants with design input on the proposed scheme.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Collateral Warranties in favour of the funder provided by the consultants with design input on the proposed scheme.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="142.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Complete Application Form</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">A fully completed Application Form signed by each applicant.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">A fully completed Application Form signed by each applicant.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell><Data ss:Type="String">Completion prior to valuation expiry</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Please note this deal needs to complete prior to the valuation expiry date of **/**/** after this date we can request a one month extension from the valuer but there is no guarantee this will be given.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Please note this deal needs to complete prior to the valuation expiry date of **/**/** after this date we can request a one month extension from the valuer but there is no guarantee this will be given.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="222">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Composite property insurance</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General </Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Composite property insurance in a joint name with Bridgeco Ltd, Fern Trading Group Ltd &amp; Nino Ltd.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Composite property insurance in a joint name with Bridgeco Ltd, Fern Trading Group Ltd &amp; Nino Ltd.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="111">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Construction Programme</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Confirm the construction programme.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Confirm the proposed construction programme.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Contractors All Risk Insurance</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">CAR Insurance with Bridgeco Ltd, Fern Trading Group Ltd &amp; Nino Ltd’s included as composite insured and First Loss Payee. Site address should be added to CAR. Please refer to the Loan Agreement for our full insurance requirements. </Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">CAR Insurance with Bridgeco Ltd, Fern Trading Group Ltd &amp; Nino Ltd’s included as composite insured and First Loss Payee. Site address should be added to CAR. Please refer to the Loan Agreement for our full insurance requirements. </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="145.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Copies of Leases</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Commercial </Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Copies of any leases, licenses, tenancies or other occupational documents at the</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Copies of any leases, licenses, tenancies or other occupational documents at the</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Custom Condition</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s67"/>
+    <Cell ss:StyleID="s67"/>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="58.285714285714285">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Detailed drawings</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s70"><Data ss:Type="String">Provide the project drawings.</Data></Cell>
+    <Cell ss:StyleID="s70"><Data ss:Type="String">Provide the detailed drawings.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="126.75">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Development Cashflow/ Appraisal </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development </Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Please provide a development cashflow/ appraisal for the project </Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Provide a development cashflow/ appraisal for the project </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell><Data ss:Type="String">Doctor Letter</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Letter from the applicant's Doctor, for each applicant over 70 years old, confirming the applicant is fully capable of making their own financial decisions. The Doctor must have known them for over 3 years.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Letter from the applicant's Doctor, for each applicant over 70 years old, confirming the applicant is fully capable of making their own financial decisions. The Doctor must have known them for over 3 years.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="285.53571428571428">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Enhanced Compliance</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please be aware that this loan will need to go through enhanced compliance checks due to the clients nationality/residency.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please be aware that this loan will need to go through enhanced compliance checks due to the clients nationality/residency.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="190.28571428571428">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Environmental Report </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Provide a copy of the Environmental Report. We will require a Letter of Reliance for this report.</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Provide a copy of the Environmental Report. We will require a Letter of Reliance for this report.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="79.285714285714292">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">ESG Questionnaire</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Complete the ESG Questionnaire</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Complete the ESG Questionnaire</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="237.75">
+    <Cell><Data ss:Type="String">Facility letter copy</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Copy of the facility letter for the current lender and proof of 12 months payments if serviced.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Copy of the facility letter for the current lender and proof of 12 months payments if serviced.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="301.28571428571428">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Fees invoice</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Please provide the invoice for your Broker Fee so we can ensure these are paid promptly and correctly (this isn't required until near completion).&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Provide the invoice for your Broker Fee so we can ensure these are paid promptly and correctly (this isn't required until near completion).&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="63.535714285714285">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Green Book </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Greener Homes Alliance</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Completed Green Book Form </Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Completed Green Book Form </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="237.75">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Ground Investigation report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please may we have Ground investigation report.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Provide a copy of the Ground investigation report. We require a Letter of Reliance in respect of this report.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="158.46428571428572">
+    <Cell><Data ss:Type="String">HMO licence</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">HMO Licence and appropriate planning approval for property use.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">HMO Licence and appropriate planning approval for property use.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="142.71428571428572">
+    <Cell ss:StyleID="s67"><Data ss:Type="String">ICD from any creditors/ ILA and certified KYC</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">ICD from any creditors/loan providers including ILA and certified KYC.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">ICD from any creditors/loan providers including ILA and certified KYC.</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="158.46428571428572">
+    <Cell><Data ss:Type="String">Income and Expenditure statement</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Signed Income and Expenditure Statement for each applicant.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Signed Income and Expenditure Statement for each applicant.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="269.46428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Initial equity</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Confirm if the initial equity is being invested as loans (shareholders/directors) or as equity. Proforma balance sheet might be needed.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Confirm if the first equity is invested as loans (shareholders/directors) or as equity. Proforma balance sheet might be needed.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="158.46428571428572">
+    <Cell ss:StyleID="s71"><Data ss:Type="String">Initial QS report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development </Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Initial QS report addressed to Bridgeco Ltd, Fern Trading Group Ltd &amp; Nino Ltd.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Initial QS report addressed to Bridgeco Ltd, Fern Trading Group Ltd &amp; Nino Ltd.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Insurance Broker Letter </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">General </Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Evidence, by way of a letter from the Borrower's insurance brokers addressed to the Finance Parties, that the insurance cover in force in respect of the Property complies with the terms of the Loan Agreement  and the necessary premia have been paid.</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Evidence, by way of a letter from the Borrower's insurance brokers addressed to the Finance Parties, that the insurance cover in force in respect of the Property complies with the terms of the Loan Agreement  and the necessary premia have been paid.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="348.75">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Insurance Review Report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">General </Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">We require an insurance review report to be provided by a firm appointed by the Lender to confirm the various insurances copy with the Loan Agreement.</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">We require an insurance review report to be provided by a firm appointed by the Lender to confirm the various insurances copy with the Loan Agreement.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="111">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Judicial review insurance</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">General </Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Evidence that Judicial review insurance is in place.</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Evidence that Judicial review insurance is in place.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="218.46428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Main Contractor information </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development </Data></Cell>
+    <Cell ss:StyleID="s70"><Data ss:Type="String">Provide confirm the name of the proposed Main Contractor and the details of the previous schemes they have completed.</Data></Cell>
+    <Cell ss:StyleID="s70"><Data ss:Type="String">Provide confirm the name of the proposed Main Contractor and the details of the previous schemes they have completed.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="285.53571428571428">
+    <Cell><Data ss:Type="String">Management agent details</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Details of the management agent who will manage the property on a day-to-day basis (to include name address and contact details).&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Details of the management agent who will manage the property on a day-to-day basis (to include name address and contact details).&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="142.71428571428572">
+    <Cell><Data ss:Type="String">Mortgage History 12 months</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Last 12 months mortgage history (if not appearing on the credit search)&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Last 12 months mortgage history (if not appearing on the credit search)&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="380.46428571428572">
+    <Cell><Data ss:Type="String">Network/Mortgage Club Fee</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">As you are part of a Network/club that we have an agreement with, we will be paying the proc fee directly to them. Please confirm that you are in agreement with this process.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">As you are part of a Network/club that we have an agreement with, we will be paying the proc fee directly to them. Please confirm that you are in agreement with this process.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="190.28571428571428">
+    <Cell ss:StyleID="s69"><Data ss:Type="String">New Build Warranty provider confirmed</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require that New Build Warranty is engaged.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Details of the company that has been engaged to provide the New Build Warranty</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="95.25">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Party Wall Awards Status</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Confirm the status of the Party Wall Awards.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Confirm the status of the Party Wall Awards.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell><Data ss:Type="String">Personal Guarantee </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Personal Guarantee of XXX% of valuation – independent legal advice will be required for this, please note this will need to be executed with another solicitors firm or another solicitor within your firm.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Personal Guarantee of XXX% of valuation – independent legal advice will be required for this, please note this will need to be executed with another solicitors firm or another solicitor within your firm.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="142.71428571428572">
+    <Cell><Data ss:Type="String">PII certificates</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">PI certificates are to be provided to our QS satisfaction.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">PII certificates are to be provided to our QS satisfaction.</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="301.28571428571428">
+    <Cell><Data ss:Type="String">Practical completion</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please note that the property will need to be at practical completion or only have final fix outstanding for us to instruct the valuation.&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please note that the property will need to be at practical completion or only have final fix outstanding for us to instruct the valuation.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="190.28571428571428">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Pre-commencement planning condition</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Update on the status of the pre-commencement planning conditions&#160; (tracker is needed).</Data></Cell>
+    <Cell ss:StyleID="s73"><Data ss:Type="String">Confirm the status of the pre-commencement planning conditions  (tracker is needed)</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="87.535714285714292">
+    <Cell><Data ss:Type="String">Pre-comp call</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Pre completion call to the borrowers.</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Pre completion call to the borrowers.</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="174.75">
+    <Cell><Data ss:Type="String">Previous completed schemes</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s70"><Data ss:Type="String">Provide the details of the previous schemes completed by the proposed contractors.</Data></Cell>
+    <Cell ss:StyleID="s70"><Data ss:Type="String">Provide the details of the previous schemes completed by the proposed construction company.</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="317.25">
+    <Cell ss:StyleID="s74"><Data ss:Type="String">Professional Indemnity Insurance Certificates-Main Contractor/Key Subcontractors</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Professional Indemnity Insurance Certificates from Main Contractor/ Key Sub contractors are to be provided to our QS satisfaction.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Professional Indemnity Insurance Certificates from Main Contractor/ Key Sub contractors are to be provided to our QS satisfaction.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="301.28571428571428">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Property Searches (less than 3 months old)</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Up to date (within the last three months) full searches on the security property(ies) - solicitors to obtain and comment in their Report on Title.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Up to date (within the last three months) full searches on the security property(ies) - solicitors to obtain and comment in their Report on Title.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="253.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Public liability insurance</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Public liability insurance is to be put on risk prior to drawdown (unless included in CAR/Building insurance).</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Public liability insurance is to be put on risk prior to drawdown (unless included in CAR/Building insurance).</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="396.53571428571428">
+    <Cell><Data ss:Type="String">Purchase funds evidence</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Evidence client holds the balance of the purchase monies and confirmation of the source of these monies. Please note we may have further queries/require further proof in regards to this.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Evidence client holds the balance of the purchase monies and confirmation of the source of these monies. Please note we may have further queries/require further proof in regards to this.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="237.75">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Redemption statement</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Redemption statement from first charge lender addressed to BridgeCo Ltd, Fern Trading Group Ltd and Nino Ltd.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Redemption statement from first charge lender addressed to BridgeCo Ltd, Fern Trading Group Ltd and Nino Ltd.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="301.28571428571428">
+    <Cell><Data ss:Type="String">Rental Income statements</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Latest 3 months bank statements to evidence the rental income received/ serviceability/ funds for works (£xx plus 10% contingency)&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Latest 3 months bank statements to evidence the rental income received/ serviceability/ funds for works (£xx plus 10% contingency)&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="95.25">
+    <Cell ss:StyleID="s69"><Data ss:Type="String">Report on Borrower</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require a Report on Borrower.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require a Report on Borrower.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="174.53571428571428">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Report on Title</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Report on Title/Certificate of Title and where applicable Report on Borrower&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Report on Title/Certificate of Title and where applicable Report on Borrower&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="237.75">
+    <Cell ss:StyleID="s69"><Data ss:Type="String">Report on Title (to be reviewed by the valuer &amp; the QS).</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require Report on Title (to be reviewed by the valuer &amp; the QS).</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We the require Report on Title to be reviewed by the valuer &amp; the QS, to ensure findings do not impact value or costs.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="333">
+    <Cell><Data ss:Type="String">Report on Title with building regulations certificate</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">New build Guarantee, Planning Permission and Building Regulations completion certificate – solicitors to obtain and comment their Report on Title.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">New build Guarantee, Planning Permission and Building Regulations completion certificate – solicitors to obtain and comment their Report on Title.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="317.25">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Right of Light</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Right of Light: Confirm if there is any Right of Light infringement and provide a copy of the RoL survey. We will require a Letter of Reliance for this report.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Right of Light: Confirm if there is any Right of Light infringement and provide a copy of the RoL survey. We will require a Letter of Reliance for this report.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="190.28571428571428">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">ROT/COT comments</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Valuers comments on the ROT/COT and confirmation the title area matches the property valued.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Valuers comments on the ROT/COT and confirmation the title area matches the property valued.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="111">
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Sales particulars &amp; current Tenancy Schedule</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Sales particulars &amp; current Tenancy Schedule</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Sales particulars &amp; current Tenancy Schedule</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="190.28571428571428">
+    <Cell><Data ss:Type="String">Sales particulars &amp; current Tenancy Schedule</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Sales particulars for the purchase. A Rightmove link, or equivalent, is acceptable.&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Sales particulars for the purchase. A Rightmove link, or equivalent, is acceptable.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="190.28571428571428">
+    <Cell><Data ss:Type="String">Sales particulars for exit property</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Sales particulars for the exit property. A Rightmove link, or equivalent, is acceptable.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Sales particulars for the exit property. A Rightmove link, or equivalent, is acceptable.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="190.28571428571428">
+    <Cell><Data ss:Type="String">Schedule of Works</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Detailed schedule of works to include a breakdown of costs and timeline for works.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Detailed schedule of works to include a breakdown of costs and timeline for works.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="111">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Scheme Planning Approval</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Planning approval for the scheme.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Provide evidence of the planning approval for the scheme.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="142.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Search Indemnity</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Indemnity insurance is acceptable for searches for this case.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Indemnity insurance is acceptable for searches for this case.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="126.75">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Security Purchase Price</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please could you confirm the original purchase price of the security asset.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Confirm the original purchase price of the security asset.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Signed Corporate Guarantee</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General </Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Signed Corporate Guarantee. Please note that independent legal advice will be required for each guarantor. The Corporate Guarantee document &amp; ILA will need to be executed with another law firm or another solicitor within your law firm if the entity is not the borrowing SPV.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Signed Corporate Guarantee. Please note that independent legal advice will be required for each guarantor. The Corporate Guarantee document &amp; ILA will need to be executed with another law firm or another solicitor within your law firm if the entity is not the borrowing SPV.</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="43.714285714285708">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Signed Intercreditor Deed</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Signed Intercreditor Deed</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Signed Intercreditor Deed</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell><Data ss:Type="String">Signed KYC and Legal docs</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Signed Legal Documents &amp; Certified KYC. Please note, due to the clients location and/or nationality they must visit a local solicitor or notary to conduct a video call to receive the advice from their UK based appointed solicitors.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Signed Legal Documents &amp; Certified KYC. Please note, due to the clients location and/or nationality they must visit a local solicitor or notary to conduct a video call to receive the advice from their UK based appointed solicitors.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="142.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Signed Legal Opinion </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Signed Legal Opinion from acceptable Law Firm for overseas entity</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Signed Legal Opinion from acceptable Law Firm for overseas entity</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="95.25">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Signed Loan Agreement </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General </Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require a signed Loan Agreement</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require a signed Loan Agreement</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="111">
+    <Cell ss:StyleID="s69"><Data ss:Type="String">Signed Mortgage Deed / Debenture</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require a Signed Mortgage Deed / Debenture.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require a Signed Mortgage Deed / Debenture.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.464285714285715">
+    <Cell ss:StyleID="s74"><Data ss:Type="String">Signed Mortgage Deed&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Signed Mortgage Deed&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Signed Mortgage Deed&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.464285714285715">
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Signed Offer Letter&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Signed Offer Letter&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Signed Offer Letter&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Signed Personal Guarantee</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Signed Personal Guarantee. Please note that independent legal advice will be required for each guarantor. The Personal Guarantee document &amp; ILA will need to be executed with another law firm or another solicitor within your law firm.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Signed Personal Guarantee. Please note that an ILA will be required for each guarantor. The Personal Guarantee document &amp; ILA will need to be executed with another law firm or another solicitor within your law firm.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="95.25">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Signed Security Agreement</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General </Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require a Signed Security Agreement</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">We require a Signed Security Agreement</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.464285714285715">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Signed Share Charge</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Signed Share Charge</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Signed Share Charge</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="43.714285714285708">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Signed Subordination Deed </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Signed Subordination Deed </Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Signed Subordination Deed </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="174.53571428571428">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Signed Utilisation Request </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Signed utilisation request</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Signed utilisation request. Template will be appended to the Loan Agreement.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="126.75">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Solicitor CIL &amp; S106 liability</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Solicitors are to verify and confirm CIL &amp; S106 liability.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Solicitors are to verify and confirm CIL &amp; S106 liability.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell><Data ss:Type="String">Solicitor details</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Solicitors details - Solicitors need to be registered with the Law Society and have a minimum of 2 / 3 / 5 SRA regulated partners. Please note, each applicant must attend their solicitor in person to sign our loan documentation.&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Solicitors details - Solicitors need to be registered with the Law Society and have a minimum of 2 / 3 / 5 SRA regulated partners. Please note, each applicant must attend their solicitor in person to sign our loan documentation.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell><Data ss:Type="String">Solicitor details and Borrower call</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Solicitors details - Solicitors need to be registered with the Law Society and have a minimum of 2 / 3 / 5 SRA regulated partners. Borrower will be able to sign the loan documentation and receive advice via video-call with solicitor if they choose to.&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Solicitors details - Solicitors need to be registered with the Law Society and have a minimum of 2 / 3 / 5 SRA regulated partners. Borrower will be able to sign the loan documentation and receive advice via video-call with solicitor if they choose to.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Source of Funds</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Provide source and origin of funds for the first equity utilised/to be utilised towards the purchase and project. Please note that full financial audit trail is required (see Summary of Source of Funds spreadsheet).</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Provide source and origin of funds for the first equity utilised/to be utilised towards the purchase and project. Please note that full financial audit trail is required (see Summary of Source of Funds spreadsheet).</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell><Data ss:Type="String">Source of Wealth</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Please provide the following for the client to prove their source of wealth: -A CV for the client listing all companies, countries and salaries. -If the client is self employed, please provide up to date accounts, SA302's or an accountants letter completed by a suitably qualified accountant that is fully traceable online. -If the client is employed, please provide the last 3 months payslips and corresponding bank statements showing salary received. If these are unavailable, please provide bank statements for 3 months and an employers reference addressed to ORE.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Please provide the following for the client to prove their source of wealth: -A CV for the client listing all companies, countries and salaries. -If the client is self employed, please provide up to date accounts, SA302's or an accountants letter completed by a suitably qualified accountant that is fully traceable online. -If the client is employed, please provide the last 3 months payslips and corresponding bank statements showing salary received. If these are unavailable, please provide bank statements for 3 months and an employers reference addressed to ORE.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="348.75">
+    <Cell><Data ss:Type="String">Source of Wealth Details</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Please can you provide a few paragraphs into the source of wealth (how were they accumulated, dates etc) including employment and salary details.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Please can you provide a few paragraphs into the source of wealth (how were they accumulated, dates etc) including employment and salary details.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="333">
+    <Cell><Data ss:Type="String">Source of Wealth Details</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please provide supporting documents/web links for the client’s source of wealth e.g. A weblink to their company, any news articles about them etc.&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please provide supporting documents/web links for the client’s source of wealth e.g. A weblink to their company, any news articles about them etc.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="269.46428571428572">
+    <Cell><Data ss:Type="String">Source of Wealth Details</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Proof of the deposit and a full history &amp; trail of the source of this money (including if any 3rd parties are involved).&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Proof of the deposit and a full history &amp; trail of the source of this money (including if any 3rd parties are involved).&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="63.535714285714285">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Target Completion Date</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please confirm target completion date.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Confirm target completion date.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="102">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Tenancy Schedule</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Commercial </Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Provide a copy of the Tenancy Schedule for the property </Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Provide a copy of the Tenancy Schedule for the property </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="190.28571428571428">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Tendered Project</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please confirm if the project has been tendered. &#160;The tender details are to be provided to our QS.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Confirm if the project has been tendered. &#160;The tender details are to be provided to our QS.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="233.25">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Terrorism Insurance Cover</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Confirmation that insurance cover is in place to cover against acts of terrorism, including any third party liability arising from&#10;such acts;</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Confirmation that insurance cover is in place to cover against acts of terrorism, including any third party liability arising from&#10;such acts;</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Title and Security investigation</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please note this transaction will require up to date (within the last three months) full searches on the security property and full title investigation. Please could you confirm with your solicitor how old the searches are and if needed, please request all the property related searches to be ordered in time for completion.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please note this transaction will require up to date (within the last three months) full searches on the security property and full title investigation. Please could you confirm with your solicitor how old the searches are and if needed, please request all the property related searches to be ordered in time for completion.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="206.25">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Transaction at arms-length</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Solicitors to confirm the previous transaction was at arms-length and at full market value</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Solicitors to confirm the previous transaction was at arms-length and at full market value</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="142.71428571428572">
+    <Cell><Data ss:Type="String">UK bank account proof</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Evidence the client holds a UK bank account with a mainstream bank.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Evidence the client holds a UK bank account with a mainstream bank.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="158.46428571428572">
+    <Cell><Data ss:Type="String">Unencumbered property ownership</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please provide an understanding of how the property is owned unencumbered.&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please provide an understanding of how the property is owned unencumbered.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="111">
+    <Cell><Data ss:Type="String">Use of Funds</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">General</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please provide a full breakdown of use of funds.&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Please provide a full breakdown of use of funds.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="253.71428571428572">
+    <Cell><Data ss:Type="String">Valuation - Vacant Possession</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Valuer to provide values for the commercial unit on a Vacant Possesion basis and also subject to the current lease basis.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Valuer to provide values for the commercial unit on a Vacant Possesion basis and also subject to the current lease basis.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="158.46428571428572">
+    <Cell ss:StyleID="s71"><Data ss:Type="String">Valuation Report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Valuation Report addressed to Bridgeco Ltd, Fern Trading Group Ltd &amp; Nino Ltd.</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Valuation Report addressed to Bridgeco Ltd, Fern Trading Group Ltd &amp; Nino Ltd.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell><Data ss:Type="String">Valuation Report - Residential</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Valuation report on a 180-day basis. This report is valid for 90 days from inspection. Please confirm you are happy for us to instruct the valuation/obtain valuation quotes and our Valuer will contact the borrower to arrange&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Valuation report on a 180-day basis. This report is valid for 90 days from inspection. Please confirm you are happy for us to instruct the valuation/obtain valuation quotes and our Valuer will contact the borrower to arrange&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell><Data ss:Type="String">Valuation report - secondhand basis</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">The valuation will be requested on a secondhand basis excluding any new build premium with the Valuer confirming:&#160; 1. There is no oversupply of new build flats.&#160; 2. How many have already sold in the block.&#160; 3. How many flats are vacant.&#160; 4. There is no reason that all flats in the development or block won't sell.&#160; Please note that LTV may be limited or we may choose not to proceed in light of any negative comments in relation to the above.&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">The valuation will be requested on a secondhand basis excluding any new build premium with the Valuer confirming:&#160; 1. There is no oversupply of new build flats.&#160; 2. How many have already sold in the block.&#160; 3. How many flats are vacant.&#160; 4. There is no reason that all flats in the development or block won't sell.&#160; Please note that LTV may be limited or we may choose not to proceed in light of any negative comments in relation to the above.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="237.75">
+    <Cell><Data ss:Type="String">Valuation report residual</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">The valuation will be on a residual basis / requested on the basis of its current use, excluding &quot;hope value&quot;.&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">The valuation will be on a residual basis / requested on the basis of its current use, excluding &quot;hope value&quot;.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell><Data ss:Type="String">Valuation report with GDV</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Valuation report on a 180-day basis, to also include comments on works and provide a GDV figure. This report is valid for 90 days from inspection. Please confirm you are happy for us to instruct the valuation/obtain valuation quotes and our Valuer will contact the borrower to arrange&#160;</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Valuation report on a 180-day basis, to also include comments on works and provide a GDV figure. This report is valid for 90 days from inspection. Please confirm you are happy for us to instruct the valuation/obtain valuation quotes and our Valuer will contact the borrower to arrange&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="102.53571428571428">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">VAT Registration Certificate </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">General </Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">A copy of the VAT registration certificate for the Borrower.</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">A copy of the VAT registration certificate for the Borrower.</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="364.71428571428572">
+    <Cell><Data ss:Type="String">Video Call with Solicitor</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Please note, that on this application it is acceptable for the client to receive their legal advice and sign their legal documents via a video call with their solicitor.&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Please note, that on this application it is acceptable for the client to receive their legal advice and sign their legal documents via a video call with their solicitor.&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="269.46428571428572">
+    <Cell><Data ss:Type="String">Waiver of interest</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Solicitors to obtain the appropriate occupier’s consent/waiver of interest/subordination of interest/Deed of gift with ILA &amp; KYC .&#160;</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Solicitors to obtain the appropriate occupier’s consent/waiver of interest/subordination of interest/Deed of gift with ILA &amp; KYC .&#160;</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="262.28571428571428">
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Final Building Contract</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">A certified true copy of the final Building Contract including for the avoidance of doubt, all drawings, plans, specifications in relation to the Development.</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">A certified true copy of the final Building Contract including for the avoidance of doubt, all drawings, plans, specifications in relation to the Development.</Data></Cell>
+    <Cell ss:StyleID="s72"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="160.28571428571428">
+    <Cell ss:StyleID="s76"><Data ss:Type="String">Detailed Working Drawings and Designs</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">Copies of the final detailed working drawing and designs in respect of the Development.</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">Copies of the final detailed working drawing and designs in respect of the Development.</Data></Cell>
+    <Cell ss:StyleID="s72"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="158.46428571428572">
+    <Cell ss:StyleID="s76"><Data ss:Type="String">Collateral Warranties</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Condition Precedent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s77"><Data ss:Type="String">A full copy of each Collateral Warranty, duly executed by the parties to it.</Data></Cell>
+    <Cell ss:StyleID="s77"><Data ss:Type="String">A full copy of each Collateral Warranty, duly executed by the parties to it.</Data></Cell>
+    <Cell ss:StyleID="s72"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="6" ss:StyleID="s72"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="6" ss:StyleID="s72"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="6" ss:StyleID="s72"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="6" ss:StyleID="s72"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="6" ss:StyleID="s72"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="6" ss:StyleID="s72"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="6" ss:StyleID="s72"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="6" ss:StyleID="s72"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="6" ss:StyleID="s72"/>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Unsynced/>
+   <Selected/>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Condition Subsequent">
+  <Table ss:ExpandedColumnCount="6" ss:ExpandedRowCount="13" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultColumnWidth="51.428571428571431"
+   ss:DefaultRowHeight="14.464285714285715">
+   <Column ss:AutoFitWidth="0" ss:Width="157.28571428571428"/>
+   <Column ss:Width="143.57142857142858"/>
+   <Column ss:Width="100.28571428571428"/>
+   <Column ss:AutoFitWidth="0" ss:Width="274.28571428571428"/>
+   <Column ss:AutoFitWidth="0" ss:Width="329.14285714285711"/>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">Name</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Requirement_Type__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Category__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Description__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Legal_Description__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Assigned_Party__c</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="364.28571428571428">
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Evidence Requirement - NHBC or Equivalent Approvals</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Condition Subsequent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">Evidence satisfactory to the Lender that the Borrower has procured all National House-Building Council or equivalent approvals, consents or authorisations as necessary to undertake the Development.</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">Evidence satisfactory to the Lender that the Borrower has procured all National House-Building Council or equivalent approvals, consents or authorisations as necessary to undertake the Development.</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell ss:StyleID="s76"><Data ss:Type="String">Evidence Requirement - NHBC Registration</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Condition Subsequent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s78"><Data ss:Type="String">Evidence satisfactory to the Lender that the Borrower has procured the registration of the Property and the Development by the appropriate builders and contractors with the National House-Building Council or equivalent.</Data></Cell>
+    <Cell ss:StyleID="s78"><Data ss:Type="String">Evidence satisfactory to the Lender that the Borrower has procured the registration of the Property and the Development by the appropriate builders and contractors with the National House-Building Council or equivalent.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="393.53571428571428">
+    <Cell ss:StyleID="s76"><Data ss:Type="String">Evidence Requirement - Health &amp; Safety Compliance</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Condition Subsequent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">Evidence satisfactory to the Lender that the Borrower has procured all health and safety regulations have been complied with and that appropriate measures are in place prior to commencement of the Development.</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">Evidence satisfactory to the Lender that the Borrower has procured all health and safety regulations have been complied with and that appropriate measures are in place prior to commencement of the Development.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="237.75">
+    <Cell ss:StyleID="s76"><Data ss:Type="String">Evidence Requirement - Professional Credentials</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Condition Subsequent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s77"><Data ss:Type="String">Evidence satisfactory to the Lender of the credentials of the professionals engaged to conduct the Development.</Data></Cell>
+    <Cell ss:StyleID="s77"><Data ss:Type="String">Evidence satisfactory to the Lender of the credentials of the professionals engaged to conduct the Development.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="409.71428571428572">
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development Feasibility Report</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Condition Subsequent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s77"><Data ss:Type="String">A report satisfactory in all aspects to the Lender stating the Development can be completed within the Borrower’s Development Appraisal and in the time frame budgeted by the Borrower.</Data></Cell>
+    <Cell ss:StyleID="s77"><Data ss:Type="String">A report satisfactory in all aspects to the Lender stating the Development can be completed within the Borrower’s Development Appraisal and in the time frame budgeted by the Borrower.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="269.46428571428572">
+    <Cell ss:StyleID="s76"><Data ss:Type="String">Construction Documentation Confirmation</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Condition Subsequent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s77"><Data ss:Type="String">Confirmation from the Lender’s construction solicitor that the construction documentation package is to the Lender’s satisfaction.</Data></Cell>
+    <Cell ss:StyleID="s77"><Data ss:Type="String">Confirmation from the Lender’s construction solicitor that the construction documentation package is to the Lender’s satisfaction.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="131.25">
+    <Cell ss:StyleID="s76"><Data ss:Type="String">Monitoring Surveyor’s Certificate</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Condition Subsequent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">The Monitoring Surveyor’s Certificate for the proposed drawdown.</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">The Monitoring Surveyor’s Certificate for the proposed drawdown.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="204">
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Supplementary Reports</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Condition Subsequent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">A copy of any supplementary reports, assignments or other items specified by the Monitoring Surveyor.</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">A copy of any supplementary reports, assignments or other items specified by the Monitoring Surveyor.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="116.46428571428571">
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development Loan Drawdown Request</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Condition Subsequent</Data></Cell>
+    <Cell ss:StyleID="s72"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">A duly completed Development Loan Drawdown Request.</Data></Cell>
+    <Cell ss:StyleID="s75"><Data ss:Type="String">A duly completed Development Loan Drawdown Request.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s62"/>
+    <Cell ss:StyleID="s72"/>
+    <Cell ss:StyleID="s62"/>
+    <Cell ss:StyleID="s62"/>
+    <Cell ss:StyleID="s62"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s62"/>
+    <Cell ss:StyleID="s72"/>
+    <Cell ss:StyleID="s62"/>
+    <Cell ss:StyleID="s62"/>
+    <Cell ss:StyleID="s62"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s62"/>
+    <Cell ss:StyleID="s72"/>
+    <Cell ss:StyleID="s62"/>
+    <Cell ss:StyleID="s62"/>
+    <Cell ss:StyleID="s62"/>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Unsynced/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveCol>1</ActiveCol>
+     <RangeSelection>C2</RangeSelection>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>
