@@ -278,6 +278,9 @@ function FieldConfigPanel({
   const [cloneOpen, setCloneOpen] = useState(false);
   const [cloneType, setCloneType] = useState("");
   const [cloneSubtype, setCloneSubtype] = useState("");
+  const [cloneToOpen, setCloneToOpen] = useState(false);
+  const [cloneToType, setCloneToType] = useState("");
+  const [cloneToSubtype, setCloneToSubtype] = useState("");
   const [sameAsOpen, setSameAsOpen] = useState(false);
   const [sameAsType, setSameAsType] = useState("");
   const [sameAsSubtype, setSameAsSubtype] = useState("");
@@ -307,7 +310,12 @@ function FieldConfigPanel({
   // Load saved config or fall back to defaults whenever the combo changes
   useEffect(() => {
     if (saved === undefined) return; // still loading
-    if (!saved || saved.linkedTo) { setSections(DEFAULT_SECTIONS); return; }
+    if (saved?.linkedTo) { setSections(DEFAULT_SECTIONS); return; }
+    if (!saved) {
+      const isFirst = collateralType === allTypes[0] && collateralSubtype === subtypesForType(allTypes[0])[0];
+      persist(isFirst ? DEFAULT_SECTIONS : []);
+      return;
+    }
     // Migrate old string[] format to Field[] format
     const migrated: Section[] = saved.sections.map((s: any) => ({
       ...s,
@@ -315,8 +323,7 @@ function FieldConfigPanel({
         typeof f === "string" ? { name: f, fieldType: "Text(255)" } : f,
       ),
     }));
-    const hasContent = migrated.some((s) => s.fields.some((f) => f.name));
-    setSections(hasContent ? migrated : DEFAULT_SECTIONS);
+    setSections(migrated);
   }, [saved, collateralType, collateralSubtype]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function persist(updated: Section[]) {
@@ -334,6 +341,20 @@ function FieldConfigPanel({
       : DEFAULT_SECTIONS;
     persist(sourceSections);
     setCloneOpen(false);
+  }
+
+  async function handleCloneToConfirm() {
+    if (!cloneToType) return;
+    const clonedSections: Section[] = sections.map((s) => ({ ...s, id: newId(), fields: s.fields.map((f) => ({ ...f })) }));
+    const targets = cloneToSubtype
+      ? [{ type: cloneToType, subtype: cloneToSubtype }]
+      : subtypesForType(cloneToType).map((sub) => ({ type: cloneToType, subtype: sub }));
+    await Promise.all(
+      targets.map(({ type, subtype }) =>
+        saveConfig({ projectId, collateralType: type, collateralSubtype: subtype, sections: clonedSections.map((s) => ({ ...s, id: newId(), fields: s.fields.map((f) => ({ ...f })) })), linkedTo: undefined }),
+      ),
+    );
+    setCloneToOpen(false);
   }
 
   async function handleSameAsConfirm() {
@@ -431,6 +452,9 @@ function FieldConfigPanel({
             <Button size="sm" variant="outline" onClick={() => { setCloneType(""); setCloneSubtype(""); setCloneOpen(true); }} className="text-xs h-7">
               Clone from…
             </Button>
+            <Button size="sm" variant="outline" onClick={() => { setCloneToType(""); setCloneToSubtype(""); setCloneToOpen(true); }} className="text-xs h-7">
+              Clone to…
+            </Button>
             <Button size="sm" variant="outline" onClick={() => { setSameAsType(""); setSameAsSubtype(""); setSameAsOpen(true); }} className="text-xs h-7">
               Same as…
             </Button>
@@ -513,6 +537,61 @@ function FieldConfigPanel({
         </DialogContent>
       </Dialog>
 
+      {/* Clone to dialog */}
+      <Dialog open={cloneToOpen} onOpenChange={setCloneToOpen}>
+        <DialogContent className="!max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Clone to…</DialogTitle>
+          </DialogHeader>
+          <p className="text-xs text-slate-500">
+            Select a destination Type, and optionally a Sub Type. If you select only a Type, the current sections and fields will be cloned to <span className="font-medium">all</span> of its sub types. If you select both, only that specific combination will be overwritten.
+          </p>
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">Type</label>
+              <select
+                value={cloneToType}
+                onChange={(e) => { setCloneToType(e.target.value); setCloneToSubtype(""); }}
+                className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)]"
+              >
+                <option value="">Select type…</option>
+                {allTypes.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+            {cloneToType && (
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Sub Type <span className="text-slate-400 font-normal">(optional — leave blank to clone to all)</span></label>
+                <select
+                  value={cloneToSubtype}
+                  onChange={(e) => setCloneToSubtype(e.target.value)}
+                  className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)]"
+                >
+                  <option value="">All sub types</option>
+                  {subtypesForType(cloneToType).map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {cloneToType && (
+              <p className="text-xs text-amber-600">
+                {cloneToSubtype
+                  ? `This will overwrite the config for ${cloneToType} — ${cloneToSubtype}.`
+                  : `This will overwrite configs for all ${subtypesForType(cloneToType).length} sub type(s) under ${cloneToType}.`}
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setCloneToOpen(false)}>Cancel</Button>
+            <Button disabled={!cloneToType} onClick={handleCloneToConfirm}>
+              Clone &amp; overwrite
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Same as dialog */}
       <Dialog open={sameAsOpen} onOpenChange={setSameAsOpen}>
         <DialogContent className="!max-w-sm">
@@ -567,7 +646,7 @@ function FieldConfigPanel({
 
       {displaySections.length === 0 && (
         <p className="text-xs text-slate-400 italic">
-          {linkedTo ? "Source config not found or has no sections." : "No sections yet — click + Add section."}
+          {linkedTo ? "Source config not found or has no sections." : "No sections yet — use Clone from… or Same as… to copy from another combo, or click + Add section."}
         </p>
       )}
 
