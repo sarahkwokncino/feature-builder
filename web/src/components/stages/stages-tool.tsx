@@ -24,11 +24,12 @@ const ALL_TABS = ["Details", "Document Generation", "Document Manager", "Smart C
 
 // Section name → builder route suffix (relative to /projects/[projectId]/)
 const SECTION_BUILDER: Record<string, { label: string; path: string }> = {
-  "Security":           { label: "Collateral Management Builder", path: "collateral" },
-  "Covenants":          { label: "Covenant Type Builder",         path: "covenants" },
-  "Conditions":         { label: "Conditions Builder",            path: "conditions" },
-  "Fees":               { label: "Fees Builder",                  path: "fees" },
-  "Policy Exceptions":  { label: "Policy Exceptions Builder",     path: "policy-exceptions" },
+  "Security":             { label: "Collateral Management Builder",  path: "collateral" },
+  "Covenants":            { label: "Covenant Type Builder",          path: "covenants" },
+  "Conditions":           { label: "Conditions Builder",             path: "conditions" },
+  "Fees":                 { label: "Fees Builder",                   path: "fees" },
+  "Policy Exceptions":    { label: "Policy Exceptions Builder",      path: "policy-exceptions" },
+  "Borrowing Structure":  { label: "Entity Involvement Type Builder", path: "relationships/entity-involvement" },
 };
 
 // Tab name → builder route suffix
