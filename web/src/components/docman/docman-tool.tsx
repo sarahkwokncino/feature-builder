@@ -1,5 +1,7 @@
 "use client";
 
+import { useBuilderLock } from "@/lib/use-builder-lock";
+import { LockedBanner } from "@/components/ui/locked-banner";
 import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../../../convex/_generated/api";
@@ -338,11 +340,14 @@ function ConditionalGroupEditor({
   defaultPlaceholderIds,
   allGroups,
   onDelete,
+  isLocked,
 }: {
   group: Group;
   levelPlaceholders: Placeholder[];
   defaultPlaceholderIds: Set<string>;
+  allGroups?: Group[];
   onDelete: () => void;
+  isLocked: boolean;
 }) {
   const updateGroup = useMutation(api.docman.updateGroup);
 
@@ -394,12 +399,15 @@ function ConditionalGroupEditor({
           value={name}
           onChange={(e) => setName(e.target.value)}
           onBlur={persist}
+          disabled={isLocked}
           className="h-7 text-sm font-medium flex-1 border-0 bg-transparent p-0 shadow-none focus-visible:ring-0"
           placeholder="Group name…"
         />
-        <button onClick={onDelete} className="rounded px-1.5 py-0.5 text-xs text-red-400 hover:bg-red-50 hover:text-red-600 shrink-0">
-          Remove
-        </button>
+        {!isLocked && (
+          <button onClick={onDelete} className="rounded px-1.5 py-0.5 text-xs text-red-400 hover:bg-red-50 hover:text-red-600 shrink-0">
+            Remove
+          </button>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-0 divide-x divide-slate-200">
@@ -415,6 +423,7 @@ function ConditionalGroupEditor({
               value={criteria}
               onChange={(e) => setCriteria(e.target.value)}
               onBlur={persist}
+              disabled={isLocked}
               placeholder="Product Line is Commercial AND Product Type is Real Estate"
               className="text-sm"
             />
@@ -474,34 +483,37 @@ function ConditionalGroupEditor({
               <p className="text-xs text-slate-400 italic">All placeholders for this level are set as defaults — remove them from Default Docman Placeholders to use them here.</p>
             ) : (
               <>
-                <div className="flex justify-end mb-1">
-                  <button
-                    onClick={() => {
-                      const allSelected = optionalPhs.every((p) => selectedIds.has(p._id));
-                      setSelectedIds((prev) => {
-                        const next = new Set(prev);
-                        for (const p of optionalPhs) {
-                          if (allSelected) next.delete(p._id); else next.add(p._id);
-                        }
-                        return next;
-                      });
-                    }}
-                    onBlur={persist}
-                    className="text-xs text-slate-500 hover:text-slate-800"
-                  >
-                    {optionalPhs.every((p) => selectedIds.has(p._id)) ? "Deselect all" : "Select all"}
-                  </button>
-                </div>
+                {!isLocked && (
+                  <div className="flex justify-end mb-1">
+                    <button
+                      onClick={() => {
+                        const allSelected = optionalPhs.every((p) => selectedIds.has(p._id));
+                        setSelectedIds((prev) => {
+                          const next = new Set(prev);
+                          for (const p of optionalPhs) {
+                            if (allSelected) next.delete(p._id); else next.add(p._id);
+                          }
+                          return next;
+                        });
+                      }}
+                      onBlur={persist}
+                      className="text-xs text-slate-500 hover:text-slate-800"
+                    >
+                      {optionalPhs.every((p) => selectedIds.has(p._id)) ? "Deselect all" : "Select all"}
+                    </button>
+                  </div>
+                )}
                 <ul className="space-y-1.5">
                   {optionalPhs.map((p) => (
                     <li key={p._id}>
-                      <label className="flex items-center gap-2 cursor-pointer group">
+                      <label className={`flex items-center gap-2 group ${isLocked ? "cursor-not-allowed" : "cursor-pointer"}`}>
                         <input
                           type="checkbox"
                           checked={selectedIds.has(p._id)}
+                          disabled={isLocked}
                           onChange={() => togglePlaceholder(p._id)}
                           onBlur={persist}
-                          className="rounded border-slate-300 text-[var(--color-blue)]"
+                          className="rounded border-slate-300 text-[var(--color-blue)] disabled:cursor-not-allowed disabled:opacity-50"
                         />
                         <span className="text-sm text-slate-800 group-hover:text-slate-900">{p.name}</span>
                       </label>
@@ -524,11 +536,13 @@ function LevelPanel({
   placeholders,
   groups,
   cardId,
+  isLocked,
 }: {
   level: DocmanLevel;
   placeholders: Placeholder[];
   groups: Group[];
   cardId: Id<"cards">;
+  isLocked: boolean;
 }) {
   const updatePlaceholder = useMutation(api.docman.updatePlaceholder);
   const updateGroup = useMutation(api.docman.updateGroup);
@@ -603,7 +617,7 @@ function LevelPanel({
                 placeholder="Search placeholders…"
                 className="h-7 text-xs flex-1"
               />
-              <button
+              {!isLocked && <button
                 onClick={async () => {
                   const visible = levelPlaceholders.filter((p) => !defaultSearch || p.name.toLowerCase().includes(defaultSearch.toLowerCase()));
                   const allChecked = visible.every((p) => p.isDefault);
@@ -619,7 +633,7 @@ function LevelPanel({
                   .every((p) => p.isDefault)
                   ? "Deselect all"
                   : "Select all"}
-              </button>
+              </button>}
             </div>
             {/* Scrollable checkbox list */}
             <ul className="max-h-44 overflow-y-auto divide-y divide-slate-100">
@@ -629,12 +643,13 @@ function LevelPanel({
                   const isDefault = !!p.isDefault;
                   return (
                     <li key={p._id}>
-                      <label className="flex items-center gap-2.5 px-3 py-2 cursor-pointer hover:bg-slate-50">
+                      <label className={`flex items-center gap-2.5 px-3 py-2 hover:bg-slate-50 ${isLocked ? "cursor-not-allowed" : "cursor-pointer"}`}>
                         <input
                           type="checkbox"
                           checked={isDefault}
+                          disabled={isLocked}
                           onChange={() => isDefault ? unmarkDefault(p) : markDefault(p)}
-                          className="rounded border-slate-300"
+                          className="rounded border-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
                         />
                         <span className="text-sm text-slate-800">{p.name}</span>
                         {p.category && (
@@ -678,12 +693,14 @@ function LevelPanel({
               </button>
             );
           })}
-          <button
-            onClick={handleAddGroup}
-            className="border-b-2 border-transparent px-3 py-2 text-xs text-slate-400 hover:text-slate-600 hover:border-slate-300 transition-colors shrink-0"
-          >
-            + Add
-          </button>
+          {!isLocked && (
+            <button
+              onClick={handleAddGroup}
+              className="border-b-2 border-transparent px-3 py-2 text-xs text-slate-400 hover:text-slate-600 hover:border-slate-300 transition-colors shrink-0"
+            >
+              + Add
+            </button>
+          )}
         </div>
 
         {/* Active group content */}
@@ -699,6 +716,7 @@ function LevelPanel({
               levelPlaceholders={levelPlaceholders}
               defaultPlaceholderIds={defaultPlaceholderIds}
               onDelete={() => handleDeleteGroup(activeGroup)}
+              isLocked={isLocked}
             />
           </div>
         ) : null}
@@ -727,6 +745,7 @@ export function DocmanTool({
   const [placeholderBuilderOpen, setPlaceholderBuilderOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const { isLocked, toggleLock } = useBuilderLock(projectId, "docman");
 
   const groups = raw?.groups ?? [];
   const placeholders = raw?.placeholders ?? [];
@@ -801,7 +820,9 @@ export function DocmanTool({
   }
 
   return (
-    <div className="flex h-full flex-col p-6">
+    <div className="pb-6">
+      {isLocked && <LockedBanner onUnlock={toggleLock} />}
+      <div className="flex h-full flex-col p-6">
       {/* Header */}
       <div className="mb-5 flex items-center justify-between">
         <div>
@@ -812,10 +833,10 @@ export function DocmanTool({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>Import</Button>
+          <Button variant="outline" size="sm" onClick={() => setImportOpen(true)} disabled={isLocked}>Import</Button>
           <Button variant="outline" size="sm" onClick={() => downloadDocmanExcel(exportData)}>Export Excel</Button>
           <Button variant="outline" size="sm" onClick={() => setYamlOpen(true)}>Export YAML</Button>
-          <Button variant="outline" onClick={() => setPlaceholderBuilderOpen(true)}>
+          <Button variant="outline" onClick={() => setPlaceholderBuilderOpen(true)} disabled={isLocked}>
             Placeholder Builder
           </Button>
         </div>
@@ -858,6 +879,7 @@ export function DocmanTool({
           placeholders={placeholders}
           groups={groups}
           cardId={cardId}
+          isLocked={isLocked}
         />
       </div>
 
@@ -890,6 +912,7 @@ export function DocmanTool({
           </div>
         )}
       />
+      </div>
     </div>
   );
 }

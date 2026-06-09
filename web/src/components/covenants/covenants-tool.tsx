@@ -27,6 +27,8 @@ import {
   COV_TYPE_KEY_PREFIX,
 } from "@/lib/picklist-defaults";
 import { toast } from "sonner";
+import { useBuilderLock } from "@/lib/use-builder-lock";
+import { LockedBanner } from "@/components/ui/locked-banner";
 
 export function CovenantsTool({
   projectId,
@@ -48,6 +50,8 @@ export function CovenantsTool({
   const [picklistOpen, setPicklistOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const { isLocked, toggleLock } = useBuilderLock(projectId, "covenants");
+
 
   const storedPicklists = useQuery(api.picklists.listForScope, {
     scope: "covenants",
@@ -123,7 +127,9 @@ export function CovenantsTool({
   }
 
   return (
-    <div className="p-6">
+    <div className="pb-6">
+      {isLocked && <LockedBanner onUnlock={toggleLock} />}
+      <div className="p-6">
       <div className="mb-4 flex items-baseline justify-between">
         <div>
           <h2 className="text-xl font-semibold text-slate-900">
@@ -134,10 +140,10 @@ export function CovenantsTool({
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setPicklistOpen(true)}>
+          <Button variant="outline" onClick={() => setPicklistOpen(true)} disabled={isLocked}>
             Manage picklists
           </Button>
-          <Button variant="outline" onClick={() => setImportOpen(true)}>
+          <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>
             Import
           </Button>
           <Button
@@ -154,11 +160,20 @@ export function CovenantsTool({
           </Button>
           <Button
             onClick={() => setCreateOpen(true)}
+            disabled={isLocked}
             className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
           >
             + Create Covenant
           </Button>
         </div>
+      </div>
+
+      <div className="mb-3 flex items-center gap-3">
+        <h3 className="text-sm font-semibold text-slate-800">Preview Playground</h3>
+        <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-medium text-amber-700">
+          Example only — not saved or exported
+        </span>
+        <span className="text-xs text-slate-400">Click <button onClick={() => setPicklistOpen(true)} className="text-[var(--color-blue)] hover:underline">Manage picklists</button> to configure values.</span>
       </div>
 
       <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
@@ -268,6 +283,7 @@ export function CovenantsTool({
           </div>
         )}
       />
+      </div>
     </div>
   );
 }

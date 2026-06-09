@@ -655,7 +655,7 @@ export function downloadCollateralExcel(
         sheetRows.push(["(No field configuration saved for this combo)"]);
       } else {
         for (const section of config.sections) {
-          sheetRows.push([section.name, "", ""]);
+          sheetRows.push([`[SECTION] ${section.name}`, "", ""]);
           sheetRows.push(["Field Name", "Salesforce Type", "Picklist Values"]);
           if (section.fields.length === 0) {
             sheetRows.push(["(No fields)", "", ""]);
@@ -2021,6 +2021,258 @@ function parseStagesCsv(text: string): StageImportRow[] | string {
   return rows;
 }
 
+// ── Connections Builder ───────────────────────────────────────────────────────
+
+export type ConnectionRoleRecord = {
+  name: string;
+  fromType?: string;
+  toType?: string;
+  description?: string;
+  selfReciprocating?: boolean;
+  reciprocalRole?: string;
+};
+
+export function buildConnectionsYaml(
+  records: ConnectionRoleRecord[],
+  meta: { storyId: string; title: string; featureArea: string },
+): string {
+  let y = `story_id: "${meta.storyId}"\ntitle: "${yamlStr(meta.title)}"\nfeature_area: ${meta.featureArea}\n`;
+  y += `source:\n  type: connections-builder\n  ref: "connections-builder@${today()}"\n\n`;
+  y += `# Object: LLC_BI__Connection_Role__c\n# Field: LLC_BI__Role__c (picklist — role name)\n\nrecords:\n\n`;
+  if (!records.length) { y += "  # No connection roles configured yet.\n"; return y; }
+  for (const r of records) {
+    y += `  - object: LLC_BI__Connection_Role__c\n    fields:\n`;
+    y += `      LLC_BI__Role__c: "${yamlStr(r.name)}"\n`;
+    y += `      Self_Reciprocating__c: ${r.selfReciprocating ? "true" : "false"}\n`;
+    if (r.reciprocalRole) y += `      Reciprocal_Role__c: "${yamlStr(r.reciprocalRole)}"\n`;
+    y += `\n`;
+  }
+  return y;
+}
+
+export function downloadConnectionsYaml(
+  records: ConnectionRoleRecord[],
+  meta: { storyId: string; title: string; featureArea: string },
+) {
+  downloadBlob(
+    new Blob([buildConnectionsYaml(records, meta)], { type: "text/yaml" }),
+    `${slugify(meta.storyId || "connections")}.yaml`,
+  );
+}
+
+export function downloadConnectionsExcel(records: ConnectionRoleRecord[]) {
+  const rows: unknown[][] = [
+    ["Connection Role Name", "Self Reciprocating", "Reciprocal Role"],
+    ...records.map((r) => [r.name, r.selfReciprocating ? "true" : "false", r.reciprocalRole ?? ""]),
+  ];
+  if (records.length === 0) rows.push(["# No connection roles defined", "", ""]);
+
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<?mso-application progid="Excel.Sheet"?>` +
+    `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">` +
+    `<Styles><Style ss:ID="h"><Font ss:Bold="1"/></Style></Styles>` +
+    buildXlsxSheet(rows, "Connection Roles") +
+    `</Workbook>`;
+  downloadBlob(new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" }), "connection-roles.xls");
+}
+
+export function parseConnectionsFile(text: string, filename: string): ConnectionRoleRecord[] | string {
+  const raw = text.replace(/^\uFEFF/, "");
+  if (filename.endsWith(".yaml") || filename.endsWith(".yml")) {
+    const blocks = raw.split(/\n  - object: LLC_BI__Connection_Role__c/);
+    blocks.shift();
+    const parsed: ConnectionRoleRecord[] = [];
+    for (const block of blocks) {
+      const gF = (label: string) => {
+        const m = block.match(new RegExp(`${label}:\\s*"([^"]*)"`, "i"));
+        return m ? m[1] : "";
+      };
+      const name = gF("LLC_BI__Role__c");
+      if (!name) continue;
+      parsed.push({
+        name,
+        fromType: gF("LLC_BI__From_Type__c") || undefined,
+        toType: gF("LLC_BI__To_Type__c") || undefined,
+      });
+    }
+    if (!parsed.length) return "No LLC_BI__Relationship__c role records found.";
+    return parsed;
+  }
+  // SpreadsheetML or CSV
+  let rowData: string[][] = [];
+  if (raw.trimStart().startsWith("<?xml") || raw.trimStart().startsWith("<Workbook")) {
+    const wsMatch = raw.match(/<Worksheet[^>]*>([\s\S]*?)<\/Worksheet>/);
+    const wsText = wsMatch ? wsMatch[1] : raw;
+    rowData = [...wsText.matchAll(/<Row[^>]*>([\s\S]*?)<\/Row>/g)].map((m) =>
+      [...m[1].matchAll(/<Data[^>]*>([\s\S]*?)<\/Data>/g)].map((c) =>
+        c[1].replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").trim()
+      )
+    );
+  } else {
+    rowData = raw.split(/\r?\n/).filter((l) => l.trim()).map(parseCsvRow);
+  }
+  if (rowData.length < 2) return "File appears empty.";
+  const headers = rowData[0].map((h) => h.toLowerCase());
+  const nameIdx = headers.findIndex((h) => h.includes("role") || h.includes("name"));
+  const fromIdx = headers.findIndex((h) => h.includes("from"));
+  const toIdx = headers.findIndex((h) => h.includes("to"));
+  const descIdx = headers.findIndex((h) => h.includes("desc"));
+  if (nameIdx === -1) return "Could not find a role name column.";
+  const parsed: ConnectionRoleRecord[] = [];
+  for (let i = 1; i < rowData.length; i++) {
+    const cells = rowData[i];
+    const name = (cells[nameIdx] ?? "").trim();
+    if (!name || name.startsWith("#")) continue;
+    parsed.push({
+      name,
+      fromType: fromIdx !== -1 ? (cells[fromIdx] ?? "").trim() || undefined : undefined,
+      toType: toIdx !== -1 ? (cells[toIdx] ?? "").trim() || undefined : undefined,
+      description: descIdx !== -1 ? (cells[descIdx] ?? "").trim() || undefined : undefined,
+    });
+  }
+  if (!parsed.length) return "No data rows found.";
+  return parsed;
+}
+
+// ── Relationships Builder ─────────────────────────────────────────────────────
+
+export type RelationshipRow = { type: string };
+
+export type RelationshipFieldConfig = {
+  relationshipType: string;
+  sections: { name: string; fields: { name: string; fieldType: string; picklistValues?: string[] }[] }[];
+};
+
+export function buildRelationshipsYaml(
+  types: string[],
+  meta: { storyId: string; title: string; featureArea: string },
+): string {
+  let y = `story_id: "${meta.storyId}"\ntitle: "${yamlStr(meta.title)}"\nfeature_area: ${meta.featureArea}\n`;
+  y += `source:\n  type: relationships-builder\n  ref: "relationships-builder@${today()}"\n\n`;
+  y += `# Object: LLC_BI__Relationship__c\n# Field: LLC_BI__Type__c\n\nrecords:\n\n`;
+  for (const type of types) {
+    y += `  - object: LLC_BI__Relationship__c\n`;
+    y += `    fields:\n`;
+    y += `      LLC_BI__Type__c: "${yamlStr(type)}"\n\n`;
+  }
+  return y;
+}
+
+export function downloadRelationshipsYaml(
+  types: string[],
+  meta: { storyId: string; title: string; featureArea: string },
+) {
+  const yaml = buildRelationshipsYaml(types, meta);
+  downloadBlob(new Blob([yaml], { type: "text/yaml" }), `${slugify(meta.storyId || "relationships")}.yaml`);
+}
+
+export function downloadRelationshipsExcel(
+  types: string[],
+  fieldConfigs?: RelationshipFieldConfig[],
+  hiddenTypes?: string[],
+) {
+  const hidden = hiddenTypes ?? [];
+  const rows: unknown[][] = [["LLC_BI__Type__c", "Active"]];
+  for (const type of types) rows.push([type, hidden.includes(type) ? "false" : "true"]);
+  if (rows.length === 1) rows.push(["# No relationship types defined", ""]);
+
+  const typeSheets: string[] = [];
+  const usedSheetNames = new Set<string>();
+
+  const uniqueSheetName = (raw: string): string => {
+    const base = raw.replace(/[/\\?*[\]:]/g, "-").slice(0, 31);
+    if (!usedSheetNames.has(base)) { usedSheetNames.add(base); return base; }
+    for (let i = 2; i < 1000; i++) {
+      const suffix = ` (${i})`;
+      const candidate = base.slice(0, 31 - suffix.length) + suffix;
+      if (!usedSheetNames.has(candidate)) { usedSheetNames.add(candidate); return candidate; }
+    }
+    return base;
+  };
+
+  for (const type of types) {
+    const config = fieldConfigs?.find((c) => c.relationshipType === type);
+    const sheetName = uniqueSheetName(type);
+    const sheetRows: unknown[][] = [[`Type: ${type}`], [""]];
+
+    if (!config || config.sections.length === 0) {
+      sheetRows.push(["(No field configuration saved for this type)"]);
+    } else {
+      for (const section of config.sections) {
+        sheetRows.push([`[SECTION] ${section.name}`, "", ""]);
+        sheetRows.push(["Field Name", "Salesforce Type", "Picklist Values"]);
+        if (section.fields.length === 0) {
+          sheetRows.push(["(No fields)", "", ""]);
+        } else {
+          for (const field of section.fields) {
+            sheetRows.push([field.name, field.fieldType, (field.picklistValues ?? []).join(", ")]);
+          }
+        }
+        sheetRows.push([""]);
+      }
+    }
+    typeSheets.push(buildXlsxSheet(sheetRows, sheetName));
+  }
+
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<?mso-application progid="Excel.Sheet"?>` +
+    `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">` +
+    `<Styles><Style ss:ID="h"><Font ss:Bold="1"/></Style></Styles>` +
+    buildXlsxSheet(rows, "Relationship Types") +
+    typeSheets.join("") +
+    `</Workbook>`;
+  downloadBlob(new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" }), "relationship-types.xls");
+}
+
+export function parseRelationshipsFile(text: string, filename: string): RelationshipRow[] | string {
+  const raw = text.replace(/^\uFEFF/, "");
+  if (filename.endsWith(".yaml") || filename.endsWith(".yml")) {
+    const blocks = raw.split(/\n  - object: LLC_BI__Relationship__c/);
+    blocks.shift();
+    const parsed: RelationshipRow[] = [];
+    for (const block of blocks) {
+      const m = block.match(/LLC_BI__Type__c:\s*"([^"]*)"/i);
+      if (m?.[1]) parsed.push({ type: m[1] });
+    }
+    if (!parsed.length) return "No LLC_BI__Relationship__c records found.";
+    return parsed;
+  }
+  // CSV or SpreadsheetML
+  if (raw.trimStart().startsWith("<?xml") || raw.trimStart().startsWith("<Workbook")) {
+    const wsMatch = raw.match(/<Worksheet[^>]*ss:Name="Relationship Types"[^>]*>([\s\S]*?)<\/Worksheet>/);
+    const wsText = wsMatch ? wsMatch[1] : raw;
+    const rowMatches = [...wsText.matchAll(/<Row[^>]*>([\s\S]*?)<\/Row>/g)];
+    if (rowMatches.length < 2) return "No data rows found.";
+    const headers = [...rowMatches[0][1].matchAll(/<Data[^>]*>([\s\S]*?)<\/Data>/g)].map((m) => m[1].trim().toLowerCase());
+    const typeIdx = headers.findIndex((h) => h.includes("type"));
+    if (typeIdx === -1) return "Could not find type column.";
+    const parsed: RelationshipRow[] = [];
+    for (let i = 1; i < rowMatches.length; i++) {
+      const cells = [...rowMatches[i][1].matchAll(/<Data[^>]*>([\s\S]*?)<\/Data>/g)].map((m) => m[1].trim());
+      const type = (cells[typeIdx] ?? "").trim();
+      if (type && !type.startsWith("#")) parsed.push({ type });
+    }
+    if (!parsed.length) return "No type rows found.";
+    return parsed;
+  }
+  // Plain CSV
+  const lines = raw.split(/\r?\n/).filter((l) => l.trim());
+  if (lines.length < 2) return "File appears empty.";
+  const headers = parseCsvRow(lines[0]).map((h) => h.trim().toLowerCase());
+  const typeIdx = headers.findIndex((h) => h.includes("type"));
+  if (typeIdx === -1) return "Could not find a type column.";
+  const parsed: RelationshipRow[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = parseCsvRow(lines[i]);
+    const type = (cells[typeIdx] ?? "").trim();
+    if (type && !type.startsWith("#")) parsed.push({ type });
+  }
+  if (!parsed.length) return "No data rows found.";
+  return parsed;
+}
+
 function parseStagesSpreadsheetML(text: string): StageImportRow[] | string {
   try {
     const wsMatch = text.match(/<Worksheet[^>]*ss:Name="All Stages"[^>]*>([\s\S]*?)<\/Worksheet>/);
@@ -2053,4 +2305,88 @@ function parseStagesSpreadsheetML(text: string): StageImportRow[] | string {
   } catch {
     return "Failed to parse spreadsheet.";
   }
+}
+
+// ── Entity Involvement Types ──────────────────────────────────────────────────
+
+export type InvolvementTypeRecord = { name: string };
+
+export function buildInvolvementTypesYaml(
+  records: InvolvementTypeRecord[],
+  meta: { storyId: string; title: string; featureArea: string },
+): string {
+  let y = `story_id: "${meta.storyId}"\ntitle: "${yamlStr(meta.title)}"\nfeature_area: ${meta.featureArea}\n`;
+  y += `source:\n  type: entity-involvement-builder\n  ref: "entity-involvement-builder@${today()}"\n\n`;
+  y += `# Object: LLC_BI__Legal_Entities__c\n# Field: LLC_BI__Borrower_Type__c (picklist)\n\nrecords:\n\n`;
+  if (!records.length) { y += "  # No involvement types configured yet.\n"; return y; }
+  for (const r of records) {
+    y += `  - object: LLC_BI__Legal_Entities__c\n    fields:\n`;
+    y += `      LLC_BI__Borrower_Type__c: "${yamlStr(r.name)}"\n\n`;
+  }
+  return y;
+}
+
+export function downloadInvolvementTypesYaml(
+  records: InvolvementTypeRecord[],
+  meta: { storyId: string; title: string; featureArea: string },
+) {
+  downloadBlob(
+    new Blob([buildInvolvementTypesYaml(records, meta)], { type: "text/yaml" }),
+    `${slugify(meta.storyId || "entity-involvement")}.yaml`,
+  );
+}
+
+export function downloadInvolvementTypesExcel(records: InvolvementTypeRecord[]) {
+  const rows: unknown[][] = [
+    ["Involvement Type Name"],
+    ...records.map((r) => [r.name]),
+  ];
+  if (records.length === 0) rows.push(["# No involvement types defined"]);
+
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<?mso-application progid="Excel.Sheet"?>` +
+    `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">` +
+    `<Styles><Style ss:ID="h"><Font ss:Bold="1"/></Style></Styles>` +
+    buildXlsxSheet(rows, "Involvement Types") +
+    `</Workbook>`;
+  downloadBlob(new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" }), "entity-involvement-types.xls");
+}
+
+export function parseInvolvementTypesFile(text: string, filename: string): InvolvementTypeRecord[] | string {
+  const raw = text.replace(/^\uFEFF/, "");
+  if (filename.endsWith(".yaml") || filename.endsWith(".yml")) {
+    const blocks = raw.split(/\n  - object: LLC_BI__Legal_Entities__c/);
+    blocks.shift();
+    const parsed: InvolvementTypeRecord[] = [];
+    for (const block of blocks) {
+      const m = block.match(/LLC_BI__Borrower_Type__c:\s*"([^"]*)"/i);
+      if (m?.[1]) parsed.push({ name: m[1] });
+    }
+    if (!parsed.length) return "No LLC_BI__Legal_Entities__c involvement type records found.";
+    return parsed;
+  }
+  let rowData: string[][] = [];
+  if (raw.trimStart().startsWith("<?xml") || raw.trimStart().startsWith("<Workbook")) {
+    const wsMatch = raw.match(/<Worksheet[^>]*>([\s\S]*?)<\/Worksheet>/);
+    const wsText = wsMatch ? wsMatch[1] : raw;
+    rowData = [...wsText.matchAll(/<Row[^>]*>([\s\S]*?)<\/Row>/g)].map((m) =>
+      [...m[1].matchAll(/<Data[^>]*>([\s\S]*?)<\/Data>/g)].map((c) =>
+        c[1].replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").trim()
+      )
+    );
+  } else {
+    rowData = raw.split(/\r?\n/).filter((l) => l.trim()).map(parseCsvRow);
+  }
+  if (rowData.length < 2) return "File appears empty.";
+  const headers = rowData[0].map((h) => h.toLowerCase());
+  const nameIdx = headers.findIndex((h) => h.includes("involvement") || h.includes("name") || h.includes("type"));
+  if (nameIdx === -1) return "Could not find an involvement type column.";
+  const parsed: InvolvementTypeRecord[] = [];
+  for (let i = 1; i < rowData.length; i++) {
+    const name = (rowData[i][nameIdx] ?? "").trim();
+    if (name && !name.startsWith("#")) parsed.push({ name });
+  }
+  if (!parsed.length) return "No data rows found.";
+  return parsed;
 }

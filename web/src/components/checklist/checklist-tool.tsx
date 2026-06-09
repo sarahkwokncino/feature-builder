@@ -1,5 +1,7 @@
 "use client";
 
+import { useBuilderLock } from "@/lib/use-builder-lock";
+import { LockedBanner } from "@/components/ui/locked-banner";
 import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../../../convex/_generated/api";
@@ -57,6 +59,7 @@ export function ChecklistTool({
   const [picklistOpen, setPicklistOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const { isLocked, toggleLock } = useBuilderLock(projectId, "checklist");
 
   const stored = useQuery(api.picklists.listForScope, { scope: "checklist" });
   const picklistMap = useMemo(() => {
@@ -159,16 +162,18 @@ export function ChecklistTool({
   }
 
   return (
-    <div className="flex h-full flex-col p-6">
+    <div className="pb-6">
+      {isLocked && <LockedBanner onUnlock={toggleLock} />}
+      <div className="flex h-full flex-col p-6">
       <div className="mb-3 flex items-baseline justify-between">
         <h2 className="text-xl font-semibold text-slate-900">
           Smart Checklist — {project.name}
         </h2>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setPicklistOpen(true)}>
+          <Button variant="outline" onClick={() => setPicklistOpen(true)} disabled={isLocked}>
             Manage picklists
           </Button>
-          <Button variant="outline" onClick={() => setImportOpen(true)}>
+          <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>
             Import
           </Button>
           <Button
@@ -187,6 +192,7 @@ export function ChecklistTool({
           </Button>
           <Button
             onClick={handleAdd}
+            disabled={isLocked}
             className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
           >
             + Add requirement
@@ -244,13 +250,15 @@ export function ChecklistTool({
                       {req.name.trim() || "Untitled requirement"}
                     </div>
                   </button>
-                  <button
-                    onClick={() => handleDelete(req._id)}
-                    className="rounded px-1 text-xs text-red-500 hover:bg-red-50"
-                    aria-label="Delete"
-                  >
-                    ×
-                  </button>
+                  {!isLocked && (
+                    <button
+                      onClick={() => handleDelete(req._id)}
+                      className="rounded px-1 text-xs text-red-500 hover:bg-red-50"
+                      aria-label="Delete"
+                    >
+                      ×
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
@@ -265,6 +273,7 @@ export function ChecklistTool({
               record={selected}
               allRecords={records}
               picklistMap={picklistMap}
+              isLocked={isLocked}
             />
           ) : (
             <div className="text-sm text-slate-500">
@@ -310,6 +319,7 @@ export function ChecklistTool({
           </div>
         )}
       />
+      </div>
     </div>
   );
 }
@@ -318,10 +328,12 @@ function RequirementDetail({
   record,
   allRecords,
   picklistMap,
+  isLocked,
 }: {
   record: Doc<"checklistReqs">;
   allRecords: Doc<"checklistReqs">[];
   picklistMap: Map<string, string[]>;
+  isLocked: boolean;
 }) {
   const update = useMutation(api.checklist.update);
 
@@ -379,6 +391,7 @@ function RequirementDetail({
           value={name}
           onChange={(e) => setName(e.target.value)}
           onBlur={persist}
+          disabled={isLocked}
           className={!name.trim() ? "border-red-400 focus:border-red-400" : ""}
         />
         {!name.trim() && (
@@ -386,10 +399,10 @@ function RequirementDetail({
         )}
       </div>
       <div>
-        <PicklistField id="req-category" label="Category" value={category} onChange={setCategory} options={picklistMap.get("category") ?? []} />
+        <PicklistField id="req-category" label="Category" value={category} onChange={setCategory} options={picklistMap.get("category") ?? []} disabled={isLocked} />
       </div>
       <div>
-        <PicklistField id="req-assignee" label="Assignee" value={assignedParty} onChange={setAssignedParty} options={picklistMap.get("assignedParty") ?? []} />
+        <PicklistField id="req-assignee" label="Assignee" value={assignedParty} onChange={setAssignedParty} options={picklistMap.get("assignedParty") ?? []} disabled={isLocked} />
       </div>
       <div>
         <Label htmlFor="req-desc">Description</Label>
@@ -399,6 +412,7 @@ function RequirementDetail({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           onBlur={persist}
+          disabled={isLocked}
         />
       </div>
       <div>
@@ -409,10 +423,11 @@ function RequirementDetail({
           value={legalDescription}
           onChange={(e) => setLegalDescription(e.target.value)}
           onBlur={persist}
+          disabled={isLocked}
         />
       </div>
       <div>
-        <PicklistField id="req-placeholder" label="Document Manager Placeholder" value={placeholderName} onChange={setPlaceholderName} options={picklistMap.get("placeholderName") ?? []} />
+        <PicklistField id="req-placeholder" label="Document Manager Placeholder" value={placeholderName} onChange={setPlaceholderName} options={picklistMap.get("placeholderName") ?? []} disabled={isLocked} />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
@@ -423,6 +438,7 @@ function RequirementDetail({
             value={criteriaUserWritten}
             onChange={(e) => setCriteriaUserWritten(e.target.value)}
             onBlur={persist}
+            disabled={isLocked}
           />
         </div>
         <div>
@@ -433,11 +449,12 @@ function RequirementDetail({
             value={criteriaGenerated}
             onChange={(e) => setCriteriaGenerated(e.target.value)}
             onBlur={persist}
+            disabled={isLocked}
           />
         </div>
       </div>
       <div className="flex gap-6 text-sm">
-        <label className="flex cursor-pointer items-center gap-2">
+        <label className={`flex items-center gap-2 ${isLocked ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
           <input
             type="checkbox"
             checked={stageCheck}
@@ -447,37 +464,42 @@ function RequirementDetail({
               if (!checked) setNeededBy("");
             }}
             onBlur={persist}
+            disabled={isLocked}
           />
           Hard Stop
         </label>
-        <label className="flex cursor-pointer items-center gap-2">
+        <label className={`flex items-center gap-2 ${isLocked ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
           <input
             type="checkbox"
             checked={doNotAutoGenerate}
             onChange={(e) => setDoNotAutoGenerate(e.target.checked)}
             onBlur={persist}
+            disabled={isLocked}
           />
           Do Not Auto-Generate
         </label>
       </div>
       {stageCheck && (
-        <PicklistField id="req-needed-by" label="Needed By" value={neededBy} onChange={setNeededBy} options={picklistMap.get("neededBy") ?? []} />
+        <PicklistField id="req-needed-by" label="Needed By" value={neededBy} onChange={setNeededBy} options={picklistMap.get("neededBy") ?? []} disabled={isLocked} />
       )}
-      <div className="flex justify-end pt-2">
-        <Button onClick={persist}>Save</Button>
-      </div>
+      {!isLocked && (
+        <div className="flex justify-end pt-2">
+          <Button onClick={persist}>Save</Button>
+        </div>
+      )}
     </div>
   );
 }
 
 function PicklistField({
-  id, label, value, onChange, options,
+  id, label, value, onChange, options, disabled,
 }: {
   id: string;
   label: string;
   value: string;
   onChange: (v: string) => void;
   options: string[];
+  disabled?: boolean;
 }) {
   return (
     <div>
@@ -485,6 +507,7 @@ function PicklistField({
       <Select
         value={value || null}
         onValueChange={(v: string | null) => onChange(v ?? "")}
+        disabled={disabled}
       >
         <SelectTrigger id={id} className="w-full">
           <SelectValue placeholder="Select…" />

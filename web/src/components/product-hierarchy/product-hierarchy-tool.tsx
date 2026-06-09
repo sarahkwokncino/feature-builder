@@ -17,6 +17,8 @@ import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import { buildProductHierarchyYaml, parseProductHierarchyYaml, downloadProductHierarchyExcel, parseProductHierarchyExcel, type ProductHierarchyExport } from "@/lib/product-hierarchy-export";
 import { toast } from "sonner";
+import { useBuilderLock } from "@/lib/use-builder-lock";
+import { LockedBanner } from "@/components/ui/locked-banner";
 
 type Line = Doc<"productLines">;
 type PType = Doc<"productTypes">;
@@ -443,6 +445,7 @@ export function ProductHierarchyTool({ projectId }: { projectId: Id<"projects"> 
   const [picklistOpen, setPicklistOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const { isLocked, toggleLock } = useBuilderLock(projectId, "product-hierarchy");
 
   // Simulator state
   const [selectedLineId, setSelectedLineId] = useState<Id<"productLines"> | "">("");
@@ -506,7 +509,9 @@ export function ProductHierarchyTool({ projectId }: { projectId: Id<"projects"> 
   const selectedProduct = products.find((p) => p._id === selectedProductId);
 
   return (
-    <div className="p-6 max-w-4xl">
+    <div className="pb-6">
+      {isLocked && <LockedBanner onUnlock={toggleLock} />}
+      <div className="p-6 max-w-4xl">
       {/* Header */}
       <div className="mb-5 flex items-start justify-between">
         <div>
@@ -520,10 +525,10 @@ export function ProductHierarchyTool({ projectId }: { projectId: Id<"projects"> 
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setPicklistOpen(true)}>
+          <Button variant="outline" onClick={() => setPicklistOpen(true)} disabled={isLocked}>
             Manage picklists
           </Button>
-          <Button variant="outline" onClick={() => setImportOpen(true)}>Import</Button>
+          <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>Import</Button>
           <Button
             variant="outline"
             onClick={() => downloadProductHierarchyExcel(exportData)}
@@ -542,6 +547,13 @@ export function ProductHierarchyTool({ projectId }: { projectId: Id<"projects"> 
       </div>
 
       {/* Simulator card — mirrors the nCino Loan form */}
+      <div className="mb-3 flex items-center gap-3">
+        <h3 className="text-sm font-semibold text-slate-800">Preview Playground</h3>
+        <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-medium text-amber-700">
+          Example only — not saved or exported
+        </span>
+        <span className="text-xs text-slate-400">Click <button onClick={() => setPicklistOpen(true)} className="text-[var(--color-blue)] hover:underline">Manage picklists</button> to configure values.</span>
+      </div>
       <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
         {/* Card title bar */}
         <div className="border-b border-slate-200 bg-slate-50 px-4 py-2.5 flex items-center gap-2">
@@ -709,6 +721,7 @@ export function ProductHierarchyTool({ projectId }: { projectId: Id<"projects"> 
           </div>
         )}
       />
+      </div>
     </div>
   );
 }

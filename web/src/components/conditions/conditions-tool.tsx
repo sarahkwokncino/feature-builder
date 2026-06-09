@@ -32,6 +32,8 @@ import {
   type ConditionType,
 } from "@/lib/export-import";
 import { toast } from "sonner";
+import { useBuilderLock } from "@/lib/use-builder-lock";
+import { LockedBanner } from "@/components/ui/locked-banner";
 
 const CONDITION_TYPES: ConditionType[] = ["Condition Precedent", "Condition Subsequent"];
 
@@ -54,6 +56,7 @@ export function ConditionsTool({
   const [picklistOpen, setPicklistOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const { isLocked, toggleLock } = useBuilderLock(projectId, "conditions");
 
   const stored = useQuery(api.picklists.listForScope, { scope: "conditions" });
   const picklistMap = useMemo(() => {
@@ -165,16 +168,18 @@ export function ConditionsTool({
   }
 
   return (
-    <div className="flex h-full flex-col p-6">
+    <div className="flex h-full flex-col">
+      {isLocked && <LockedBanner onUnlock={toggleLock} />}
+      <div className="flex h-full flex-col p-6">
       <div className="mb-3 flex items-baseline justify-between">
         <h2 className="text-xl font-semibold text-slate-900">
           Conditions Builder — {project.name}
         </h2>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setPicklistOpen(true)}>
+          <Button variant="outline" onClick={() => setPicklistOpen(true)} disabled={isLocked}>
             Manage picklists
           </Button>
-          <Button variant="outline" onClick={() => setImportOpen(true)}>
+          <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>
             Import
           </Button>
           <Button
@@ -193,6 +198,7 @@ export function ConditionsTool({
           </Button>
           <Button
             onClick={handleAdd}
+            disabled={isLocked}
             className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
           >
             + Add condition
@@ -287,13 +293,15 @@ export function ConditionsTool({
                       </span>
                     )}
                   </button>
-                  <button
-                    onClick={() => handleDelete(req._id)}
-                    className="rounded px-1 text-xs text-red-500 hover:bg-red-50"
-                    aria-label="Delete"
-                  >
-                    ×
-                  </button>
+                  {!isLocked && (
+                    <button
+                      onClick={() => handleDelete(req._id)}
+                      className="rounded px-1 text-xs text-red-500 hover:bg-red-50"
+                      aria-label="Delete"
+                    >
+                      ×
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
@@ -308,6 +316,7 @@ export function ConditionsTool({
               record={selected}
               allRecords={records}
               picklistMap={picklistMap}
+              isLocked={isLocked}
             />
           ) : (
             <div className="text-sm text-slate-500">
@@ -350,6 +359,7 @@ export function ConditionsTool({
           </div>
         )}
       />
+      </div>
     </div>
   );
 }
@@ -358,10 +368,12 @@ function ConditionDetail({
   record,
   allRecords,
   picklistMap,
+  isLocked,
 }: {
   record: Doc<"conditionReqs">;
   allRecords: Doc<"conditionReqs">[];
   picklistMap: Map<string, string[]>;
+  isLocked: boolean;
 }) {
   const update = useMutation(api.conditions.update);
 
@@ -411,6 +423,7 @@ function ConditionDetail({
           value={name}
           onChange={(e) => setName(e.target.value)}
           onBlur={persist}
+          disabled={isLocked}
           className={!name.trim() ? "border-red-400 focus:border-red-400" : ""}
         />
         {!name.trim() && (
@@ -424,6 +437,7 @@ function ConditionDetail({
           value={category}
           onChange={setCategory}
           options={picklistMap.get("category") ?? []}
+          disabled={isLocked}
         />
       </div>
       <div>
@@ -433,6 +447,7 @@ function ConditionDetail({
           value={assignedParty}
           onChange={setAssignedParty}
           options={picklistMap.get("assignedParty") ?? []}
+          disabled={isLocked}
         />
       </div>
       <div>
@@ -443,6 +458,7 @@ function ConditionDetail({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           onBlur={persist}
+          disabled={isLocked}
         />
       </div>
       <div>
@@ -453,11 +469,14 @@ function ConditionDetail({
           value={legalDescription}
           onChange={(e) => setLegalDescription(e.target.value)}
           onBlur={persist}
+          disabled={isLocked}
         />
       </div>
-      <div className="flex justify-end pt-2">
-        <Button onClick={persist}>Save</Button>
-      </div>
+      {!isLocked && (
+        <div className="flex justify-end pt-2">
+          <Button onClick={persist}>Save</Button>
+        </div>
+      )}
     </div>
   );
 }
@@ -468,12 +487,14 @@ function PicklistField({
   value,
   onChange,
   options,
+  disabled,
 }: {
   id: string;
   label: string;
   value: string;
   onChange: (v: string) => void;
   options: string[];
+  disabled?: boolean;
 }) {
   return (
     <div>
@@ -481,6 +502,7 @@ function PicklistField({
       <Select
         value={value || null}
         onValueChange={(v: string | null) => onChange(v ?? "")}
+        disabled={disabled}
       >
         <SelectTrigger id={id} className="w-full">
           <SelectValue placeholder="Select…" />

@@ -8,17 +8,21 @@
  * @module
  */
 
+import type * as builderLocks from "../builderLocks.js";
 import type * as checklist from "../checklist.js";
 import type * as collateral from "../collateral.js";
 import type * as conditions from "../conditions.js";
+import type * as connections from "../connections.js";
 import type * as covenants from "../covenants.js";
 import type * as docman from "../docman.js";
 import type * as fees from "../fees.js";
 import type * as heatmap from "../heatmap.js";
+import type * as involvementTypes from "../involvementTypes.js";
 import type * as picklists from "../picklists.js";
 import type * as policyExceptions from "../policyExceptions.js";
 import type * as productHierarchy from "../productHierarchy.js";
 import type * as projects from "../projects.js";
+import type * as relationships from "../relationships.js";
 import type * as seedData from "../seedData.js";
 import type * as stages from "../stages.js";
 
@@ -29,17 +33,21 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  builderLocks: typeof builderLocks;
   checklist: typeof checklist;
   collateral: typeof collateral;
   conditions: typeof conditions;
+  connections: typeof connections;
   covenants: typeof covenants;
   docman: typeof docman;
   fees: typeof fees;
   heatmap: typeof heatmap;
+  involvementTypes: typeof involvementTypes;
   picklists: typeof picklists;
   policyExceptions: typeof policyExceptions;
   productHierarchy: typeof productHierarchy;
   projects: typeof projects;
+  relationships: typeof relationships;
   seedData: typeof seedData;
   stages: typeof stages;
 }>;

@@ -16,6 +16,8 @@ import {
 } from "@/lib/export-import";
 import { POLICY_EXCEPTION_TYPES } from "@/lib/picklist-defaults";
 import { toast } from "sonner";
+import { useBuilderLock } from "@/lib/use-builder-lock";
+import { LockedBanner } from "@/components/ui/locked-banner";
 import {
   Dialog,
   DialogContent,
@@ -41,6 +43,7 @@ export function PolicyExceptionsTool({
   const [selectedId, setSelectedId] = useState<Id<"policyExceptions"> | null>(null);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [manageTypesOpen, setManageTypesOpen] = useState(false);
+  const { isLocked, toggleLock } = useBuilderLock(projectId, "policy-exceptions");
   const [newTypeName, setNewTypeName] = useState("");
 
   // Use stored types as authoritative once saved; fall back to defaults only if nothing saved yet
@@ -136,14 +139,16 @@ export function PolicyExceptionsTool({
   const selected = records.find((r) => r._id === selectedId) ?? null;
 
   return (
-    <div className="flex h-full flex-col p-6">
+    <div className="flex h-full flex-col">
+      {isLocked && <LockedBanner onUnlock={toggleLock} />}
+      <div className="flex h-full flex-col p-6">
       {/* Header */}
       <div className="mb-4 flex items-baseline justify-between">
         <h2 className="text-xl font-semibold text-slate-900">
           Policy Exceptions Builder — {project.name}
         </h2>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setManageTypesOpen(true)}>
+          <Button variant="outline" onClick={() => setManageTypesOpen(true)} disabled={isLocked}>
             Manage types
           </Button>
           <Button
@@ -162,6 +167,7 @@ export function PolicyExceptionsTool({
           </Button>
           <Button
             onClick={handleAdd}
+            disabled={isLocked}
             className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
           >
             + Add Exception
@@ -225,13 +231,15 @@ export function PolicyExceptionsTool({
                             </div>
                           )}
                         </button>
-                        <button
-                          onClick={() => handleDelete(exc._id)}
-                          className="rounded px-1 text-xs text-red-500 hover:bg-red-50"
-                          aria-label="Delete"
-                        >
-                          ×
-                        </button>
+                        {!isLocked && (
+                          <button
+                            onClick={() => handleDelete(exc._id)}
+                            className="rounded px-1 text-xs text-red-500 hover:bg-red-50"
+                            aria-label="Delete"
+                          >
+                            ×
+                          </button>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -244,7 +252,7 @@ export function PolicyExceptionsTool({
         {/* Right: detail form */}
         <div className="overflow-auto rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           {selected ? (
-            <ExceptionDetail key={selected._id} record={selected} allRecords={records} allTypes={allTypes} />
+            <ExceptionDetail key={selected._id} record={selected} allRecords={records} allTypes={allTypes} isLocked={isLocked} />
           ) : (
             <div className="text-sm text-slate-500">
               Add an exception to get started.
@@ -302,6 +310,7 @@ export function PolicyExceptionsTool({
         buildPreview={buildPreview}
         onDownload={(meta) => downloadPolicyExceptionsYaml(exportRows, meta)}
       />
+      </div>
     </div>
   );
 }
@@ -312,10 +321,12 @@ function ExceptionDetail({
   record,
   allRecords,
   allTypes,
+  isLocked,
 }: {
   record: Doc<"policyExceptions">;
   allRecords: Doc<"policyExceptions">[];
   allTypes: string[];
+  isLocked: boolean;
 }) {
   const update = useMutation(api.policyExceptions.update);
 
@@ -418,7 +429,8 @@ function ExceptionDetail({
             id="pe-type"
             value={type}
             onChange={(e) => handleTypeChange(e.target.value)}
-            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)]"
+            disabled={isLocked}
+            className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {allTypes.map((t) => (
               <option key={t} value={t}>
@@ -439,6 +451,7 @@ function ExceptionDetail({
           value={name}
           onChange={(e) => setName(e.target.value)}
           onBlur={() => persist()}
+          disabled={isLocked}
           className={!name.trim() ? "border-red-400 focus:border-red-400" : ""}
         />
         {!name.trim() && (
@@ -451,12 +464,13 @@ function ExceptionDetail({
         <Label>Severities</Label>
         <div className="mt-2 flex gap-4">
           {ALL_SEVERITIES.map((sev) => (
-            <label key={sev} className="flex cursor-pointer items-center gap-2 text-sm">
+            <label key={sev} className={`flex items-center gap-2 text-sm ${isLocked ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
               <input
                 type="checkbox"
                 checked={severities.includes(sev)}
                 onChange={() => handleSeverityToggle(sev)}
-                className="h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)]"
+                disabled={isLocked}
+                className="h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)] disabled:cursor-not-allowed"
               />
               {sev}
             </label>
@@ -478,46 +492,54 @@ function ExceptionDetail({
                 value={mr.reason}
                 onChange={(e) => handleMitigationChange(i, "reason", e.target.value)}
                 onBlur={() => handleMitigationBlur(i)}
+                disabled={isLocked}
                 className="flex-1"
               />
-              <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-slate-600">
+              <label className={`flex shrink-0 items-center gap-1.5 text-xs text-slate-600 ${isLocked ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
                 <input
                   type="checkbox"
                   checked={mr.commentRequired}
                   onChange={(e) =>
                     handleMitigationChange(i, "commentRequired", e.target.checked)
                   }
-                  className="h-3.5 w-3.5 rounded border-slate-300 text-[var(--color-blue)]"
+                  disabled={isLocked}
+                  className="h-3.5 w-3.5 rounded border-slate-300 text-[var(--color-blue)] disabled:cursor-not-allowed"
                 />
                 Comment required?
               </label>
-              <button
-                onClick={() => handleRemoveMitigation(i)}
-                className="rounded px-1 text-sm text-red-500 hover:bg-red-50"
-                aria-label="Remove mitigation reason"
-              >
-                ×
-              </button>
+              {!isLocked && (
+                <button
+                  onClick={() => handleRemoveMitigation(i)}
+                  className="rounded px-1 text-sm text-red-500 hover:bg-red-50"
+                  aria-label="Remove mitigation reason"
+                >
+                  ×
+                </button>
+              )}
             </div>
           ))}
         </div>
-        <button
-          onClick={handleAddMitigation}
-          className="mt-2 text-xs font-medium text-[var(--color-blue)] hover:underline"
-        >
-          + Add mitigation reason
-        </button>
+        {!isLocked && (
+          <button
+            onClick={handleAddMitigation}
+            className="mt-2 text-xs font-medium text-[var(--color-blue)] hover:underline"
+          >
+            + Add mitigation reason
+          </button>
+        )}
       </div>
 
       {/* Save */}
-      <div className="flex justify-end pt-2">
-        <Button
-          onClick={() => persist()}
-          className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
-        >
-          Save
-        </Button>
-      </div>
+      {!isLocked && (
+        <div className="flex justify-end pt-2">
+          <Button
+            onClick={() => persist()}
+            className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
+          >
+            Save
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

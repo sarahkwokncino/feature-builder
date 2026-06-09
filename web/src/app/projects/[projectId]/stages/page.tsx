@@ -9,7 +9,7 @@ export default async function StagesPage(
   return (
     <>
       <Topbar
-        title="Stages Builder"
+        title="Stages and UI Builder"
         back={{ href: `/projects/${projectId}`, label: "Heatmap" }}
         back2={{ href: `/projects/${projectId}/builders`, label: "Feature Builders" }}
       />

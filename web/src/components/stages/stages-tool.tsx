@@ -8,6 +8,8 @@ import type { Doc, Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useBuilderLock } from "@/lib/use-builder-lock";
+import { LockedBanner } from "@/components/ui/locked-banner";
 import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import {
@@ -52,6 +54,7 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
   const deleteSection = useMutation(api.stages.deleteSection);
   const reorderSections = useMutation(api.stages.reorderSections);
   const bulkImport = useMutation(api.stages.bulkImport);
+  const { isLocked, toggleLock } = useBuilderLock(projectId, "stages");
 
   const [selectedStageId, setSelectedStageId] = useState<Id<"stages"> | null>(null);
   const [activeTab, setActiveTab] = useState<TabName>("Details");
@@ -226,17 +229,19 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
 
   return (
     <div className="flex h-full flex-col">
+      {isLocked && <LockedBanner onUnlock={toggleLock} />}
       {/* Stage path bar */}
       <div className="flex-shrink-0 border-b border-slate-200 bg-white px-6 py-4 shadow-sm">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-900">Stages — {project.name}</h2>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={() => setImportOpen(true)}>Import</Button>
+            <Button size="sm" variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>Import</Button>
             <Button size="sm" variant="outline" onClick={() => downloadStagesExcel(buildExportData())}>Export Excel</Button>
             <Button size="sm" variant="outline" onClick={() => setYamlOpen(true)}>Export YAML</Button>
             <Button
               size="sm"
               onClick={() => { setAddingStage(true); setNewStageName(""); }}
+              disabled={isLocked}
               className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
             >
               + Add Stage

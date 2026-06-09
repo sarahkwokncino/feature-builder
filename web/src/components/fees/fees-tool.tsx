@@ -18,6 +18,8 @@ import {
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import { FEES_PICKLISTS } from "@/lib/picklist-defaults";
 import { toast } from "sonner";
+import { useBuilderLock } from "@/lib/use-builder-lock";
+import { LockedBanner } from "@/components/ui/locked-banner";
 
 export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
   const project = useQuery(api.projects.get, { id: projectId });
@@ -28,6 +30,7 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
 
   const update = useMutation(api.fees.update);
   const bulkImport = useMutation(api.fees.bulkImport);
+  const { isLocked, toggleLock } = useBuilderLock(projectId, "fees");
 
   const [selectedId, setSelectedId] = useState<Id<"fees"> | null>(null);
   const detailPanelRef = useRef<HTMLDivElement>(null);
@@ -130,14 +133,16 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
   const selected = records.find((r) => r._id === selectedId) ?? null;
 
   return (
-    <div className="flex h-full flex-col p-6">
+    <div className="flex h-full flex-col">
+      {isLocked && <LockedBanner onUnlock={toggleLock} />}
+      <div className="flex h-full flex-col p-6">
       {/* Header */}
       <div className="mb-4 flex items-baseline justify-between">
         <h2 className="text-xl font-semibold text-slate-900">
           Fees Builder — {project.name}
         </h2>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setImportOpen(true)}>
+          <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>
             Import
           </Button>
           <Button
@@ -156,6 +161,7 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
           </Button>
           <Button
             onClick={handleAdd}
+            disabled={isLocked}
             className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
           >
             + Add Fee
@@ -221,6 +227,7 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
                         <input
                           type="checkbox"
                           checked={allChecked}
+                          disabled={isLocked}
                           ref={(el) => { if (el) el.indeterminate = someChecked && !allChecked; }}
                           onChange={async () => {
                             for (const fee of records) {
@@ -233,7 +240,7 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
                               }
                             }
                           }}
-                          className="mt-1 h-4 w-4 cursor-pointer rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)]"
+                          className="mt-1 h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)] disabled:cursor-not-allowed disabled:opacity-50"
                           title={allChecked ? `Deselect all for ${prod}` : `Select all for ${prod}`}
                         />
                       </th>
@@ -264,12 +271,13 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
                       <input
                         type="checkbox"
                         checked={rowAllChecked}
+                        disabled={isLocked}
                         ref={(el) => { if (el) el.indeterminate = rowSomeChecked && !rowAllChecked; }}
                         onChange={() => {
                           const next = rowAllChecked ? [] : [...allProducts];
                           update({ id: fee._id, appliedToProducts: next });
                         }}
-                        className="h-4 w-4 cursor-pointer rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)]"
+                        className="h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)] disabled:cursor-not-allowed disabled:opacity-50"
                         title={rowAllChecked ? `Deselect all products for ${fee.name}` : `Select all products for ${fee.name}`}
                       />
                     </td>
@@ -280,8 +288,9 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
                           <input
                             type="checkbox"
                             checked={checked}
+                            disabled={isLocked}
                             onChange={() => handleMatrixToggle(fee, prod)}
-                            className="h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)] cursor-pointer"
+                            className="h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)] disabled:cursor-not-allowed disabled:opacity-50"
                             title={`${checked ? "Remove" : "Apply"} ${fee.name} → ${prod}`}
                           />
                         </td>
@@ -337,13 +346,15 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
                         : "No calculation type set"}
                     </div>
                   </button>
-                  <button
-                    onClick={() => handleDelete(fee._id)}
-                    className="rounded px-1 text-xs text-red-500 hover:bg-red-50"
-                    aria-label="Delete"
-                  >
-                    ×
-                  </button>
+                  {!isLocked && (
+                    <button
+                      onClick={() => handleDelete(fee._id)}
+                      className="rounded px-1 text-xs text-red-500 hover:bg-red-50"
+                      aria-label="Delete"
+                    >
+                      ×
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
@@ -353,7 +364,7 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
         {/* Right: detail form */}
         <div ref={detailPanelRef} className="overflow-y-auto rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
           {selected ? (
-            <FeeDetail key={selected._id} record={selected} allRecords={records} allProducts={allProducts} />
+            <FeeDetail key={selected._id} record={selected} allRecords={records} allProducts={allProducts} isLocked={isLocked} />
           ) : (
             <div className="text-sm text-slate-500">
               Add a fee to get started.
@@ -394,6 +405,7 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
         buildPreview={buildPreview}
         onDownload={(meta) => downloadFeesYaml(exportRows, meta)}
       />
+      </div>
     </div>
   );
 }
@@ -404,10 +416,12 @@ function FeeDetail({
   record,
   allRecords,
   allProducts,
+  isLocked,
 }: {
   record: Doc<"fees">;
   allRecords: Doc<"fees">[];
   allProducts: string[];
+  isLocked: boolean;
 }) {
   const update = useMutation(api.fees.update);
 
@@ -528,6 +542,7 @@ function FeeDetail({
           value={name}
           onChange={(e) => setName(e.target.value)}
           onBlur={() => persist()}
+          disabled={isLocked}
           className={!name.trim() ? "border-red-400 focus:border-red-400" : ""}
         />
         {!name.trim() && (
@@ -542,7 +557,8 @@ function FeeDetail({
           id="fee-paid-by"
           value={feePaidBy}
           onChange={(e) => handleSelectChange(setFeePaidBy, "feePaidBy", e.target.value)}
-          className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)]"
+          disabled={isLocked}
+          className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <option value="">— Select —</option>
           {FEES_PICKLISTS.feePaidBy.map((v) => (
@@ -560,7 +576,8 @@ function FeeDetail({
           onChange={(e) =>
             handleCalculationTypeChange(e.target.value as "Flat Amount" | "Percentage" | "")
           }
-          className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)]"
+          disabled={isLocked}
+          className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <option value="">— Select —</option>
           {FEES_PICKLISTS.calculationType.map((v) => (
@@ -580,7 +597,8 @@ function FeeDetail({
               onChange={(e) =>
                 handleSelectChange(setBasisSource, "basisSource", e.target.value)
               }
-              className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)]"
+              disabled={isLocked}
+              className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <option value="">— Select —</option>
               {FEES_PICKLISTS.basisSource.map((v) => (
@@ -599,6 +617,7 @@ function FeeDetail({
               value={percentage}
               onChange={(e) => setPercentage(e.target.value)}
               onBlur={() => persist()}
+              disabled={isLocked}
               placeholder="e.g. 1.5"
               className="mt-1"
             />
@@ -618,6 +637,7 @@ function FeeDetail({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             onBlur={() => persist()}
+            disabled={isLocked}
             placeholder="e.g. 1500"
             className="mt-1"
           />
@@ -633,7 +653,8 @@ function FeeDetail({
           onChange={(e) =>
             handleSelectChange(setCollectionMethod, "collectionMethod", e.target.value)
           }
-          className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)]"
+          disabled={isLocked}
+          className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <option value="">— Select —</option>
           {FEES_PICKLISTS.collectionMethod.map((v) => (
@@ -644,12 +665,13 @@ function FeeDetail({
 
       {/* Auto Apply */}
       <div>
-        <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
+        <label className={`flex items-center gap-2 text-sm font-medium text-slate-700 ${isLocked ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
           <input
             type="checkbox"
             checked={autoApply}
             onChange={(e) => handleAutoApplyChange(e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)]"
+            disabled={isLocked}
+            className="h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)] disabled:cursor-not-allowed"
           />
           Auto Apply
           <span className="text-xs font-normal text-slate-500">
@@ -669,32 +691,37 @@ function FeeDetail({
           ) : (
             <>
               <div className="mt-1 flex gap-2">
-                <button
-                  onClick={() => { setAppliedToProducts(allProducts); persist({ appliedToProducts: allProducts }); }}
-                  className="text-xs font-medium text-[var(--color-blue)] hover:underline"
-                >
-                  Select all
-                </button>
-                {appliedToProducts.length > 0 && (
+                {!isLocked && (
                   <>
-                    <span className="text-xs text-slate-300">|</span>
                     <button
-                      onClick={() => { setAppliedToProducts([]); persist({ appliedToProducts: [] }); }}
-                      className="text-xs font-medium text-slate-400 hover:text-slate-600 hover:underline"
+                      onClick={() => { setAppliedToProducts(allProducts); persist({ appliedToProducts: allProducts }); }}
+                      className="text-xs font-medium text-[var(--color-blue)] hover:underline"
                     >
-                      Clear all
+                      Select all
                     </button>
+                    {appliedToProducts.length > 0 && (
+                      <>
+                        <span className="text-xs text-slate-300">|</span>
+                        <button
+                          onClick={() => { setAppliedToProducts([]); persist({ appliedToProducts: [] }); }}
+                          className="text-xs font-medium text-slate-400 hover:text-slate-600 hover:underline"
+                        >
+                          Clear all
+                        </button>
+                      </>
+                    )}
                   </>
                 )}
               </div>
             <div className="mt-2 max-h-64 space-y-1.5 overflow-y-auto rounded-md border border-slate-200 p-2">
               {allProducts.map((prod) => (
-                <label key={prod} className="flex cursor-pointer items-center gap-2 text-sm">
+                <label key={prod} className={`flex items-center gap-2 text-sm ${isLocked ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
                   <input
                     type="checkbox"
                     checked={appliedToProducts.includes(prod)}
                     onChange={() => handleToggleProduct(prod)}
-                    className="h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)]"
+                    disabled={isLocked}
+                    className="h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)] disabled:cursor-not-allowed"
                   />
                   {prod}
                 </label>
@@ -714,20 +741,23 @@ function FeeDetail({
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
           onBlur={() => persist()}
+          disabled={isLocked}
           placeholder="Optional notes…"
-          className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)]"
+          className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)] disabled:cursor-not-allowed disabled:opacity-60"
         />
       </div>
 
       {/* Save */}
-      <div className="flex justify-end pt-2">
-        <Button
-          onClick={() => persist()}
-          className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
-        >
-          Save
-        </Button>
-      </div>
+      {!isLocked && (
+        <div className="flex justify-end pt-2">
+          <Button
+            onClick={() => persist()}
+            className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
+          >
+            Save
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

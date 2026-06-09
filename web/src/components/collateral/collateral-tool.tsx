@@ -1,5 +1,7 @@
 "use client";
 
+import { useBuilderLock } from "@/lib/use-builder-lock";
+import { LockedBanner } from "@/components/ui/locked-banner";
 import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../../../convex/_generated/api";
@@ -256,12 +258,14 @@ function FieldConfigPanel({
   collateralSubtype,
   allTypes,
   subtypesForType,
+  isLocked,
 }: {
   projectId: Id<"projects">;
   collateralType: string;
   collateralSubtype: string;
   allTypes: string[];
   subtypesForType: (t: string) => string[];
+  isLocked: boolean;
 }) {
   const saved = useQuery(api.collateral.getFieldConfig, { projectId, collateralType, collateralSubtype });
   const allConfigs = useQuery(api.collateral.listFieldConfigs, { projectId });
@@ -271,6 +275,8 @@ function FieldConfigPanel({
   const [sections, setSections] = useState<Section[]>(DEFAULT_SECTIONS);
   const [newFieldInputs, setNewFieldInputs] = useState<Record<string, { name: string; fieldType: string }>>({});
   const [newPicklistInputs, setNewPicklistInputs] = useState<Record<string, string>>({});
+  const [picklistPasteMode, setPicklistPasteMode] = useState<Record<string, boolean>>({});
+  const [picklistPasteText, setPicklistPasteText] = useState<Record<string, string>>({});
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
   const [editingSectionName, setEditingSectionName] = useState("");
   const [newSectionName, setNewSectionName] = useState("");
@@ -447,7 +453,7 @@ function FieldConfigPanel({
         <h3 className="text-sm font-semibold text-slate-800">
           Fields for <span className="text-[var(--color-blue)]">{collateralType} — {collateralSubtype}</span>
         </h3>
-        {!linkedTo && (
+        {!linkedTo && !isLocked && (
           <div className="flex gap-2">
             <Button size="sm" variant="outline" onClick={() => { setCloneType(""); setCloneSubtype(""); setCloneOpen(true); }} className="text-xs h-7">
               Clone from…
@@ -477,9 +483,11 @@ function FieldConfigPanel({
             {linkedTo.collateralType} — {linkedTo.collateralSubtype}
             <span className="ml-2 text-xs text-blue-600">(read-only — changes to the source are automatically reflected here)</span>
           </div>
-          <Button size="sm" variant="outline" onClick={handleRemoveLink} className="text-xs h-7 border-blue-300 text-blue-700 hover:bg-blue-100">
-            Remove link
-          </Button>
+          {!isLocked && (
+            <Button size="sm" variant="outline" onClick={handleRemoveLink} className="text-xs h-7 border-blue-300 text-blue-700 hover:bg-blue-100">
+              Remove link
+            </Button>
+          )}
         </div>
       )}
 
@@ -654,7 +662,7 @@ function FieldConfigPanel({
         <div key={section.id} className={`rounded-lg border bg-white overflow-hidden ${linkedTo ? "border-blue-100 opacity-90" : "border-slate-200"}`}>
           {/* Section header */}
           <div className={`flex items-center gap-2 border-b px-4 py-2 ${linkedTo ? "border-blue-100 bg-blue-50/50" : "border-slate-200 bg-slate-50"}`}>
-            {!linkedTo && editingSectionId === section.id ? (
+            {!linkedTo && !isLocked && editingSectionId === section.id ? (
               <Input
                 value={editingSectionName}
                 onChange={(e) => setEditingSectionName(e.target.value)}
@@ -668,9 +676,9 @@ function FieldConfigPanel({
               />
             ) : (
               <span
-                className={`flex-1 text-sm font-medium text-slate-800 ${!linkedTo ? "cursor-pointer hover:text-[var(--color-blue)]" : ""}`}
-                onClick={!linkedTo ? () => { setEditingSectionId(section.id); setEditingSectionName(section.name); } : undefined}
-                title={!linkedTo ? "Click to rename" : undefined}
+                className={`flex-1 text-sm font-medium text-slate-800 ${!linkedTo && !isLocked ? "cursor-pointer hover:text-[var(--color-blue)]" : ""}`}
+                onClick={!linkedTo && !isLocked ? () => { setEditingSectionId(section.id); setEditingSectionName(section.name); } : undefined}
+                title={!linkedTo && !isLocked ? "Click to rename" : undefined}
               >
                 {section.name}
               </span>
@@ -678,7 +686,7 @@ function FieldConfigPanel({
             {linkedTo && (
               <span className="text-[10px] text-blue-400 italic">read-only</span>
             )}
-            {!linkedTo && (
+            {!linkedTo && !isLocked && (
               <>
                 <button
                   onClick={() => removeSection(section.id)}
@@ -710,7 +718,7 @@ function FieldConfigPanel({
                   <div className="grid grid-cols-[1fr_160px_60px] gap-2 items-center text-sm">
                     <span className="text-slate-800">{field.name}</span>
                     <span className="text-xs text-slate-500">{field.fieldType}</span>
-                    {!linkedTo && (
+                    {!linkedTo && !isLocked && (
                       <button
                         onClick={() => removeField(section.id, field.name)}
                         className="hidden group-hover:block text-xs text-red-400 hover:text-red-600 text-right"
@@ -728,7 +736,7 @@ function FieldConfigPanel({
                         {(field.picklistValues ?? []).map((v) => (
                           <span key={v} className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
                             {v}
-                            {!linkedTo && (
+                            {!linkedTo && !isLocked && (
                               <button
                                 onClick={() => removePicklistValue(section.id, field.name, v)}
                                 className="hover:text-red-500 leading-none text-[10px]"
@@ -737,28 +745,71 @@ function FieldConfigPanel({
                           </span>
                         ))}
                       </div>
-                      {!linkedTo && (
-                        <div className="flex gap-1.5 mt-1">
-                          <Input
-                            value={newPicklistInputs[picklistKey] ?? ""}
-                            onChange={(e) => setNewPicklistInputs((prev) => ({ ...prev, [picklistKey]: e.target.value }))}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                const val = (newPicklistInputs[picklistKey] ?? "").trim();
-                                if (val) { addPicklistValue(section.id, field.name, val); setNewPicklistInputs((prev) => ({ ...prev, [picklistKey]: "" })); }
-                              }
-                            }}
-                            placeholder="Add picklist value…"
-                            className="h-6 text-xs"
-                          />
-                          <Button
-                            size="sm"
-                            className="h-6 px-2 text-xs shrink-0"
-                            onClick={() => {
-                              const val = (newPicklistInputs[picklistKey] ?? "").trim();
-                              if (val) { addPicklistValue(section.id, field.name, val); setNewPicklistInputs((prev) => ({ ...prev, [picklistKey]: "" })); }
-                            }}
-                          >+ Add</Button>
+                      {!linkedTo && !isLocked && (
+                        <div className="mt-1 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <button
+                              onClick={() => setPicklistPasteMode((prev) => ({ ...prev, [picklistKey]: !prev[picklistKey] }))}
+                              className="text-[10px] text-[var(--color-blue)] hover:underline"
+                            >
+                              {picklistPasteMode[picklistKey] ? "Cancel paste" : "Paste list"}
+                            </button>
+                          </div>
+                          {picklistPasteMode[picklistKey] ? (
+                            <div className="space-y-1">
+                              <textarea
+                                value={picklistPasteText[picklistKey] ?? ""}
+                                onChange={(e) => setPicklistPasteText((prev) => ({ ...prev, [picklistKey]: e.target.value }))}
+                                placeholder={"One value per line…"}
+                                rows={4}
+                                autoFocus
+                                className="w-full rounded border border-slate-300 px-2 py-1 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)] resize-none"
+                              />
+                              <Button
+                                size="sm"
+                                className="h-6 px-2 text-xs w-full"
+                                onClick={() => {
+                                  const existing = field.picklistValues ?? [];
+                                  const lines = (picklistPasteText[picklistKey] ?? "")
+                                    .split("\n").map((l) => l.trim()).filter((l) => l && !existing.includes(l));
+                                  if (lines.length) {
+                                    persist(sections.map((s) => s.id === section.id ? {
+                                      ...s,
+                                      fields: s.fields.map((f) => f.name === field.name
+                                        ? { ...f, picklistValues: [...existing, ...lines] } : f),
+                                    } : s));
+                                  }
+                                  setPicklistPasteText((prev) => ({ ...prev, [picklistKey]: "" }));
+                                  setPicklistPasteMode((prev) => ({ ...prev, [picklistKey]: false }));
+                                }}
+                              >
+                                Add {(picklistPasteText[picklistKey] ?? "").split("\n").filter((l) => l.trim() && !(field.picklistValues ?? []).includes(l.trim())).length} value(s)
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex gap-1.5">
+                              <Input
+                                value={newPicklistInputs[picklistKey] ?? ""}
+                                onChange={(e) => setNewPicklistInputs((prev) => ({ ...prev, [picklistKey]: e.target.value }))}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    const val = (newPicklistInputs[picklistKey] ?? "").trim();
+                                    if (val) { addPicklistValue(section.id, field.name, val); setNewPicklistInputs((prev) => ({ ...prev, [picklistKey]: "" })); }
+                                  }
+                                }}
+                                placeholder="Add picklist value…"
+                                className="h-6 text-xs"
+                              />
+                              <Button
+                                size="sm"
+                                className="h-6 px-2 text-xs shrink-0"
+                                onClick={() => {
+                                  const val = (newPicklistInputs[picklistKey] ?? "").trim();
+                                  if (val) { addPicklistValue(section.id, field.name, val); setNewPicklistInputs((prev) => ({ ...prev, [picklistKey]: "" })); }
+                                }}
+                              >+ Add</Button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -768,8 +819,8 @@ function FieldConfigPanel({
             })}
           </ul>
 
-          {/* Add field — hidden when linked */}
-          {!linkedTo && (
+          {/* Add field — hidden when linked or locked */}
+          {!linkedTo && !isLocked && (
             <div className="border-t border-slate-100 px-4 py-2 grid grid-cols-[1fr_160px_auto] gap-2 items-center">
               <Input
                 value={newFieldInputs[section.id]?.name ?? ""}
@@ -797,8 +848,8 @@ function FieldConfigPanel({
         </div>
       ))}
 
-      {/* Add section inline — hidden when linked */}
-      {!linkedTo && addingSectionOpen && (
+      {/* Add section inline — hidden when linked or locked */}
+      {!linkedTo && !isLocked && addingSectionOpen && (
         <div className="flex gap-2">
           <Input
             value={newSectionName}
@@ -832,6 +883,7 @@ export function CollateralTool({
   const [manageOpen, setManageOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const { isLocked, toggleLock } = useBuilderLock(projectId, "collateral");
 
   const setValues = useMutation(api.picklists.setValues);
 
@@ -908,7 +960,9 @@ export function CollateralTool({
   }
 
   return (
-    <div className="p-6">
+    <div className="pb-6">
+      {isLocked && <LockedBanner onUnlock={toggleLock} />}
+      <div className="p-6">
       {/* Header */}
       <div className="mb-6 flex items-baseline justify-between">
         <div>
@@ -921,10 +975,10 @@ export function CollateralTool({
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setManageOpen(true)}>
+          <Button variant="outline" onClick={() => setManageOpen(true)} disabled={isLocked}>
             Manage Collaterals
           </Button>
-          <Button variant="outline" onClick={() => setImportOpen(true)}>
+          <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>
             Import
           </Button>
           <Button variant="outline" onClick={() => {
@@ -1016,6 +1070,7 @@ export function CollateralTool({
           collateralSubtype={selectedSubtype ?? activeSubtypes[0]}
           allTypes={typeValues}
           subtypesForType={subtypesForType}
+          isLocked={isLocked}
         />
       )}
 
@@ -1044,6 +1099,7 @@ export function CollateralTool({
         buildPreview={buildPreview}
         onDownload={(meta) => downloadCollateralYaml(collateralPicklists, meta)}
       />
+      </div>
     </div>
   );
 }

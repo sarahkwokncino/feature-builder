@@ -257,9 +257,62 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index("byProject", ["projectId"]),
 
+  // Builder lock state — one row per projectId + kind when locked
+  builderLocks: defineTable({
+    projectId: v.id("projects"),
+    kind: v.string(),
+    lockedAt: v.number(),
+  }).index("byProject", ["projectId"])
+    .index("byProjectKind", ["projectId", "kind"]),
+
+  // Entity Involvement Types — how a relationship is involved with a loan
+  involvementTypes: defineTable({
+    projectId: v.id("projects"),
+    name: v.string(),
+    order: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("byProject", ["projectId"]),
+
+  // Connection roles — connecting role names between relationship types
+  connectionRoles: defineTable({
+    projectId: v.id("projects"),
+    name: v.string(),
+    fromType: v.optional(v.string()),
+    toType: v.optional(v.string()),
+    description: v.optional(v.string()),
+    selfReciprocating: v.optional(v.boolean()),
+    reciprocalRole: v.optional(v.string()),
+    order: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("byProject", ["projectId"]),
+
+  // Relationship field config — one row per projectId + relationshipType
+  relationshipFieldConfigs: defineTable({
+    projectId: v.id("projects"),
+    relationshipType: v.string(),
+    sections: v.array(
+      v.object({
+        id: v.string(),
+        name: v.string(),
+        fields: v.array(v.object({
+          name: v.string(),
+          fieldType: v.string(),
+          picklistValues: v.optional(v.array(v.string())),
+        })),
+      }),
+    ),
+    linkedTo: v.optional(v.object({
+      relationshipType: v.string(),
+    })),
+    updatedAt: v.number(),
+  }).index("byProject", ["projectId"])
+    .index("byProjectType", ["projectId", "relationshipType"]),
+
   // Picklist values, scoped per configurator
   picklists: defineTable({
-    scope: v.union(v.literal("covenants"), v.literal("checklist"), v.literal("collateral"), v.literal("conditions"), v.literal("policy-exceptions"), v.literal("fees")),
+    scope: v.union(v.literal("covenants"), v.literal("checklist"), v.literal("collateral"), v.literal("conditions"), v.literal("policy-exceptions"), v.literal("fees"), v.literal("relationships")),
     key: v.string(),
     values: v.array(v.string()),
   }).index("byScopeKey", ["scope", "key"]),
