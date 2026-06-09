@@ -20,6 +20,7 @@ import type * as policyExceptions from "../policyExceptions.js";
 import type * as productHierarchy from "../productHierarchy.js";
 import type * as projects from "../projects.js";
 import type * as seedData from "../seedData.js";
+import type * as stages from "../stages.js";
 
 import type {
   ApiFromModules,
@@ -40,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   productHierarchy: typeof productHierarchy;
   projects: typeof projects;
   seedData: typeof seedData;
+  stages: typeof stages;
 }>;
 
 /**

@@ -1820,3 +1820,237 @@ export function _parseDocmanExcelLegacy(text: string): DocmanExport | string {
   if (!placeholders.length) return "No placeholder rows found.";
   return { placeholders, groups: [] };
 }
+
+// ── Stages ────────────────────────────────────────────────────────────────────
+
+export type StageImportRow = {
+  stageName: string;
+  sectionName: string;
+  isDefault?: boolean;
+  isHidden?: boolean;
+  description?: string;
+  subsections?: { id: string; name: string; fields: { id: string; name: string; fieldType: string }[] }[];
+};
+
+type StageExportData = {
+  stages: {
+    name: string;
+    isFixed?: boolean;
+    enabledTabs?: string[];
+    sections: {
+      name: string;
+      isDefault?: boolean;
+      isHidden?: boolean;
+      description?: string;
+      subsections?: { id: string; name: string; fields: { id: string; name: string; fieldType: string }[] }[];
+    }[];
+  }[];
+};
+
+export function buildStagesYaml(
+  data: StageExportData,
+  meta: { storyId: string; title: string; featureArea: string },
+): string {
+  const lines: string[] = [];
+  lines.push(`# ${meta.storyId} — ${meta.title}`);
+  lines.push(`# Feature area: ${meta.featureArea}`);
+  lines.push(`# Generated: ${today()}`);
+  lines.push("");
+  lines.push("stages:");
+  for (const stage of data.stages) {
+    lines.push(`  - name: "${yamlStr(stage.name)}"`);
+    if (stage.isFixed) lines.push(`    isFixed: true`);
+    if (stage.enabledTabs) lines.push(`    enabledTabs: [${stage.enabledTabs.map((t) => `"${yamlStr(t)}"`).join(", ")}]`);
+    lines.push(`    routes:`);
+    for (const sec of stage.sections) {
+      lines.push(`      - name: "${yamlStr(sec.name)}"`);
+      lines.push(`        isUserCreated: ${!sec.isDefault}`);
+      if (sec.isHidden) lines.push(`        isHidden: true`);
+      if (sec.description) lines.push(`        description: "${yamlStr(sec.description)}"`);
+      if (sec.subsections && sec.subsections.length > 0) {
+        lines.push(`        subRoutes:`);
+        for (const sub of sec.subsections) {
+          lines.push(`          - name: "${yamlStr(sub.name)}"`);
+          if (sub.fields.length > 0) {
+            lines.push(`            fields:`);
+            for (const f of sub.fields) {
+              lines.push(`              - name: "${yamlStr(f.name)}"`);
+              lines.push(`                fieldType: "${yamlStr(f.fieldType)}"`);
+            }
+          }
+        }
+      }
+    }
+  }
+  return lines.join("\n");
+}
+
+export function downloadStagesYaml(
+  data: StageExportData,
+  meta: { storyId: string; title: string; featureArea: string },
+) {
+  const yaml = buildStagesYaml(data, meta);
+  downloadBlob(new Blob([yaml], { type: "text/yaml" }), `stages-${slugify(meta.title || "export")}.yaml`);
+}
+
+export function downloadStagesExcel(data: StageExportData) {
+  const allRows: string[][] = [];
+  const COLS = ["Stage", "Route", "Is User Created", "Is Hidden", "Description", "Sub Route", "Field Name", "Field Type"];
+
+  for (const stage of data.stages) {
+    for (const sec of stage.sections) {
+      const userCreated = !sec.isDefault ? "true" : "false";
+      if (!sec.subsections || sec.subsections.length === 0) {
+        allRows.push([stage.name, sec.name, userCreated, sec.isHidden ? "true" : "", sec.description ?? "", "", "", ""]);
+      } else {
+        for (const sub of sec.subsections) {
+          if (sub.fields.length === 0) {
+            allRows.push([stage.name, sec.name, userCreated, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, "", ""]);
+          } else {
+            for (const f of sub.fields) {
+              allRows.push([stage.name, sec.name, userCreated, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, f.name, f.fieldType]);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Build one worksheet per stage, plus a flat "All Stages" sheet
+  let sheetsXml = "";
+
+  // All Stages sheet
+  const headerRow = `<Row>${COLS.map((c) => `<Cell><Data ss:Type="String">${c}</Data></Cell>`).join("")}</Row>`;
+  const dataRows = allRows.map((row) =>
+    `<Row>${row.map((c) => `<Cell><Data ss:Type="String">${(c ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;")}</Data></Cell>`).join("")}</Row>`
+  ).join("\n");
+  sheetsXml += `<Worksheet ss:Name="All Stages"><Table>${headerRow}\n${dataRows}</Table></Worksheet>\n`;
+
+  // Per-stage sheets
+  for (const stage of data.stages) {
+    const sheetName = stage.name.slice(0, 31).replace(/[\\/*?[\]:]/g, "");
+    const stageRows = allRows.filter((r) => r[0] === stage.name);
+    const stageDataRows = stageRows.map((row) =>
+      `<Row>${row.map((c) => `<Cell><Data ss:Type="String">${(c ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;")}</Data></Cell>`).join("")}</Row>`
+    ).join("\n");
+    sheetsXml += `<Worksheet ss:Name="${sheetName}"><Table>${headerRow}\n${stageDataRows}</Table></Worksheet>\n`;
+  }
+
+  const xml = `<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">${sheetsXml}</Workbook>`;
+  downloadBlob(new Blob([xml], { type: "application/vnd.ms-excel" }), "stages-export.xls");
+}
+
+export function parseStagesFile(text: string, filename: string): StageImportRow[] | string {
+  const lower = filename.toLowerCase();
+  if (lower.endsWith(".yaml") || lower.endsWith(".yml")) return parseStagesYaml(text);
+  if (lower.endsWith(".csv")) return parseStagesCsv(text);
+  return parseStagesSpreadsheetML(text);
+}
+
+function parseStagesYaml(text: string): StageImportRow[] | string {
+  try {
+    const rows: StageImportRow[] = [];
+    let currentStage = "";
+    let currentRoute = "";
+    let currentRouteObj: StageImportRow | null = null;
+    let currentSubRoute: { id: string; name: string; fields: { id: string; name: string; fieldType: string }[] } | null = null;
+    const lines = text.split("\n");
+    for (const line of lines) {
+      const stageMatch = line.match(/^\s{2}-\s+name:\s+"?([^"]+)"?/);
+      const routeMatch = line.match(/^\s{6}-\s+name:\s+"?([^"]+)"?/);
+      const subRouteMatch = line.match(/^\s{10}-\s+name:\s+"?([^"]+)"?/);
+      const fieldMatch = line.match(/^\s{14}-\s+name:\s+"?([^"]+)"?/);
+      const fieldTypeMatch = line.match(/^\s{16}fieldType:\s+"?([^"]+)"?/);
+      const descMatch = line.match(/^\s{8}description:\s+"?([^"]*)"?/);
+      const hiddenMatch = line.match(/^\s{8}isHidden:\s+(true|false)/);
+      const isDefaultMatch = line.match(/^\s{8}isDefault:\s+(true|false)/);
+
+      if (stageMatch && !routeMatch) { currentStage = stageMatch[1]; currentRoute = ""; currentRouteObj = null; currentSubRoute = null; }
+      else if (routeMatch) {
+        if (currentRouteObj) rows.push(currentRouteObj);
+        currentRoute = routeMatch[1];
+        currentRouteObj = { stageName: currentStage, sectionName: currentRoute };
+        currentSubRoute = null;
+      } else if (subRouteMatch && currentRouteObj) {
+        if (currentSubRoute) currentRouteObj.subsections = [...(currentRouteObj.subsections ?? []), currentSubRoute];
+        currentSubRoute = { id: Math.random().toString(36).slice(2), name: subRouteMatch[1], fields: [] };
+      } else if (fieldMatch && currentSubRoute) {
+        currentSubRoute.fields.push({ id: Math.random().toString(36).slice(2), name: fieldMatch[1], fieldType: "Text" });
+      } else if (fieldTypeMatch && currentSubRoute && currentSubRoute.fields.length > 0) {
+        currentSubRoute.fields[currentSubRoute.fields.length - 1].fieldType = fieldTypeMatch[1];
+      } else if (descMatch && currentRouteObj) {
+        currentRouteObj.description = descMatch[1];
+      } else if (hiddenMatch && currentRouteObj) {
+        currentRouteObj.isHidden = hiddenMatch[1] === "true";
+      } else if (isDefaultMatch && currentRouteObj) {
+        currentRouteObj.isDefault = isDefaultMatch[1] === "true";
+      }
+    }
+    if (currentSubRoute && currentRouteObj) currentRouteObj.subsections = [...(currentRouteObj.subsections ?? []), currentSubRoute];
+    if (currentRouteObj) rows.push(currentRouteObj);
+    if (!rows.length) return "No stage routes found in YAML.";
+    return rows;
+  } catch {
+    return "Failed to parse YAML file.";
+  }
+}
+
+function parseStagesCsv(text: string): StageImportRow[] | string {
+  const lines = text.split("\n").filter((l) => l.trim());
+  if (!lines.length) return "Empty file.";
+  const headers = parseCsvRow(lines[0]).map((h) => h.trim().toLowerCase());
+  const stageIdx = headers.indexOf("stage");
+  const routeIdx = headers.indexOf("route");
+  const descIdx = headers.indexOf("description");
+  const hiddenIdx = headers.indexOf("is hidden");
+  if (stageIdx === -1 || routeIdx === -1) return "CSV must have 'Stage' and 'Route' columns.";
+  const rows: StageImportRow[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cells = parseCsvRow(lines[i]);
+    const stageName = (cells[stageIdx] ?? "").trim();
+    const sectionName = (cells[routeIdx] ?? "").trim();
+    if (!stageName || !sectionName) continue;
+    rows.push({
+      stageName,
+      sectionName,
+      description: descIdx !== -1 ? (cells[descIdx] ?? "").trim() || undefined : undefined,
+      isHidden: hiddenIdx !== -1 ? (cells[hiddenIdx] ?? "").trim().toLowerCase() === "true" : undefined,
+    });
+  }
+  if (!rows.length) return "No data rows found.";
+  return rows;
+}
+
+function parseStagesSpreadsheetML(text: string): StageImportRow[] | string {
+  try {
+    const wsMatch = text.match(/<Worksheet[^>]*ss:Name="All Stages"[^>]*>([\s\S]*?)<\/Worksheet>/);
+    const wsText = wsMatch ? wsMatch[1] : text;
+    const rowMatches = [...wsText.matchAll(/<Row[^>]*>([\s\S]*?)<\/Row>/g)];
+    if (rowMatches.length < 2) return "No data rows found.";
+    const getHeader = (row: string) =>
+      [...row.matchAll(/<Data[^>]*>([\s\S]*?)<\/Data>/g)].map((m) => m[1].trim().toLowerCase());
+    const headers = getHeader(rowMatches[0][1]);
+    const stageIdx = headers.indexOf("stage");
+    const routeIdx = headers.indexOf("route");
+    const descIdx = headers.indexOf("description");
+    const hiddenIdx = headers.indexOf("is hidden");
+    if (stageIdx === -1 || routeIdx === -1) return "Spreadsheet must have 'Stage' and 'Route' columns.";
+    const rows: StageImportRow[] = [];
+    for (let i = 1; i < rowMatches.length; i++) {
+      const cells = [...rowMatches[i][1].matchAll(/<Data[^>]*>([\s\S]*?)<\/Data>/g)].map((m) => m[1].trim());
+      const stageName = (cells[stageIdx] ?? "").trim();
+      const sectionName = (cells[routeIdx] ?? "").trim();
+      if (!stageName || !sectionName) continue;
+      rows.push({
+        stageName,
+        sectionName,
+        description: descIdx !== -1 ? (cells[descIdx] ?? "").trim() || undefined : undefined,
+        isHidden: hiddenIdx !== -1 ? (cells[hiddenIdx] ?? "").trim().toLowerCase() === "true" : undefined,
+      });
+    }
+    if (!rows.length) return "No data rows found.";
+    return rows;
+  } catch {
+    return "Failed to parse spreadsheet.";
+  }
+}

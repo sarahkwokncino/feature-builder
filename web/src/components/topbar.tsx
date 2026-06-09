@@ -4,10 +4,12 @@ import { ReactNode } from "react";
 export function Topbar({
   title,
   back,
+  back2,
   right,
 }: {
   title: string;
   back?: { href: string; label?: string };
+  back2?: { href: string; label?: string };
   right?: ReactNode;
 }) {
   return (
@@ -24,6 +26,14 @@ export function Topbar({
             className="ml-3 rounded border border-white/25 bg-white/10 px-3 py-1 text-xs hover:bg-white/20"
           >
             ← {back.label ?? "Back"}
+          </Link>
+        ) : null}
+        {back2 ? (
+          <Link
+            href={back2.href}
+            className="rounded border border-white/25 bg-white/10 px-3 py-1 text-xs hover:bg-white/20"
+          >
+            ← {back2.label ?? "Back"}
           </Link>
         ) : null}
       </div>

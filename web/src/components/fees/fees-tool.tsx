@@ -18,21 +18,13 @@ import {
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import { FEES_PICKLISTS } from "@/lib/picklist-defaults";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 
 export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
   const project = useQuery(api.projects.get, { id: projectId });
   const records = useQuery(api.fees.listForProject, { projectId });
   const create = useMutation(api.fees.create);
   const remove = useMutation(api.fees.remove);
-  const setPicklistValues = useMutation(api.picklists.setValues);
-  const storedPicklists = useQuery(api.picklists.listForScope, { scope: "fees" });
+  const hierarchy = useQuery(api.productHierarchy.listForProject, { projectId });
 
   const update = useMutation(api.fees.update);
   const bulkImport = useMutation(api.fees.bulkImport);
@@ -41,34 +33,21 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
   const detailPanelRef = useRef<HTMLDivElement>(null);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
-  const [manageProductsOpen, setManageProductsOpen] = useState(false);
-  const [newProductName, setNewProductName] = useState("");
   const [activeTab, setActiveTab] = useState<"configure" | "matrix">("configure");
 
+  // Derive ProductLine-ProductType-Product strings from the product hierarchy
   const allProducts = useMemo(() => {
-    const stored = storedPicklists?.find((p) => p.key === "products")?.values;
-    return stored ?? [];
-  }, [storedPicklists]);
-
-  async function handleAddProduct() {
-    const lines = newProductName
-      .split(/\r?\n/)
-      .map((l) => l.trim())
-      .filter((l) => l.length > 0);
-    if (!lines.length) return;
-    const toAdd = lines.filter((l) => !allProducts.includes(l));
-    if (!toAdd.length) {
-      toast.error("All entered products already exist.");
-      return;
-    }
-    await setPicklistValues({ scope: "fees", key: "products", values: [...allProducts, ...toAdd] });
-    setNewProductName("");
-    toast.success(toAdd.length === 1 ? `Product "${toAdd[0]}" added` : `${toAdd.length} products added`);
-  }
-
-  async function handleRemoveProduct(name: string) {
-    await setPicklistValues({ scope: "fees", key: "products", values: allProducts.filter((p) => p !== name) });
-  }
+    if (!hierarchy) return [];
+    const { lines, types, products } = hierarchy;
+    return products
+      .map((p) => {
+        const type = types.find((t) => t._id === p.productTypeId);
+        const line = lines.find((l) => l._id === p.productLineId);
+        if (!type || !line) return null;
+        return `${line.name}-${type.name}-${p.name}`;
+      })
+      .filter((s): s is string => s !== null);
+  }, [hierarchy]);
 
   async function handleMatrixToggle(fee: Doc<"fees">, product: string) {
     const current = fee.appliedToProducts ?? [];
@@ -158,9 +137,6 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
           Fees Builder — {project.name}
         </h2>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={() => setManageProductsOpen(true)}>
-            Manage products
-          </Button>
           <Button variant="outline" onClick={() => setImportOpen(true)}>
             Import
           </Button>
@@ -187,6 +163,18 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
         </div>
       </div>
 
+      {/* Products source info */}
+      <p className="mb-3 text-xs text-slate-500">
+        Products are sourced from the{" "}
+        <a
+          href={`/projects/${projectId}/product-hierarchy`}
+          className="font-medium text-[var(--color-blue)] hover:underline"
+        >
+          Product Hierarchy Builder
+        </a>
+        . Add or edit products there to update the list here.
+      </p>
+
       {/* Tabs */}
       <div className="mb-4 flex gap-1 border-b border-slate-200">
         {(["configure", "matrix"] as const).map((tab) => (
@@ -211,7 +199,7 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
             <div className="p-8 text-center text-sm text-slate-500">
               {records.length === 0
                 ? "No fees configured yet. Add fees in the Configure tab."
-                : "No products configured yet. Use \"Manage products\" to add product names."}
+                : "No products found. Add products in the Product Hierarchy Builder first."}
             </div>
           ) : (
             <table className="w-full text-sm">
@@ -220,6 +208,7 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
                   <th className="sticky left-0 z-10 bg-slate-50 px-4 py-2 text-left text-xs font-semibold text-slate-500 min-w-[180px]">
                     Fee
                   </th>
+                  <th className="sticky left-[180px] z-10 bg-slate-50 px-3 py-2 text-center text-xs font-medium text-slate-500 min-w-[60px] border-r border-slate-200" />
                   {allProducts.map((prod) => {
                     const allChecked = records.every((f) => (f.appliedToProducts ?? []).includes(prod));
                     const someChecked = records.some((f) => (f.appliedToProducts ?? []).includes(prod));
@@ -228,7 +217,7 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
                         key={prod}
                         className="px-3 py-2 text-center text-xs font-medium text-slate-600 min-w-[120px] max-w-[160px]"
                       >
-                        <div className="truncate" title={prod}>{prod}</div>
+                        <div className="break-words">{prod}</div>
                         <input
                           type="checkbox"
                           checked={allChecked}
@@ -250,9 +239,6 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
                       </th>
                     );
                   })}
-                  <th className="px-3 py-2 text-center text-xs font-medium text-slate-500 min-w-[80px]">
-                    All
-                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -274,6 +260,19 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
                         </div>
                       )}
                     </td>
+                    <td className="sticky left-[180px] z-10 bg-white px-3 py-2 text-center border-r border-slate-200 hover:bg-slate-50">
+                      <input
+                        type="checkbox"
+                        checked={rowAllChecked}
+                        ref={(el) => { if (el) el.indeterminate = rowSomeChecked && !rowAllChecked; }}
+                        onChange={() => {
+                          const next = rowAllChecked ? [] : [...allProducts];
+                          update({ id: fee._id, appliedToProducts: next });
+                        }}
+                        className="h-4 w-4 cursor-pointer rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)]"
+                        title={rowAllChecked ? `Deselect all products for ${fee.name}` : `Select all products for ${fee.name}`}
+                      />
+                    </td>
                     {allProducts.map((prod) => {
                       const checked = applied.includes(prod);
                       return (
@@ -288,19 +287,6 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
                         </td>
                       );
                     })}
-                    <td className="px-3 py-2 text-center">
-                      <input
-                        type="checkbox"
-                        checked={rowAllChecked}
-                        ref={(el) => { if (el) el.indeterminate = rowSomeChecked && !rowAllChecked; }}
-                        onChange={() => {
-                          const next = rowAllChecked ? [] : [...allProducts];
-                          update({ id: fee._id, appliedToProducts: next });
-                        }}
-                        className="h-4 w-4 cursor-pointer rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)]"
-                        title={rowAllChecked ? `Deselect all products for ${fee.name}` : `Select all products for ${fee.name}`}
-                      />
-                    </td>
                   </tr>
                   );
                 })}
@@ -377,56 +363,6 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
       </div>
       )}
 
-      {/* Manage Products dialog */}
-      <Dialog open={manageProductsOpen} onOpenChange={setManageProductsOpen}>
-        <DialogContent className="!max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Manage Products</DialogTitle>
-          </DialogHeader>
-          <p className="text-xs text-slate-500">
-            Add or remove product names available for fee auto-apply rules.
-          </p>
-          <p className="text-xs text-slate-500">
-            Write the full product name in the format{" "}
-            <span className="text-xs font-medium text-slate-700">ProductLine-ProductType-Product</span>.
-            Example: <span className="text-xs font-medium text-slate-700">Real Estate-Commercial-Bridging Loan</span>.
-            The export will automatically split this into{" "}
-            <span className="text-xs text-slate-600">LLC_BI__Product_Line_Name__c</span>,{" "}
-            <span className="text-xs text-slate-600">LLC_BI__Product_Type_Name__c</span>, and{" "}
-            <span className="text-xs text-slate-600">LLC_BI__Product__c</span>.
-          </p>
-          <ul className="max-h-64 divide-y divide-slate-100 overflow-y-auto rounded-md border border-slate-200">
-            {allProducts.length === 0 && (
-              <li className="px-3 py-2 text-sm text-slate-400 italic">No products added yet.</li>
-            )}
-            {allProducts.map((p) => (
-              <li key={p} className="flex items-center justify-between px-3 py-2 text-sm">
-                <span className="text-slate-800">{p}</span>
-                <button
-                  onClick={() => handleRemoveProduct(p)}
-                  className="text-xs text-red-400 hover:text-red-600"
-                >
-                  Remove
-                </button>
-              </li>
-            ))}
-          </ul>
-          <div className="flex gap-2">
-            <textarea
-              placeholder={"Full product name… (paste multiple lines to add in bulk)"}
-              value={newProductName}
-              onChange={(e) => setNewProductName(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleAddProduct(); } }}
-              rows={3}
-              className="flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)]"
-            />
-            <Button onClick={handleAddProduct} disabled={!newProductName.trim()}>Add</Button>
-          </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setManageProductsOpen(false)}>Close</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <ImportDialog<FeeRecord>
         open={importOpen}
@@ -728,7 +664,7 @@ function FeeDetail({
           <Label>Applied To Products</Label>
           {allProducts.length === 0 ? (
             <p className="mt-1 text-xs text-slate-400">
-              No products configured. Use &ldquo;Manage products&rdquo; in the header to add product names.
+              No products found. Add products in the Product Hierarchy Builder first.
             </p>
           ) : (
             <>

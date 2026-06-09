@@ -11,6 +11,7 @@ export default async function ConditionsPage(
       <Topbar
         title="Conditions Builder"
         back={{ href: `/projects/${projectId}`, label: "Heatmap" }}
+        back2={{ href: `/projects/${projectId}/builders`, label: "Feature Builders" }}
       />
       <main className="flex-1 overflow-auto bg-slate-100">
         <ConditionsTool projectId={projectId as Id<"projects">} />

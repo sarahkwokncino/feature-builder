@@ -263,4 +263,49 @@ export default defineSchema({
     key: v.string(),
     values: v.array(v.string()),
   }).index("byScopeKey", ["scope", "key"]),
+
+  // Stages — nCino loan lifecycle stages
+  stages: defineTable({
+    projectId: v.id("projects"),
+    name: v.string(),
+    isFixed: v.optional(v.boolean()),   // true for Booked and Complete — cannot rename/delete
+    keyFields: v.optional(v.array(v.string())), // up to 5 key field labels
+    enabledTabs: v.optional(v.array(v.string())), // tabs enabled for this stage; undefined = all on
+    order: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("byProject", ["projectId"]),
+
+  // Sections on the Details tab for a given stage
+  stageSections: defineTable({
+    stageId: v.id("stages"),
+    projectId: v.id("projects"),
+    name: v.string(),
+    isDefault: v.optional(v.boolean()),
+    isHidden: v.optional(v.boolean()),
+    description: v.optional(v.string()),
+    subsections: v.optional(v.array(v.object({
+      id: v.string(),
+      name: v.string(),
+      description: v.optional(v.string()),
+      fields: v.array(v.object({
+        id: v.string(),
+        name: v.string(),
+        fieldType: v.string(),
+      })),
+      sections: v.optional(v.array(v.object({
+        id: v.string(),
+        name: v.string(),
+        fields: v.array(v.object({
+          id: v.string(),
+          name: v.string(),
+          fieldType: v.string(),
+        })),
+      }))),
+    }))),
+    order: v.number(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("byStage", ["stageId"])
+    .index("byProject", ["projectId"]),
 });

@@ -11,6 +11,7 @@ export default async function PolicyExceptionsPage(
       <Topbar
         title="Policy Exceptions Builder"
         back={{ href: `/projects/${projectId}`, label: "Heatmap" }}
+        back2={{ href: `/projects/${projectId}/builders`, label: "Feature Builders" }}
       />
       <main className="flex-1 overflow-auto bg-slate-100">
         <PolicyExceptionsTool projectId={projectId as Id<"projects">} />
