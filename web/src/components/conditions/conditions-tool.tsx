@@ -20,6 +20,12 @@ import {
   CONDITIONS_PICKLISTS,
   CONDITIONS_PICKLIST_LABELS,
 } from "@/lib/picklist-defaults";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
 import {
@@ -516,6 +522,249 @@ function PicklistField({
           ))}
         </SelectContent>
       </Select>
+    </div>
+  );
+}
+
+// ── Conditions Preview Playground ─────────────────────────────────────────────
+
+type PreviewCondition = {
+  id: string;
+  name: string;
+  description?: string;
+  taskType?: string;
+  category?: string;
+  conditionType: string;
+};
+
+export function ConditionsPreviewPlayground({ projectId }: { projectId: Id<"projects"> }) {
+  const records = useQuery(api.conditions.listForProject, { projectId });
+  const stored = useQuery(api.picklists.listForScope, { scope: "conditions" });
+
+  const categoryOptions = useMemo(() => {
+    const fromPicklist = stored?.find((p) => p.key === "category")?.values
+      ?? CONDITIONS_PICKLISTS["category"] ?? [];
+    const fromRecords = [...new Set((records ?? []).map((r) => r.category).filter(Boolean) as string[])];
+    return [...new Set([...fromPicklist, ...fromRecords])].sort();
+  }, [stored, records]);
+
+  const [added, setAdded] = useState<PreviewCondition[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const allConditions: PreviewCondition[] = useMemo(
+    () => (records ?? []).map((r) => ({
+      id: r._id,
+      name: r.name,
+      description: r.description,
+      taskType: r.taskType,
+      category: r.category,
+      conditionType: r.conditionType,
+    })),
+    [records],
+  );
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return allConditions.filter((c) => {
+      const matchesCat = categoryFilter === "all" || c.category === categoryFilter;
+      const matchesSearch = !q || c.name.toLowerCase().includes(q) || (c.description ?? "").toLowerCase().includes(q);
+      return matchesCat && matchesSearch;
+    });
+  }, [allConditions, search, categoryFilter]);
+
+  function openDialog() {
+    setSearch("");
+    setCategoryFilter("all");
+    setSelected(new Set());
+    setDialogOpen(true);
+  }
+
+  function toggleSelect(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function handleSelectAll() {
+    setSelected(new Set(filtered.map((c) => c.id)));
+  }
+
+  function handleClearSelection() {
+    setSelected(new Set());
+  }
+
+  function handleAdd() {
+    const toAdd = filtered.filter((c) => selected.has(c.id) && !added.find((a) => a.id === c.id));
+    setAdded((prev) => [...prev, ...toAdd]);
+    setDialogOpen(false);
+  }
+
+  function handleRemove(id: string) {
+    setAdded((prev) => prev.filter((c) => c.id !== id));
+  }
+
+  return (
+    <div className="max-w-4xl">
+      <div className="mb-3 flex items-center gap-3">
+        <h3 className="text-sm font-semibold text-slate-800">Preview Playground</h3>
+        <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-medium text-amber-700">
+          Example only — not saved or exported
+        </span>
+        <span className="text-xs text-slate-400">
+          Reflects your <span className="font-medium">Conditions Builder</span> config.
+        </span>
+        <Button onClick={openDialog} className="ml-auto bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]">
+          + Add Conditions
+        </Button>
+      </div>
+
+      {/* Added conditions table */}
+      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="grid grid-cols-[1fr_180px_140px_36px] gap-2 border-b border-slate-100 bg-slate-50 px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+          <span>Name</span>
+          <span>Description</span>
+          <span>Task Type / Category</span>
+          <span />
+        </div>
+        {added.length === 0 ? (
+          <div className="px-4 py-8 text-center text-sm text-slate-400 italic">
+            No conditions added yet — click <strong>+ Add Conditions</strong> to select from your library.
+          </div>
+        ) : (
+          <ul className="divide-y divide-slate-100">
+            {added.map((c) => (
+              <li key={c.id} className="grid grid-cols-[1fr_180px_140px_36px] gap-2 items-start px-4 py-2.5 hover:bg-slate-50 group">
+                <span className="text-sm font-medium text-slate-800">{c.name}</span>
+                <span className="text-xs text-slate-500 line-clamp-2">{c.description || "—"}</span>
+                <div className="flex flex-col gap-0.5">
+                  {c.taskType && (
+                    <span className="inline-block rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600 w-fit">{c.taskType}</span>
+                  )}
+                  {c.category && (
+                    <span className="text-[10px] text-slate-400">{c.category}</span>
+                  )}
+                </div>
+                <button
+                  onClick={() => handleRemove(c.id)}
+                  className="mt-0.5 text-xs text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Remove"
+                >×</button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Add Conditions dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="!max-w-3xl !max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Add Conditions</DialogTitle>
+            <p className="text-xs text-slate-500 mt-0.5">Select one or more conditions from the list</p>
+          </DialogHeader>
+
+          {/* Search + category filter */}
+          <div className="flex gap-2 shrink-0">
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)] shrink-0"
+            >
+              <option value="all">All</option>
+              {categoryOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <div className="relative flex-1">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+              </svg>
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search"
+                autoFocus
+                className="w-full rounded border border-slate-300 bg-white pl-9 pr-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)]"
+              />
+            </div>
+          </div>
+
+          {/* Selection controls */}
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="text-xs text-slate-500">{selected.size} item(s) selected</span>
+            <button onClick={handleSelectAll} className="rounded border border-slate-300 px-3 py-1 text-xs text-slate-600 hover:bg-slate-50">Select All</button>
+            <button onClick={handleClearSelection} className="rounded border border-slate-300 px-3 py-1 text-xs text-slate-600 hover:bg-slate-50">Clear Selection</button>
+          </div>
+
+          {/* Condition list */}
+          <div className="flex-1 overflow-y-auto rounded-lg border border-slate-200">
+            {/* Column headers */}
+            <div className="sticky top-0 grid grid-cols-[36px_1fr_1fr_120px] gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+              <span />
+              <span>Name</span>
+              <span>Description</span>
+              <span>Task Type</span>
+            </div>
+
+            {filtered.length === 0 ? (
+              <div className="px-4 py-8 text-center text-sm text-slate-400 italic">
+                No conditions match your search.
+              </div>
+            ) : (
+              <ul className="divide-y divide-slate-100">
+                {filtered.map((c) => {
+                  const isSelected = selected.has(c.id);
+                  const alreadyAdded = !!added.find((a) => a.id === c.id);
+                  return (
+                    <li
+                      key={c.id}
+                      onClick={() => !alreadyAdded && toggleSelect(c.id)}
+                      className={`grid grid-cols-[36px_1fr_1fr_120px] gap-2 items-start px-3 py-2.5 transition-colors ${
+                        alreadyAdded
+                          ? "opacity-40 cursor-not-allowed"
+                          : isSelected
+                          ? "bg-[var(--color-blue)]/8 cursor-pointer"
+                          : "hover:bg-slate-50 cursor-pointer"
+                      }`}
+                    >
+                      <div className="flex items-center justify-center pt-0.5">
+                        <div className={`flex h-5 w-5 items-center justify-center rounded border text-xs font-bold transition-colors ${
+                          isSelected
+                            ? "border-[var(--color-blue)] bg-[var(--color-blue)] text-white"
+                            : "border-slate-300 text-slate-400 hover:border-[var(--color-blue)]"
+                        }`}>
+                          {isSelected ? "✓" : "+"}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium text-slate-800">{c.name}</div>
+                        {c.category && <div className="text-[10px] text-slate-400 mt-0.5">{c.category}</div>}
+                      </div>
+                      <p className="text-xs text-slate-500 line-clamp-2">{c.description || "—"}</p>
+                      <span className="text-xs text-slate-500">{c.taskType || "—"}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="flex justify-end gap-2 shrink-0 pt-1">
+            <Button variant="ghost" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button
+              disabled={selected.size === 0}
+              onClick={handleAdd}
+              className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
+            >
+              Add {selected.size > 0 ? `${selected.size} ` : ""}Condition{selected.size !== 1 ? "s" : ""}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

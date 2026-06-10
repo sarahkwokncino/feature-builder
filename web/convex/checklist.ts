@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
 
 export const listForCard = query({
   args: { cardId: v.id("cards") },
@@ -10,6 +11,29 @@ export const listForCard = query({
       .collect();
     records.sort((a, b) => a.createdAt - b.createdAt);
     return records;
+  },
+});
+
+export const listForProject = query({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, { projectId }): Promise<Doc<"checklistReqs">[]> => {
+    const all: Doc<"checklistReqs">[] = [];
+    const heatmaps = await ctx.db.query("heatmaps").filter((q) => q.eq(q.field("projectId"), projectId)).collect();
+    for (const heatmap of heatmaps) {
+      const phases = await ctx.db.query("phases").filter((q) => q.eq(q.field("heatmapId"), heatmap._id)).collect();
+      for (const phase of phases) {
+        const subphases = await ctx.db.query("subphases").filter((q) => q.eq(q.field("phaseId"), phase._id)).collect();
+        for (const subphase of subphases) {
+          const cards = await ctx.db.query("cards").filter((q) => q.eq(q.field("subphaseId"), subphase._id)).collect();
+          for (const card of cards) {
+            const reqs = await ctx.db.query("checklistReqs").withIndex("byCard", (q) => q.eq("cardId", card._id)).collect();
+            all.push(...reqs);
+          }
+        }
+      }
+    }
+    all.sort((a, b) => a.createdAt - b.createdAt);
+    return all;
   },
 });
 

@@ -524,3 +524,142 @@ function PicklistField({
     </div>
   );
 }
+
+// ── Smart Checklist Preview Playground ───────────────────────────────────────
+
+export function ChecklistPreviewPlayground({
+  projectId,
+}: {
+  projectId: Id<"projects">;
+}) {
+  const allRecords = useQuery(api.checklist.listForProject, { projectId });
+
+  // Only show Loan-level items with no criteria (always generated)
+  const alwaysOn = useMemo(
+    () =>
+      (allRecords ?? []).filter(
+        (r) =>
+          (r.checklistLevel ?? "Loan") === "Loan" &&
+          !r.criteriaUserWritten?.trim() &&
+          !r.criteriaGenerated?.trim(),
+      ),
+    [allRecords],
+  );
+
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return q ? alwaysOn.filter((r) => r.name.toLowerCase().includes(q)) : alwaysOn;
+  }, [alwaysOn, search]);
+
+  // Auto-select first
+  useEffect(() => {
+    if (!selectedId && filtered.length > 0) setSelectedId(filtered[0]._id);
+    if (selectedId && !filtered.find((r) => r._id === selectedId)) setSelectedId(filtered[0]?._id ?? null);
+  }, [filtered, selectedId]);
+
+  const selected = filtered.find((r) => r._id === selectedId) ?? null;
+
+  return (
+    <div className="max-w-5xl">
+      <div className="mb-3 flex items-center gap-3">
+        <h3 className="text-sm font-semibold text-slate-800">Preview Playground</h3>
+        <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-medium text-amber-700">
+          Example only — not saved or exported
+        </span>
+        <span className="text-xs text-slate-400">
+          Showing Loan requirements that apply to all loans (no criteria set).
+        </span>
+      </div>
+
+      <div className="flex overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm" style={{ height: "420px" }}>
+        {/* Left: requirement list */}
+        <div className="flex w-72 shrink-0 flex-col border-r border-slate-200">
+          <div className="border-b border-slate-200 p-2">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search requirements…"
+              className="w-full rounded border border-slate-300 px-2.5 py-1.5 text-xs text-slate-700 focus:border-[var(--color-blue)] focus:outline-none"
+            />
+          </div>
+          <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
+            {allRecords === undefined ? (
+              <div className="px-4 py-6 text-center text-xs text-slate-400">Loading…</div>
+            ) : filtered.length === 0 ? (
+              <div className="px-4 py-6 text-center text-xs text-slate-400 italic">
+                {alwaysOn.length === 0
+                  ? "No always-on Loan requirements configured yet."
+                  : "No matches."}
+              </div>
+            ) : (
+              filtered.map((r) => (
+                <button
+                  key={r._id}
+                  onClick={() => setSelectedId(r._id)}
+                  className={`flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors ${
+                    r._id === selectedId
+                      ? "bg-[var(--color-blue)]/8 border-l-2 border-[var(--color-blue)]"
+                      : "hover:bg-slate-50 border-l-2 border-transparent"
+                  }`}
+                >
+                  <svg className="h-3.5 w-3.5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className={`text-sm ${r._id === selectedId ? "font-medium text-[var(--color-blue)]" : "text-slate-800"}`}>
+                    {r.name}
+                  </span>
+                </button>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Right: detail panel */}
+        <div className="flex-1 overflow-y-auto p-5">
+          {selected ? (
+            <div>
+              <h4 className="mb-4 text-base font-semibold text-slate-900">{selected.name}</h4>
+              <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm">
+                <DetailField label="Assignee" value={selected.assignedParty} />
+                <DetailField label="Category" value={selected.category} />
+                <DetailField label="Description" value={selected.description} wide />
+                <DetailField label="Legal Description" value={selected.legalDescription} wide />
+                <DetailField label="Document Manager Placeholder" value={selected.placeholderName} wide />
+                <div className="col-span-2 flex gap-6">
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" checked={!!selected.stageCheck} readOnly className="rounded border-slate-300" />
+                    <span className="text-slate-600">Hard Stop</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" checked={!!selected.doNotAutoGenerate} readOnly className="rounded border-slate-300" />
+                    <span className="text-slate-600">Do Not Auto-Generate</span>
+                  </div>
+                </div>
+                {selected.stageCheck && selected.neededBy && (
+                  <DetailField label="Needed By" value={selected.neededBy} />
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="flex h-full items-center justify-center text-sm text-slate-400 italic">
+              Select a requirement to view details.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DetailField({ label, value, wide }: { label: string; value?: string; wide?: boolean }) {
+  return (
+    <div className={wide ? "col-span-2" : ""}>
+      <p className="mb-0.5 text-xs font-medium text-slate-500">{label}</p>
+      <p className="text-sm text-slate-800">{value || <span className="italic text-slate-400">—</span>}</p>
+    </div>
+  );
+}

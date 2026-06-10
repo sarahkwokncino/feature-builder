@@ -916,3 +916,175 @@ export function DocmanTool({
     </div>
   );
 }
+
+// ── Document Manager Preview Playground ───────────────────────────────────────
+
+const DEFAULT_LOAN_PLACEHOLDERS = [
+  "Application Form",
+  "Arrears Statement",
+  "Board Minutes",
+  "Broker Update",
+  "Closing Statement",
+  "Consent to Charge",
+  "Corporate Guarantee",
+  "Credit Agreement",
+  "Direct Debit Mandate",
+  "Facility Letter",
+  "ID Verification",
+  "Insurance Certificate",
+  "Land Registry Search",
+  "Legal Charge",
+  "Loan Agreement",
+  "Mortgage Deed",
+  "Personal Guarantee",
+  "Redemption Statement",
+  "Solicitor Undertaking",
+  "Valuation Report",
+];
+
+type PreviewDoc = {
+  id: string;
+  name: string;
+  category: string;
+};
+
+const CATEGORY_OPTIONS = [
+  "Application",
+  "Approval",
+  "Credit Update",
+  "Legal",
+  "Legal Document",
+  "Post Completion",
+];
+
+export function DocmanPreviewPlayground() {
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [docs] = useState<PreviewDoc[]>(() =>
+    DEFAULT_LOAN_PLACEHOLDERS.map((name, i) => ({
+      id: String(i),
+      name,
+      category: CATEGORY_OPTIONS[i % CATEGORY_OPTIONS.length],
+    })),
+  );
+
+  const filtered = docs.filter((d) => {
+    const matchesSearch = !search || d.name.toLowerCase().includes(search.toLowerCase());
+    const matchesCategory = !categoryFilter || d.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
+  const totalDocs = docs.length;
+  const customerPortalCount = docs.length;
+  const eSignatureCount = 0;
+
+  const categoryCounts = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const d of docs) map[d.category] = (map[d.category] ?? 0) + 1;
+    return map;
+  }, [docs]);
+
+  return (
+    <div className="max-w-5xl">
+      <div className="mb-3 flex items-center gap-3">
+        <h3 className="text-sm font-semibold text-slate-800">Preview Playground</h3>
+        <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-medium text-amber-700">
+          Example only — not saved or exported
+        </span>
+        <span className="text-xs text-slate-400">
+          Shows Loan default document placeholders that are automatically generated.
+        </span>
+      </div>
+
+      <div className="flex gap-0 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm" style={{ height: "420px" }}>
+        {/* Left sidebar */}
+        <div className="w-48 shrink-0 overflow-y-auto border-r border-slate-200 bg-slate-50 p-3">
+          <button
+            onClick={() => setCategoryFilter(null)}
+            className={`mb-1 flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm transition-colors ${
+              categoryFilter === null ? "bg-white font-semibold text-slate-900 shadow-sm" : "text-slate-700 hover:bg-white"
+            }`}
+          >
+            <span className="min-w-[1.5rem] text-right text-xs font-bold text-slate-500">{totalDocs}</span>
+            <span>All Documents</span>
+          </button>
+          <div className="mb-1 flex items-center gap-2 rounded px-2 py-1.5 text-sm text-slate-500">
+            <span className="min-w-[1.5rem] text-right text-xs font-bold">{customerPortalCount}</span>
+            <span>Customer Portal</span>
+          </div>
+          <div className="mb-3 flex items-center gap-2 rounded px-2 py-1.5 text-sm text-slate-500">
+            <span className="min-w-[1.5rem] text-right text-xs font-bold">{eSignatureCount}</span>
+            <span>E-Signature</span>
+          </div>
+
+          <div className="mb-2 border-t border-slate-200 pt-3">
+            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+              Filter by Categories
+            </p>
+            {CATEGORY_OPTIONS.map((cat) => (
+              <label key={cat} className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-xs text-slate-700 hover:bg-white">
+                <input
+                  type="checkbox"
+                  checked={categoryFilter === cat}
+                  onChange={() => setCategoryFilter(categoryFilter === cat ? null : cat)}
+                  className="rounded border-slate-300"
+                />
+                <span className="flex-1">{cat}</span>
+                <span className="text-slate-400">{categoryCounts[cat] ?? 0}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Main panel */}
+        <div className="flex flex-1 flex-col overflow-hidden">
+          {/* Toolbar */}
+          <div className="flex items-center gap-3 border-b border-slate-200 px-4 py-2.5">
+            <div className="relative flex-1">
+              <svg className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by document name or details."
+                className="w-full rounded border border-slate-300 py-1.5 pl-8 pr-3 text-xs text-slate-700 focus:border-[var(--color-blue)] focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Column headers */}
+          <div className="grid grid-cols-[1fr_160px_32px] items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+            <span>Name ↑</span>
+            <span>Last Modified Date</span>
+            <span />
+          </div>
+
+          {/* Rows */}
+          <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
+            {filtered.length === 0 ? (
+              <div className="px-4 py-8 text-center text-xs text-slate-400 italic">No documents match your search.</div>
+            ) : (
+              filtered.map((doc) => (
+                <div
+                  key={doc.id}
+                  className="grid grid-cols-[1fr_160px_32px] items-center gap-2 px-4 py-2.5 hover:bg-slate-50"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <svg className="h-3.5 w-3.5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0" />
+                    </svg>
+                    <span className="text-sm text-slate-800">{doc.name}</span>
+                  </div>
+                  <span className="text-xs text-slate-400">03/12/2025</span>
+                  <button className="text-slate-300 hover:text-slate-500">›</button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

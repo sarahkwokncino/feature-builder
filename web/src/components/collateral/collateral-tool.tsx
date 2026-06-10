@@ -867,6 +867,255 @@ function FieldConfigPanel({
   );
 }
 
+// ── Preview Playground (read-only, embedded in Stages & UI Builder) ──────────
+
+function CollateralPreviewFields({
+  projectId,
+  collateralType,
+  collateralSubtype,
+}: {
+  projectId: Id<"projects">;
+  collateralType: string;
+  collateralSubtype: string;
+}) {
+  const saved = useQuery(api.collateral.getFieldConfig, { projectId, collateralType, collateralSubtype });
+  const linkedTo = saved?.linkedTo ?? null;
+  const sourceConfig = useQuery(
+    api.collateral.getFieldConfig,
+    linkedTo ? { projectId, collateralType: linkedTo.collateralType, collateralSubtype: linkedTo.collateralSubtype } : "skip",
+  );
+
+  if (saved === undefined) {
+    return <p className="text-xs text-slate-400 italic px-1">Loading…</p>;
+  }
+
+  const rawSections = linkedTo ? (sourceConfig?.sections ?? null) : (saved?.sections ?? null);
+
+  const displaySections: Section[] = rawSections
+    ? (rawSections as any[]).map((s) => ({
+        ...s,
+        fields: (s.fields as any[]).map((f) =>
+          typeof f === "string" ? { name: f, fieldType: "Text(255)" } : f,
+        ),
+      }))
+    : DEFAULT_SECTIONS;
+
+  return (
+    <div className="space-y-3">
+      {linkedTo && (
+        <div className="flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-800">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 shrink-0 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.172 13.828a4 4 0 015.656 0l4 4a4 4 0 01-5.656 5.656l-1.101-1.102" />
+          </svg>
+          <span><span className="font-medium">Same as:</span> {linkedTo.collateralType} — {linkedTo.collateralSubtype}</span>
+        </div>
+      )}
+
+      {displaySections.length === 0 && (
+        <p className="text-xs text-slate-400 italic">No sections configured for this combination yet.</p>
+      )}
+
+      {displaySections.map((section) => (
+        <div key={section.id} className="rounded-lg border border-slate-200 bg-white overflow-hidden">
+          <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-2">
+            <span className="flex-1 text-sm font-medium text-slate-800">{section.name}</span>
+            <span className="text-[10px] text-slate-400">{section.fields.length} field{section.fields.length !== 1 ? "s" : ""}</span>
+          </div>
+          <div className="grid grid-cols-[1fr_160px] gap-2 px-4 py-1.5 bg-slate-50 border-b border-slate-100 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+            <span>Field Name</span>
+            <span>Salesforce Type</span>
+          </div>
+          <ul className="divide-y divide-slate-100">
+            {section.fields.length === 0 && (
+              <li className="px-4 py-2 text-xs text-slate-400 italic">No fields.</li>
+            )}
+            {section.fields.map((field) => (
+              <li key={field.name} className="px-4 py-2">
+                <div className="grid grid-cols-[1fr_160px] gap-2 items-center text-sm">
+                  <span className="text-slate-800">{field.name}</span>
+                  <span className="text-xs text-slate-500">{field.fieldType}</span>
+                </div>
+                {field.fieldType === "Picklist" && (field.picklistValues ?? []).length > 0 && (
+                  <div className="mt-1.5 ml-4 flex flex-wrap gap-1">
+                    {(field.picklistValues ?? []).map((v) => (
+                      <span key={v} className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">{v}</span>
+                    ))}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+type SecurityEntry = { id: string; collateralType: string; collateralSubtype: string };
+
+export function CollateralPreviewPlayground({
+  projectId,
+  typeValues,
+  subtypesForType,
+}: {
+  projectId: Id<"projects">;
+  typeValues: string[];
+  subtypesForType: (t: string) => string[];
+}) {
+  const [entries, setEntries] = useState<SecurityEntry[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [adding, setAdding] = useState(false);
+  const [pendingType, setPendingType] = useState<string>(() => typeValues[0] ?? "");
+  const [pendingSubtype, setPendingSubtype] = useState<string>(() => subtypesForType(typeValues[0] ?? "")[0] ?? "");
+
+  const pendingSubtypes = pendingType ? subtypesForType(pendingType) : [];
+
+  function handlePendingTypeChange(t: string) {
+    setPendingType(t);
+    setPendingSubtype(subtypesForType(t)[0] ?? "");
+  }
+
+  function handleAdd() {
+    if (!pendingType || !pendingSubtype) return;
+    const id = Math.random().toString(36).slice(2, 8);
+    const entry: SecurityEntry = { id, collateralType: pendingType, collateralSubtype: pendingSubtype };
+    setEntries((prev) => [...prev, entry]);
+    setActiveId(id);
+    setAdding(false);
+    setPendingType(typeValues[0] ?? "");
+    setPendingSubtype(subtypesForType(typeValues[0] ?? "")[0] ?? "");
+  }
+
+  function handleRemove(id: string) {
+    setEntries((prev) => {
+      const next = prev.filter((e) => e.id !== id);
+      if (activeId === id) setActiveId(next[next.length - 1]?.id ?? null);
+      return next;
+    });
+  }
+
+  const activeEntry = entries.find((e) => e.id === activeId) ?? null;
+
+  return (
+    <div className="max-w-3xl">
+      <div className="mb-3 flex items-center gap-3">
+        <h3 className="text-sm font-semibold text-slate-800">Preview Playground</h3>
+        <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-medium text-amber-700">
+          Example only — not saved or exported
+        </span>
+      </div>
+      <p className="mb-4 text-xs text-slate-500">
+        Add securities to see how their configured fields would appear in nCino. Each tab represents one security on the loan.
+      </p>
+
+      {typeValues.length === 0 ? (
+        <p className="text-xs text-slate-400 italic">No collateral types configured yet. Add them in the Collateral Management Builder.</p>
+      ) : (
+        <>
+          {/* Tab bar */}
+          {(entries.length > 0 || adding) && (
+            <div className="mb-4 flex items-center gap-0 border-b border-slate-200">
+              {entries.map((e) => (
+                <button
+                  key={e.id}
+                  onClick={() => { setActiveId(e.id); setAdding(false); }}
+                  className={`group relative flex items-center gap-1.5 px-3 py-2 text-xs font-medium border-b-2 -mb-px transition-colors ${
+                    activeId === e.id && !adding
+                      ? "border-[var(--color-blue)] text-[var(--color-blue)]"
+                      : "border-transparent text-slate-500 hover:text-slate-700"
+                  }`}
+                >
+                  <span>{e.collateralType} — {e.collateralSubtype}</span>
+                  <span
+                    role="button"
+                    onClick={(ev) => { ev.stopPropagation(); handleRemove(e.id); }}
+                    className="ml-0.5 rounded text-[10px] leading-none text-slate-300 hover:text-red-400"
+                    title="Remove"
+                  >✕</span>
+                </button>
+              ))}
+              {adding && (
+                <div className="border-b-2 border-[var(--color-blue)] -mb-px px-3 py-2 text-xs font-medium text-[var(--color-blue)]">
+                  New security…
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Add security picker */}
+          {adding ? (
+            <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+              <p className="mb-3 text-xs font-semibold text-slate-600">Choose type and sub type for this security</p>
+              <div className="grid grid-cols-2 gap-3 max-w-lg">
+                <div>
+                  <label className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500 mb-1">Type</label>
+                  <select
+                    value={pendingType}
+                    onChange={(e) => handlePendingTypeChange(e.target.value)}
+                    className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)]"
+                  >
+                    {typeValues.map((t) => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500 mb-1">Sub Type</label>
+                  <select
+                    value={pendingSubtype}
+                    onChange={(e) => setPendingSubtype(e.target.value)}
+                    disabled={pendingSubtypes.length === 0}
+                    className="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)] disabled:bg-slate-50 disabled:text-slate-400"
+                  >
+                    {pendingSubtypes.length === 0
+                      ? <option value="" disabled>No sub types</option>
+                      : pendingSubtypes.map((s) => <option key={s} value={s}>{s}</option>)
+                    }
+                  </select>
+                </div>
+              </div>
+              <div className="mt-3 flex gap-2">
+                <button
+                  onClick={handleAdd}
+                  disabled={!pendingType || !pendingSubtype}
+                  className="rounded bg-[var(--color-blue)] px-3 py-1.5 text-xs font-medium text-white hover:opacity-90 disabled:opacity-40"
+                >
+                  Add Security
+                </button>
+                <button
+                  onClick={() => setAdding(false)}
+                  className="rounded px-3 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => { setAdding(true); setPendingType(typeValues[0] ?? ""); setPendingSubtype(subtypesForType(typeValues[0] ?? "")[0] ?? ""); }}
+              className="mb-4 flex items-center gap-1.5 rounded-md border border-dashed border-slate-300 px-3 py-2 text-xs font-medium text-slate-500 hover:border-[var(--color-blue)] hover:text-[var(--color-blue)] transition-colors"
+            >
+              <span className="text-base leading-none">+</span> Add Security
+            </button>
+          )}
+
+          {/* Active entry fields */}
+          {activeEntry && !adding && (
+            <CollateralPreviewFields
+              projectId={projectId}
+              collateralType={activeEntry.collateralType}
+              collateralSubtype={activeEntry.collateralSubtype}
+            />
+          )}
+
+          {entries.length === 0 && !adding && (
+            <p className="text-xs text-slate-400 italic">No securities added yet — click Add Security above.</p>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 // ── Main Tool ─────────────────────────────────────────────────────────────────
 
 export function CollateralTool({

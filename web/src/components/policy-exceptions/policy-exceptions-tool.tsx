@@ -315,6 +315,317 @@ export function PolicyExceptionsTool({
   );
 }
 
+// ─── Preview Playground ───────────────────────────────────────────────────────
+
+type PreviewException = {
+  id: string;
+  type: string;
+  name: string;
+  severities: string[];
+  mitigationReasons: { reason: string; commentRequired: boolean }[];
+  // runtime state
+  selectedSeverity: string;
+  selectedReasons: string[];
+  comment: string;
+};
+
+const SEVERITY_COLOURS: Record<string, string> = {
+  Minor:    "bg-yellow-100 text-yellow-700",
+  Major:    "bg-orange-100 text-orange-700",
+  Critical: "bg-red-100 text-red-700",
+};
+
+export function PolicyExceptionsPreviewPlayground({
+  projectId,
+}: {
+  projectId: Id<"projects">;
+}) {
+  const records = useQuery(api.policyExceptions.listForProject, { projectId });
+  const storedPicklists = useQuery(api.picklists.listForScope, { scope: "policy-exceptions" });
+
+  const allTypes = useMemo(() => {
+    const stored = storedPicklists?.find((p) => p.key === "types")?.values;
+    return stored ?? POLICY_EXCEPTION_TYPES;
+  }, [storedPicklists]);
+
+  const allExceptions = useMemo(
+    () => (records ?? []).map((r) => ({
+      id: r._id,
+      type: r.type,
+      name: r.name,
+      severities: r.severities,
+      mitigationReasons: r.mitigationReasons,
+    })),
+    [records],
+  );
+
+  const [added, setAdded] = useState<PreviewException[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  // dialog state
+  const [dialogType, setDialogType] = useState("");
+  const [dialogName, setDialogName] = useState("");
+  const [dialogSeverity, setDialogSeverity] = useState("");
+
+  const filteredByType = useMemo(
+    () => dialogType ? allExceptions.filter((e) => e.type === dialogType) : [],
+    [allExceptions, dialogType],
+  );
+
+  const selectedConfig = useMemo(
+    () => allExceptions.find((e) => e.id === dialogName) ?? null,
+    [allExceptions, dialogName],
+  );
+
+  function openDialog() {
+    setDialogType("");
+    setDialogName("");
+    setDialogSeverity("");
+    setDialogOpen(true);
+  }
+
+  function handleAdd() {
+    if (!selectedConfig || !dialogSeverity) return;
+    const alreadyAdded = added.find((a) => a.id === selectedConfig.id);
+    if (alreadyAdded) return;
+    setAdded((prev) => [
+      ...prev,
+      {
+        ...selectedConfig,
+        selectedSeverity: dialogSeverity,
+        selectedReasons: [],
+        comment: "",
+      },
+    ]);
+    setDialogOpen(false);
+  }
+
+  function handleRemove(id: string) {
+    setAdded((prev) => prev.filter((e) => e.id !== id));
+  }
+
+  function setReason(id: string, slot: 0 | 1 | 2, value: string) {
+    setAdded((prev) =>
+      prev.map((e) => {
+        if (e.id !== id) return e;
+        const next = [e.selectedReasons[0] ?? "", e.selectedReasons[1] ?? "", e.selectedReasons[2] ?? ""] as [string, string, string];
+        next[slot] = value;
+        return { ...e, selectedReasons: next.filter((r, i) => i === slot || r !== value) };
+      }),
+    );
+  }
+
+  function setComment(id: string, value: string) {
+    setAdded((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, comment: value } : e)),
+    );
+  }
+
+  const canAdd = !!selectedConfig && !!dialogSeverity;
+
+  return (
+    <div className="max-w-4xl">
+      <div className="mb-3 flex items-center gap-3">
+        <h3 className="text-sm font-semibold text-slate-800">Preview Playground</h3>
+        <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-medium text-amber-700">
+          Example only — not saved or exported
+        </span>
+        <span className="text-xs text-slate-400">
+          Reflects your <span className="font-medium">Policy Exceptions Builder</span> config.
+        </span>
+        <Button onClick={openDialog} className="ml-auto bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]">
+          + Add an Exception
+        </Button>
+      </div>
+
+      {/* Added exceptions list */}
+      {added.length === 0 ? (
+        <div className="rounded-lg border border-slate-200 bg-white px-4 py-8 text-center text-sm text-slate-400 italic shadow-sm">
+          No exceptions added yet — click <strong>+ Add an Exception</strong> to select from your library.
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {added.map((exc) => {
+            const needsComment = exc.selectedReasons.some((r) => {
+              if (!r) return false;
+              return exc.mitigationReasons.find((m) => m.reason === r)?.commentRequired ?? false;
+            });
+            return (
+              <div key={exc.id} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-sm font-semibold text-slate-800">{exc.name}</span>
+                      <span className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-500">{exc.type}</span>
+                      <span className={`rounded px-2 py-0.5 text-xs font-medium ${SEVERITY_COLOURS[exc.selectedSeverity] ?? "bg-slate-100 text-slate-600"}`}>
+                        {exc.selectedSeverity}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleRemove(exc.id)}
+                    className="text-xs text-red-400 hover:text-red-600 shrink-0"
+                    title="Remove"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                {exc.mitigationReasons.length > 0 && (
+                  <div className="mt-3">
+                    <div className="grid grid-cols-3 gap-3">
+                      {([0, 1, 2] as const).map((slot) => {
+                        const otherSlots = ([0, 1, 2] as const).filter((s) => s !== slot);
+                        const usedByOthers = otherSlots.map((s) => exc.selectedReasons[s] ?? "").filter(Boolean);
+                        return (
+                          <div key={slot}>
+                            <label className="mb-1 block text-xs font-medium text-slate-600">
+                              Mitigation Reason {slot + 1}
+                            </label>
+                            <select
+                              value={exc.selectedReasons[slot] ?? ""}
+                              onChange={(e) => setReason(exc.id, slot, e.target.value)}
+                              className="w-full rounded-md border border-slate-300 bg-white px-2 py-1.5 text-xs shadow-sm focus:border-[var(--color-blue)] focus:outline-none"
+                            >
+                              <option value="">— None —</option>
+                              {exc.mitigationReasons.map((mr) => (
+                                <option
+                                  key={mr.reason}
+                                  value={mr.reason}
+                                  disabled={usedByOthers.includes(mr.reason)}
+                                >
+                                  {mr.reason}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {needsComment && (
+                  <div className="mt-3">
+                    <label className="mb-1 block text-xs font-medium text-slate-600">
+                      Comments <span className="text-red-500">*</span>
+                      <span className="ml-1 font-normal text-slate-400">(required for selected reason)</span>
+                    </label>
+                    <textarea
+                      value={exc.comment}
+                      onChange={(e) => setComment(exc.id, e.target.value)}
+                      placeholder="Write a comment…"
+                      rows={3}
+                      className={`w-full rounded-md border px-3 py-2 text-sm text-slate-700 focus:border-[var(--color-blue)] focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)] ${
+                        !exc.comment.trim() ? "border-red-400" : "border-slate-300"
+                      }`}
+                    />
+                    {!exc.comment.trim() && (
+                      <p className="mt-0.5 text-xs text-red-500">Comment is required.</p>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Add Exception dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="!max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Add an Exception</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-1">
+            {/* Type */}
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-700">
+                Policy Area <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={dialogType}
+                onChange={(e) => { setDialogType(e.target.value); setDialogName(""); setDialogSeverity(""); }}
+                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--color-blue)] focus:outline-none"
+              >
+                <option value="">— Select type —</option>
+                {allTypes.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Name */}
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-700">
+                Policy Exception Name <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={dialogName}
+                onChange={(e) => { setDialogName(e.target.value); setDialogSeverity(""); }}
+                disabled={!dialogType}
+                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-[var(--color-blue)] focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <option value="">— Select exception —</option>
+                {filteredByType.map((e) => (
+                  <option key={e.id} value={e.id} disabled={!!added.find((a) => a.id === e.id)}>
+                    {e.name}{added.find((a) => a.id === e.id) ? " (already added)" : ""}
+                  </option>
+                ))}
+              </select>
+              {dialogType && filteredByType.length === 0 && (
+                <p className="mt-1 text-xs text-slate-400 italic">No exceptions configured for this type.</p>
+              )}
+            </div>
+
+            {/* Severity */}
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-700">
+                Severity <span className="text-red-500">*</span>
+              </label>
+              {selectedConfig && selectedConfig.severities.length > 0 ? (
+                <div className="flex gap-3">
+                  {selectedConfig.severities.map((s) => (
+                    <label key={s} className="flex cursor-pointer items-center gap-2 text-sm">
+                      <input
+                        type="radio"
+                        name="dialog-severity"
+                        value={s}
+                        checked={dialogSeverity === s}
+                        onChange={() => setDialogSeverity(s)}
+                        className="h-4 w-4 border-slate-300 text-[var(--color-blue)]"
+                      />
+                      <span className={`rounded px-2 py-0.5 text-xs font-medium ${SEVERITY_COLOURS[s] ?? "bg-slate-100 text-slate-600"}`}>
+                        {s}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              ) : selectedConfig ? (
+                <p className="text-xs text-slate-400 italic">No severities configured for this exception.</p>
+              ) : (
+                <p className="text-xs text-slate-400 italic">Select a name first.</p>
+              )}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button
+              disabled={!canAdd}
+              onClick={handleAdd}
+              className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
+            >
+              Add
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
 // ─── Detail form ──────────────────────────────────────────────────────────────
 
 function ExceptionDetail({

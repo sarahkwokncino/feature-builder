@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "convex/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
@@ -19,6 +19,15 @@ import {
   parseStagesFile,
   type StageImportRow,
 } from "@/lib/export-import";
+import { EntityInvolvementPlayground, ManageInvolvementTypesDialog } from "@/components/entity-involvement/entity-involvement-tool";
+import { CollateralPreviewPlayground } from "@/components/collateral/collateral-tool";
+import { CovenantsPreviewPlayground } from "@/components/covenants/covenants-tool";
+import { ConditionsPreviewPlayground } from "@/components/conditions/conditions-tool";
+import { FeesPreviewPlayground } from "@/components/fees/fees-tool";
+import { PolicyExceptionsPreviewPlayground } from "@/components/policy-exceptions/policy-exceptions-tool";
+import { DocmanPreviewPlayground } from "@/components/docman/docman-tool";
+import { ChecklistPreviewPlayground } from "@/components/checklist/checklist-tool";
+import { COLLATERAL_TYPE_SUBTYPE_MAP, COLLATERAL_SUBTYPE_KEY_PREFIX } from "@/lib/picklist-defaults";
 
 const ALL_TABS = ["Details", "Document Generation", "Document Manager", "Smart Checklist", "Chatter", "Approval"] as const;
 
@@ -439,6 +448,32 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
                 onMoveSection={handleMoveSection}
                 onSaveSection={(id, patch) => updateSection({ id, ...patch })}
               />
+            ) : activeTab === "Document Manager" ? (
+              <div className="space-y-4">
+                <div className="text-xs text-slate-500">
+                  Configure placeholders in the{" "}
+                  <Link
+                    href={`/projects/${projectId}/${TAB_BUILDER["Document Manager"].path}`}
+                    className="font-medium text-[var(--color-blue)] hover:underline"
+                  >
+                    Document Manager Builder →
+                  </Link>
+                </div>
+                <DocmanPreviewPlayground />
+              </div>
+            ) : activeTab === "Smart Checklist" ? (
+              <div className="space-y-4">
+                <div className="text-xs text-slate-500">
+                  Configure requirements in the{" "}
+                  <Link
+                    href={`/projects/${projectId}/${TAB_BUILDER["Smart Checklist"].path}`}
+                    className="font-medium text-[var(--color-blue)] hover:underline"
+                  >
+                    Smart Checklist Builder →
+                  </Link>
+                </div>
+                <ChecklistPreviewPlayground projectId={projectId} />
+              </div>
             ) : (
               <div className="rounded-lg border border-slate-200 bg-white p-8 text-center text-sm text-slate-400">
                 {TAB_BUILDER[activeTab] ? (
@@ -724,6 +759,33 @@ function SectionPanel({
 }) {
   const hidden = !!section.isHidden;
   const builderLink = SECTION_BUILDER[section.name];
+  const isBorrowingStructure = section.name === "Borrowing Structure";
+  const isSecurity = section.name === "Security";
+  const isCovenants = section.name === "Covenants";
+  const isConditions = section.name === "Conditions";
+  const isFees = section.name === "Fees";
+  const isPolicyExceptions = section.name === "Policy Exceptions";
+
+  const involvementTypes = useQuery(
+    api.involvementTypes.list,
+    isBorrowingStructure ? { projectId } : "skip",
+  );
+  const typeNames = (involvementTypes ?? []).map((t) => t.name);
+  const [manageInvolvementOpen, setManageInvolvementOpen] = useState(false);
+
+  const collateralPicklists = useQuery(
+    api.picklists.listForScope,
+    isSecurity ? { scope: "collateral" } : "skip",
+  );
+  const collateralTypeValues = useMemo(() => {
+    if (!isSecurity) return [];
+    const row = collateralPicklists?.find((r) => r.key === "types");
+    return row?.values ?? Object.keys(COLLATERAL_TYPE_SUBTYPE_MAP);
+  }, [isSecurity, collateralPicklists]);
+  function collateralSubtypesForType(type: string): string[] {
+    const row = collateralPicklists?.find((r) => r.key === COLLATERAL_SUBTYPE_KEY_PREFIX + type);
+    return row?.values ?? COLLATERAL_TYPE_SUBTYPE_MAP[type] ?? [];
+  }
 
   const [subsections, setSubsections] = useState<Subsection[]>(
     (section.subsections as Subsection[] | undefined) ?? [],
@@ -883,7 +945,55 @@ function SectionPanel({
         </div>
       )}
 
-      <div className="relative flex-1 overflow-hidden">
+      {isBorrowingStructure && !hidden && (
+        <div className="flex-shrink-0 overflow-y-auto border-b border-slate-100 px-5 py-4">
+          <EntityInvolvementPlayground
+            typeNames={typeNames}
+            onOpenManage={() => setManageInvolvementOpen(true)}
+          />
+          <ManageInvolvementTypesDialog
+            open={manageInvolvementOpen}
+            onOpenChange={setManageInvolvementOpen}
+            projectId={projectId}
+          />
+        </div>
+      )}
+
+      {isSecurity && !hidden && (
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          <CollateralPreviewPlayground
+            projectId={projectId}
+            typeValues={collateralTypeValues}
+            subtypesForType={collateralSubtypesForType}
+          />
+        </div>
+      )}
+
+      {isCovenants && !hidden && (
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          <CovenantsPreviewPlayground projectId={projectId} />
+        </div>
+      )}
+
+      {isConditions && !hidden && (
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          <ConditionsPreviewPlayground projectId={projectId} />
+        </div>
+      )}
+
+      {isFees && !hidden && (
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          <FeesPreviewPlayground projectId={projectId} />
+        </div>
+      )}
+
+      {isPolicyExceptions && !hidden && (
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          <PolicyExceptionsPreviewPlayground projectId={projectId} />
+        </div>
+      )}
+
+      <div className={`relative overflow-hidden ${isSecurity || isBorrowingStructure || isCovenants || isConditions || isFees || isPolicyExceptions ? "flex-shrink-0" : "flex-1"}`}>
         <div className={`flex h-full flex-col ${hidden ? "pointer-events-none select-none" : ""}`}>
           {!section.isDefault && (
             <>

@@ -15,6 +15,12 @@ import {
   parseFeesFile,
   type FeeRecord,
 } from "@/lib/export-import";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import { FEES_PICKLISTS } from "@/lib/picklist-defaults";
 import { toast } from "sonner";
@@ -32,11 +38,11 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
   const bulkImport = useMutation(api.fees.bulkImport);
   const { isLocked, toggleLock } = useBuilderLock(projectId, "fees");
 
+  const [activeTab, setActiveTab] = useState<"configure" | "matrix">("configure");
   const [selectedId, setSelectedId] = useState<Id<"fees"> | null>(null);
   const detailPanelRef = useRef<HTMLDivElement>(null);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"configure" | "matrix">("configure");
 
   // Derive ProductLine-ProductType-Product strings from the product hierarchy
   const allProducts = useMemo(() => {
@@ -190,7 +196,7 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
             className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${
               activeTab === tab
                 ? "border-b-2 border-[var(--color-blue)] text-[var(--color-blue)]"
-                : "text-slate-500 hover:text-slate-800"
+                : "text-slate-500 hover:text-slate-700"
             }`}
           >
             {tab === "configure" ? "Configure" : "Product Matrix"}
@@ -198,114 +204,6 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
         ))}
       </div>
 
-      {/* Matrix view */}
-      {activeTab === "matrix" && (
-        <div className="flex-1 overflow-auto rounded-lg border border-slate-200 bg-white shadow-sm">
-          {records.length === 0 || allProducts.length === 0 ? (
-            <div className="p-8 text-center text-sm text-slate-500">
-              {records.length === 0
-                ? "No fees configured yet. Add fees in the Configure tab."
-                : "No products found. Add products in the Product Hierarchy Builder first."}
-            </div>
-          ) : (
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-slate-200 bg-slate-50">
-                  <th className="sticky left-0 z-10 bg-slate-50 px-4 py-2 text-left text-xs font-semibold text-slate-500 min-w-[180px]">
-                    Fee
-                  </th>
-                  <th className="sticky left-[180px] z-10 bg-slate-50 px-3 py-2 text-center text-xs font-medium text-slate-500 min-w-[60px] border-r border-slate-200" />
-                  {allProducts.map((prod) => {
-                    const allChecked = records.every((f) => (f.appliedToProducts ?? []).includes(prod));
-                    const someChecked = records.some((f) => (f.appliedToProducts ?? []).includes(prod));
-                    return (
-                      <th
-                        key={prod}
-                        className="px-3 py-2 text-center text-xs font-medium text-slate-600 min-w-[120px] max-w-[160px]"
-                      >
-                        <div className="break-words">{prod}</div>
-                        <input
-                          type="checkbox"
-                          checked={allChecked}
-                          disabled={isLocked}
-                          ref={(el) => { if (el) el.indeterminate = someChecked && !allChecked; }}
-                          onChange={async () => {
-                            for (const fee of records) {
-                              const current = fee.appliedToProducts ?? [];
-                              const next = allChecked
-                                ? current.filter((p) => p !== prod)
-                                : current.includes(prod) ? current : [...current, prod];
-                              if (next.length !== current.length || next.some((p, i) => p !== current[i])) {
-                                await update({ id: fee._id, appliedToProducts: next });
-                              }
-                            }
-                          }}
-                          className="mt-1 h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)] disabled:cursor-not-allowed disabled:opacity-50"
-                          title={allChecked ? `Deselect all for ${prod}` : `Select all for ${prod}`}
-                        />
-                      </th>
-                    );
-                  })}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {records.map((fee) => {
-                  const applied = fee.appliedToProducts ?? [];
-                  const rowAllChecked = allProducts.every((p) => applied.includes(p));
-                  const rowSomeChecked = allProducts.some((p) => applied.includes(p));
-                  return (
-                  <tr key={fee._id} className="hover:bg-slate-50">
-                    <td className="sticky left-0 z-10 bg-white px-4 py-2 font-medium text-slate-800 hover:bg-slate-50">
-                      <div>{fee.name.trim() || <span className="italic text-slate-400">Untitled</span>}</div>
-                      {fee.calculationType && (
-                        <div className="text-xs text-slate-400">
-                          {fee.calculationType === "Percentage" && fee.percentage !== undefined
-                            ? `${fee.percentage}%`
-                            : fee.calculationType === "Flat Amount" && fee.amount !== undefined
-                            ? `£${fee.amount.toLocaleString()}`
-                            : fee.calculationType}
-                        </div>
-                      )}
-                    </td>
-                    <td className="sticky left-[180px] z-10 bg-white px-3 py-2 text-center border-r border-slate-200 hover:bg-slate-50">
-                      <input
-                        type="checkbox"
-                        checked={rowAllChecked}
-                        disabled={isLocked}
-                        ref={(el) => { if (el) el.indeterminate = rowSomeChecked && !rowAllChecked; }}
-                        onChange={() => {
-                          const next = rowAllChecked ? [] : [...allProducts];
-                          update({ id: fee._id, appliedToProducts: next });
-                        }}
-                        className="h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)] disabled:cursor-not-allowed disabled:opacity-50"
-                        title={rowAllChecked ? `Deselect all products for ${fee.name}` : `Select all products for ${fee.name}`}
-                      />
-                    </td>
-                    {allProducts.map((prod) => {
-                      const checked = applied.includes(prod);
-                      return (
-                        <td key={prod} className="px-3 py-2 text-center">
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            disabled={isLocked}
-                            onChange={() => handleMatrixToggle(fee, prod)}
-                            className="h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)] disabled:cursor-not-allowed disabled:opacity-50"
-                            title={`${checked ? "Remove" : "Apply"} ${fee.name} → ${prod}`}
-                          />
-                        </td>
-                      );
-                    })}
-                  </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </div>
-      )}
-
-      {/* Configure view */}
       {activeTab === "configure" && (
       <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[320px_1fr]">
         {/* Left: fee list */}
@@ -372,6 +270,69 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
           )}
         </div>
       </div>
+      )}
+
+      {activeTab === "matrix" && (
+        <div className="min-h-0 flex-1 overflow-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+          {allProducts.length === 0 ? (
+            <div className="p-6 text-center text-sm text-slate-500">
+              No products configured. Add products in the{" "}
+              <a
+                href={`/projects/${projectId}/product-hierarchy`}
+                className="font-medium text-[var(--color-blue)] hover:underline"
+              >
+                Product Hierarchy Builder
+              </a>{" "}
+              first.
+            </div>
+          ) : records.length === 0 ? (
+            <div className="p-6 text-center text-sm text-slate-500">
+              No fees yet. Add fees in the Configure tab first.
+            </div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead className="sticky top-0 z-10 bg-slate-50">
+                <tr>
+                  <th className="border-b border-r border-slate-200 px-3 py-2 text-left font-medium text-slate-700">
+                    Fee
+                  </th>
+                  {allProducts.map((p) => (
+                    <th
+                      key={p}
+                      className="border-b border-r border-slate-200 px-2 py-2 text-center text-xs font-medium text-slate-600 last:border-r-0"
+                      style={{ minWidth: "120px" }}
+                    >
+                      {p.split("-").join(" › ")}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {records.map((fee) => (
+                  <tr key={fee._id} className="hover:bg-slate-50">
+                    <td className="border-r border-slate-200 px-3 py-2 font-medium text-slate-800">
+                      {fee.name}
+                    </td>
+                    {allProducts.map((prod) => (
+                      <td
+                        key={prod}
+                        className="border-r border-slate-100 px-2 py-2 text-center last:border-r-0"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={(fee.appliedToProducts ?? []).includes(prod)}
+                          onChange={() => handleMatrixToggle(fee, prod)}
+                          disabled={isLocked}
+                          className="h-4 w-4 rounded border-slate-300 text-[var(--color-blue)] focus:ring-[var(--color-blue)] disabled:cursor-not-allowed"
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       )}
 
 
@@ -758,6 +719,264 @@ function FeeDetail({
           </Button>
         </div>
       )}
+    </div>
+  );
+}
+
+// ── Fees Preview Playground ───────────────────────────────────────────────────
+
+type PreviewFee = {
+  id: string;
+  name: string;
+  feePaidBy?: string;
+  calculationType?: string;
+  basisSource?: string;
+  percentage?: number;
+  amount?: number;
+  collectionMethod?: string;
+  autoApply?: boolean;
+  overrideAmount?: string;
+};
+
+function feeValueLabel(fee: PreviewFee): string {
+  if (fee.calculationType === "Percentage" && fee.percentage !== undefined)
+    return `${fee.percentage}%`;
+  const amount = fee.overrideAmount !== undefined
+    ? parseFloat(fee.overrideAmount)
+    : fee.amount;
+  if (fee.calculationType === "Flat Amount" && amount !== undefined && !isNaN(amount))
+    return `£${amount.toLocaleString()}`;
+  return fee.calculationType ?? "—";
+}
+
+export function FeesPreviewPlayground({ projectId }: { projectId: Id<"projects"> }) {
+  const records = useQuery(api.fees.listForProject, { projectId });
+
+  const allFees: PreviewFee[] = useMemo(
+    () => (records ?? []).map((r) => ({
+      id: r._id,
+      name: r.name,
+      feePaidBy: r.feePaidBy,
+      calculationType: r.calculationType,
+      basisSource: r.basisSource,
+      percentage: r.percentage,
+      amount: r.amount,
+      collectionMethod: r.collectionMethod,
+      autoApply: r.autoApply,
+    })),
+    [records],
+  );
+
+  const [added, setAdded] = useState<PreviewFee[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return allFees;
+    return allFees.filter((f) => f.name.toLowerCase().includes(q));
+  }, [allFees, search]);
+
+  function openDialog() {
+    setSearch("");
+    setSelected(new Set());
+    setDialogOpen(true);
+  }
+
+  function toggleSelect(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  function handleApply() {
+    const toAdd = filtered.filter((f) => selected.has(f.id) && !added.find((a) => a.id === f.id));
+    setAdded((prev) => [...prev, ...toAdd]);
+    setDialogOpen(false);
+  }
+
+  function handleRemove(id: string) {
+    setAdded((prev) => prev.filter((f) => f.id !== id));
+  }
+
+  function handleAmountChange(id: string, value: string) {
+    setAdded((prev) => prev.map((f) => f.id === id ? { ...f, overrideAmount: value } : f));
+  }
+
+  return (
+    <div className="max-w-4xl">
+      <div className="mb-3 flex items-center gap-3">
+        <h3 className="text-sm font-semibold text-slate-800">Preview Playground</h3>
+        <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-[11px] font-medium text-amber-700">
+          Example only — not saved or exported
+        </span>
+        <span className="text-xs text-slate-400">
+          Reflects your <span className="font-medium">Fees Builder</span> config.
+        </span>
+        <Button onClick={openDialog} className="ml-auto bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]">
+          + Add Fees
+        </Button>
+      </div>
+
+      {/* Added fees table */}
+      <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="grid grid-cols-[1fr_100px_120px_100px_100px_120px_32px] gap-2 border-b border-slate-100 bg-slate-50 px-4 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+          <span>Fee Type</span>
+          <span>Paid By</span>
+          <span>Calc Type</span>
+          <span>Basis Source</span>
+          <span>Value</span>
+          <span>Collection</span>
+          <span />
+        </div>
+        {added.length === 0 ? (
+          <div className="px-4 py-8 text-center text-sm text-slate-400 italic">
+            No fees added yet — click <strong>+ Add Fees</strong> to select from your library.
+          </div>
+        ) : (
+          <ul className="divide-y divide-slate-100">
+            {added.map((f) => (
+              <li key={f.id} className="grid grid-cols-[1fr_100px_120px_100px_100px_120px_32px] gap-2 items-center px-4 py-2.5 hover:bg-slate-50 group">
+                <span className="text-sm font-medium text-slate-800">{f.name}</span>
+                <span className="text-xs text-slate-500">{f.feePaidBy || "—"}</span>
+                <span className="text-xs text-slate-500">{f.calculationType || "—"}</span>
+                <span className="text-xs text-slate-500">{f.basisSource || "—"}</span>
+                {f.calculationType === "Flat Amount" && (!f.amount || f.amount === 0) ? (
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-slate-400">£</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={f.overrideAmount ?? ""}
+                      onChange={(e) => handleAmountChange(f.id, e.target.value)}
+                      placeholder="0.00"
+                      className="w-16 rounded border border-slate-300 px-1.5 py-0.5 text-xs text-slate-700 focus:border-[var(--color-blue)] focus:outline-none"
+                    />
+                  </div>
+                ) : (
+                  <span className="text-xs text-slate-500">{feeValueLabel(f)}</span>
+                )}
+                <span className="text-xs text-slate-500">{f.collectionMethod || "—"}</span>
+                <button
+                  onClick={() => handleRemove(f.id)}
+                  className="text-xs text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Remove"
+                >×</button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {/* Add Fees dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="!max-w-4xl !max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Add Fees</DialogTitle>
+            <p className="text-xs text-slate-500 mt-0.5">Select one or more fees from the list</p>
+          </DialogHeader>
+
+          {/* Search */}
+          <div className="relative shrink-0">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+            </svg>
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search"
+              autoFocus
+              className="w-full rounded border border-slate-300 bg-white pl-9 pr-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-1 focus:ring-[var(--color-blue)]"
+            />
+          </div>
+
+          {/* Selection controls */}
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="text-xs text-slate-500">{selected.size} Selected Items</span>
+            <button
+              onClick={() => setSelected(new Set(filtered.map((f) => f.id)))}
+              className="rounded border border-slate-300 px-3 py-1 text-xs text-slate-600 hover:bg-slate-50"
+            >
+              Select All
+            </button>
+            <button
+              onClick={() => setSelected(new Set())}
+              className="rounded border border-slate-300 px-3 py-1 text-xs text-slate-600 hover:bg-slate-50"
+            >
+              Clear Selection
+            </button>
+          </div>
+
+          {/* Fee list */}
+          <div className="flex-1 overflow-y-auto rounded-lg border border-slate-200">
+            <div className="sticky top-0 grid grid-cols-[36px_1fr_110px_130px_110px_130px] gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+              <span />
+              <span>Fee Type</span>
+              <span>Fee Paid By</span>
+              <span>Calculation Type</span>
+              <span>Amount / %</span>
+              <span>Collection Method</span>
+            </div>
+
+            {filtered.length === 0 ? (
+              <div className="px-4 py-8 text-center text-sm text-slate-400 italic">
+                {records === undefined ? "Loading…" : "No fees match your search."}
+              </div>
+            ) : (
+              <ul className="divide-y divide-slate-100">
+                {filtered.map((f) => {
+                  const isSelected = selected.has(f.id);
+                  const alreadyAdded = !!added.find((a) => a.id === f.id);
+                  return (
+                    <li
+                      key={f.id}
+                      onClick={() => !alreadyAdded && toggleSelect(f.id)}
+                      className={`grid grid-cols-[36px_1fr_110px_130px_110px_130px] gap-2 items-center px-3 py-2.5 transition-colors ${
+                        alreadyAdded
+                          ? "opacity-40 cursor-not-allowed"
+                          : isSelected
+                          ? "bg-[var(--color-blue)]/8 cursor-pointer"
+                          : "hover:bg-slate-50 cursor-pointer"
+                      }`}
+                    >
+                      <div className="flex items-center justify-center">
+                        <div className={`flex h-5 w-5 items-center justify-center rounded border text-xs font-bold transition-colors ${
+                          isSelected
+                            ? "border-[var(--color-blue)] bg-[var(--color-blue)] text-white"
+                            : "border-slate-300 text-slate-400 hover:border-[var(--color-blue)]"
+                        }`}>
+                          {isSelected ? "✓" : "+"}
+                        </div>
+                      </div>
+                      <span className="text-sm font-medium text-slate-800 truncate">{f.name}</span>
+                      <span className="text-xs text-slate-500">{f.feePaidBy || "—"}</span>
+                      <span className="text-xs text-slate-500">{f.calculationType || "—"}</span>
+                      <span className="text-xs text-slate-500">{feeValueLabel(f)}</span>
+                      <span className="text-xs text-slate-500">{f.collectionMethod || "—"}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="flex justify-end gap-2 shrink-0 pt-1">
+            <Button variant="ghost" onClick={() => setDialogOpen(false)}>Cancel</Button>
+            <Button
+              disabled={selected.size === 0}
+              onClick={handleApply}
+              className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
+            >
+              Apply Selected Fee{selected.size !== 1 ? "s" : ""}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -28,7 +28,7 @@ import { LockedBanner } from "@/components/ui/locked-banner";
 
 // ── Manage Involvement Types Dialog ──────────────────────────────────────────
 
-function ManageInvolvementTypesDialog({
+export function ManageInvolvementTypesDialog({
   open,
   onOpenChange,
   projectId,
@@ -149,7 +149,7 @@ function ManageInvolvementTypesDialog({
 
 type PlaygroundEntry = { relationship: string; involvementType: string };
 
-function EntityInvolvementPlayground({ typeNames, onOpenManage }: { typeNames: string[]; onOpenManage: () => void }) {
+export function EntityInvolvementPlayground({ typeNames, onOpenManage }: { typeNames: string[]; onOpenManage: () => void }) {
   const [relationship, setRelationship] = useState("");
   const [involvementType, setInvolvementType] = useState("");
   const [entries, setEntries] = useState<PlaygroundEntry[]>([]);

@@ -1731,16 +1731,21 @@ function parseFeesSpreadsheetML(xml: string): FeeRecord[] | string {
   const sourceXml = feeTemplatesXml ?? xml;
 
   const rowPattern = /<Row[^>]*>([\s\S]*?)<\/Row>/gi;
-  const cellPattern = /<Cell[^>]*>[\s\S]*?<Data[^>]*>([\s\S]*?)<\/Data>[\s\S]*?<\/Cell>/gi;
 
   const allRows: string[][] = [];
   let rowMatch;
   while ((rowMatch = rowPattern.exec(sourceXml)) !== null) {
     const cells: string[] = [];
-    let cellMatch;
-    const cellRe = new RegExp(cellPattern.source, "gi");
-    while ((cellMatch = cellRe.exec(rowMatch[1])) !== null) {
-      cells.push(decode(cellMatch[1]));
+    const indexAttrRe = /ss:Index="(\d+)"/i;
+    const cellNodes = [...rowMatch[1].matchAll(/<Cell([^>]*)>[\s\S]*?<\/Cell>/gi)];
+    for (const node of cellNodes) {
+      const idxMatch = node[1].match(indexAttrRe);
+      if (idxMatch) {
+        const targetIdx = parseInt(idxMatch[1], 10) - 1;
+        while (cells.length < targetIdx) cells.push("");
+      }
+      const dataMatch = node[0].match(/<Data[^>]*>([\s\S]*?)<\/Data>/i);
+      cells.push(dataMatch ? decode(dataMatch[1]) : "");
     }
     if (cells.length > 0) allRows.push(cells);
   }
