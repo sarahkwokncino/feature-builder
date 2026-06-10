@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
+import { ExportButton } from "@/components/ui/export-button";
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import {
   buildConnectionsYaml,
@@ -416,8 +417,10 @@ export function ConnectionsTool({ projectId }: { projectId: Id<"projects"> }) {
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={() => setManageOpen(true)} disabled={isLocked}>Manage Roles</Button>
           <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>Import</Button>
-          <Button variant="outline" onClick={() => downloadConnectionsExcel(asRecords())}>Export Excel</Button>
-          <Button variant="outline" onClick={() => setYamlOpen(true)}>Export YAML</Button>
+          <ExportButton
+            onExcelClick={() => downloadConnectionsExcel(asRecords())}
+            onYamlClick={() => setYamlOpen(true)}
+          />
         </div>
       </div>
 

@@ -1,0 +1,1247 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Version>16.00</Version>
+ </DocumentProperties>
+ <OfficeDocumentSettings xmlns="urn:schemas-microsoft-com:office:office">
+  <AllowPNG/>
+ </OfficeDocumentSettings>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>11865</WindowHeight>
+  <WindowWidth>28800</WindowWidth>
+  <WindowTopX>32767</WindowTopX>
+  <WindowTopY>32767</WindowTopY>
+  <ActiveSheet>1</ActiveSheet>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="s62">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Font ss:FontName="Aptos Display" x:Family="Swiss" ss:Size="12"
+    ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s63">
+   <Font ss:FontName="Aptos Display" x:Family="Swiss" ss:Size="12"
+    ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s64">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Font ss:FontName="Aptos Display" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s65">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Font ss:FontName="Aptos Display" x:Family="Swiss" ss:Size="11"/>
+  </Style>
+  <Style ss:ID="s66">
+   <Font ss:FontName="Aptos Display" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s67">
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#333333"/>
+  </Style>
+  <Style ss:ID="s68">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Loan Requirements">
+  <Table ss:ExpandedColumnCount="11" ss:ExpandedRowCount="81" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Column ss:AutoFitWidth="0" ss:Width="106.5"/>
+   <Column ss:Index="8" ss:Width="214.5"/>
+   <Column ss:AutoFitWidth="0" ss:Width="138.75"/>
+   <Column ss:AutoFitWidth="0" ss:Width="220.5"/>
+   <Column ss:AutoFitWidth="0" ss:Width="203.25"/>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">Checklist lookup: SELECT Id FROM LLC_BI__Checklist__c WHERE LLC_BI__Checklist__r.Name = 'LLC_BI__Loan__c' — set LLC_BI__Requirement__c.LLC_BI__Checklist__c to that Id</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">Name</Data></Cell>
+    <Cell><Data ss:Type="String">Checklist_Level__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Description__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Assigned_Party__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Do_Not_Auto_Generate__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Stage_Check__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Needed_By__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Document_Manager_Placeholder__c</Data></Cell>
+    <Cell><Data ss:Type="String">Criteria_User_Written__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Advanced_Criteria__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Is_Template__c</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">HTAR</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Fund Approval Sheet</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Fund Approval Sheet</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Credit Paper </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">BDM</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Qualification</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Green Light Paper</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Final Approval Paper</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Approval Paper</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Payment approval</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.25">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Responsible Investment Tool Completed</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">ESG Template</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Loan Summary</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Signed and Dated Application Form</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Application Form</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.25">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Latest AIP</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">BDM</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Agreement in Principle</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="31.5">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Latest HOT</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">BDM</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Heads of Terms</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Reference on Existing Charge</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Existing Charge</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Valuation Report and Photos </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Valuer's Comments on ROT</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s66"/>
+    <Cell><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Valuer's comments on QS report </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s66"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commercial/Refurbishment</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">QS Report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s66"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Cost Consultant Report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s66"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">QS Comments on ROT</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s66"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">QS comments on Valuation </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s66"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Asset Manager report </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s66"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Sales Particulars</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:Index="9" ss:StyleID="s63"><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">EWS1 Certificate</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">EPC Certificate</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.25">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Full Schedule of works / costs / timelines</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Planning Permission</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:Index="9" ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Building Regulations and Consents</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:Index="9" ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Fund managers report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">BDM</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commerical</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">AVM</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Signed Facility Agreement</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Facility Letter</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.25">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">Signed Offer Letter</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Offer Letter</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">BTL/Refurbishment/Unregulated Residential Bridge/Enviro-let</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="45">
+    <Cell ss:StyleID="s65"><Data ss:Type="String">RMC Signed Non Binding &amp; Binding Offers &amp; Acceptance</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Regulated Offer Letter</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Regulated Bridge</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Signed Drawdown Notice</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Drawdown Notice</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Signed Mortgage Deed</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Mortgage Deed</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Debenture</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Debenture</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="78.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Report on Title</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Report on Title / Certificate of Title</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Report on Borrower</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Report on Borrower</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Solicitors Certificate of Advice </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell><Data ss:Type="String">Solicitors Certficate</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Proof of Purchase Price &amp; Deposit</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Personal Guarantee</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Personal Guarantee</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">ILA for PG providers</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Board Minutes</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Board Minutes</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">ICD/Dos/DoP and associated docs</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">ILA for ICD</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">ILA for ICD</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Redemption statement </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Redemption Statement</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Share Charge</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Share Charge</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="31.5">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Directors Questionnare</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Directors Questionnare</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="31.5">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Process Agent Letter/Confirmation</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Process Agent Letter</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.25">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Consent from existing 1st charge lender </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="31.5">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Maximum Liabilities Letter</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Maximum Liabilities Letter</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.25">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Signed DDM</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Direct Debit Mandate</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">BTL/Refurbishment/Commercial/Unregulated Residential Bridge</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="31.5">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Land Registry Office Copy -Security</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="31.5">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Land Registry Office Copies - Resi/Assets</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">AST/Leases</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Lease Document</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="45">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Buildings Insurance/CAR/Public Liability </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="31.5">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Speak withs Completed?</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.25">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Has the broker got the relevant permissions?</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Exposure checked?</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Watchlist Checked?</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Welcome letter</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Completion</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Welcome Letter - Debt</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="31.5">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">ESIS Completed and Issued</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">ESIS</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Regulated bridge</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="31.5">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">ESIS received and client advised</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Regulated bridge</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="31.5">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Signed I &amp; E (if refinance exit)</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Regulated bridge</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="31.5">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Confirm borrower income is in pounds</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Regulated bridge</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.25">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">No foreign monies confirmed on summary</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Regulated bridge</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.25">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">If exit is refi, ensure AIPs received and noted in summary</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Regulated bridge</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="63">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">If exit is sale, AM comments confirm realistic &amp; achievable</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Regulated bridge</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.25">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Confirm income multiple is on summary</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Regulated bridge</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Exit Handover on file</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Welcome letter</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Portfolio Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Completion</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Welcome Letter - Resi</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Residential</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Exit</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Proof of Exit</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.25">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Check all approver / committee actions completed</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">All</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Corporate Guarantee</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="7" ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Corporate Guarantee</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s68"><Data ss:Type="String">ILA for Corporate Guarantee providers</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="7" ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:Index="9" ss:StyleID="s63"><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s68"><Data ss:Type="String">ILA for Personal Guarantee Providers</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:Index="9" ss:StyleID="s63"/>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Source of funds</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:Index="9" ss:StyleID="s63"/>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Insurance Review Report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:Index="9" ss:StyleID="s63"/>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Credit Approval</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:Index="9" ss:StyleID="s63"/>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="30">
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Construction Programme Check</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:Index="9" ss:StyleID="s63"/>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="60">
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Ground Investigation report</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Loan</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6" ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Ground Investigation Report</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Product Type = Development</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Unsynced/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>8</ActiveRow>
+     <ActiveCol>7</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+  <ConditionalFormatting xmlns="urn:schemas-microsoft-com:office:excel">
+   <Range>R23C1,R27C1:R28C1</Range>
+   <Condition>
+    <Value1>LEN(TRIM(RC))=0</Value1>
+    <Format Style='color:#BFBFBF;background:#BFBFBF'/>
+   </Condition>
+  </ConditionalFormatting>
+ </Worksheet>
+ <Worksheet ss:Name="Relationship Requirements">
+  <Table ss:ExpandedColumnCount="11" ss:ExpandedRowCount="14" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Column ss:AutoFitWidth="0" ss:Width="225.75"/>
+   <Column ss:Index="3" ss:Width="112.5"/>
+   <Column ss:Width="129"/>
+   <Column ss:Width="165.75"/>
+   <Column ss:Width="116.25"/>
+   <Column ss:Index="8" ss:Width="214.5"/>
+   <Column ss:Width="118.5"/>
+   <Column ss:Width="143.25"/>
+   <Column ss:Width="114.75"/>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">Checklist lookup: SELECT Id FROM LLC_BI__Checklist__c WHERE LLC_BI__Checklist__r.Name = 'Account' — set LLC_BI__Requirement__c.LLC_BI__Checklist__c to that Id</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">Name</Data></Cell>
+    <Cell><Data ss:Type="String">Checklist_Level__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Description__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Assigned_Party__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Do_Not_Auto_Generate__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Stage_Check__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Needed_By__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Document_Manager_Placeholder__c</Data></Cell>
+    <Cell><Data ss:Type="String">Criteria_User_Written__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Advanced_Criteria__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Is_Template__c</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Law Society - SRA Document</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Relationship</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Operations</Data></Cell>
+    <Cell ss:Index="6"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Law Society Search</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Certified Passport / Photo Driving License</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Relationship</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Operations</Data></Cell>
+    <Cell ss:Index="6"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Proof of ID</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Individual + Business</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">1 x Certified PoR (last 3 months)</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Relationship</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Operations</Data></Cell>
+    <Cell ss:Index="6"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Proof of Address</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Individual + Business</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">TraceSmart Individuals</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Relationship</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Operations</Data></Cell>
+    <Cell ss:Index="6"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Tracesmart</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Individual + Business</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Google Search</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Relationship</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Operations</Data></Cell>
+    <Cell ss:Index="6"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Google search</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Individual + Business</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">World Check</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Relationship</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Operations</Data></Cell>
+    <Cell ss:Index="6"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">World Check</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Individual + Business</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Individual Credit Search (Experian)</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Relationship</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Operations</Data></Cell>
+    <Cell ss:Index="6"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Experian</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Individual + Business</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Company Credit Search (CreditSafe)</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Relationship</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Operations</Data></Cell>
+    <Cell ss:Index="6"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Safe - Company</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Business</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Credit Safe Directors Search</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Relationship</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Operations</Data></Cell>
+    <Cell ss:Index="6"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Safe - Director</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Individual</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">CV/Company profile </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Relationship</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">BDM</Data></Cell>
+    <Cell ss:Index="6"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Qualification</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Evidence of experience</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Individual + Business</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Certified Bank statements (last 3 months)</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Relationship</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Proof of Funds</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Individual + Business</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Explanations for adverse / voters</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Relationship</Data></Cell>
+    <Cell ss:Index="4" ss:StyleID="s63"><Data ss:Type="String">Credit Manager</Data></Cell>
+    <Cell ss:Index="6"><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Review</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Adverse explanation</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Individual + Business</Data></Cell>
+    <Cell ss:Index="11"><Data ss:Type="String">Y</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Unsynced/>
+   <Selected/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>28</ActiveRow>
+     <ActiveCol>3</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Document Manager Placeholders">
+  <Table ss:ExpandedColumnCount="2" ss:ExpandedRowCount="45" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">Document Manager Placeholder Name</Data></Cell>
+    <Cell><Data ss:Type="String">Action Required</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Fund Approval Sheet</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Green Light Paper</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Final Approval Paper</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Application Form</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="47.25">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Agreement in Principle</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="31.5">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Heads of Terms</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Law Society Search</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Proof of ID</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Proof of Address</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Tracesmart</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Google search</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">World Check</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Experian</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Credit Safe - Company</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">Credit Safe - Director</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Evidence of experience</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Proof of Funds</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Existing Charge</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Adverse explanation</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Facility Letter</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Offer Letter</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Regulated Offer Letter</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Drawdown Notice</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Mortgage Deed</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Debenture</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="78.75">
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Report on Title / Certificate of Title</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Report on Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell><Data ss:Type="String">Solicitors Certficate</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s66"><Data ss:Type="String">Personal Guarantee</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Board Minutes</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">ILA for ICD</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Redemption Statement</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Share Charge</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Directors Questionnare</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Process Agent Letter</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Maximum Liabilities Letter</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:StyleID="s67"><Data ss:Type="String">Direct Debit Mandate</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Lease Document</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Welcome Letter - Debt</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">ESIS</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Welcome Letter - Resi</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Proof of Exit</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="15.75">
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Corporate Guarantee</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="60">
+    <Cell ss:StyleID="s68"><Data ss:Type="String">Ground Investigation Report</Data></Cell>
+    <Cell><Data ss:Type="String">Verify placeholder exists in Document Manager, or create it before importing.</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Unsynced/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>21</ActiveRow>
+     <ActiveCol>9</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>

@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
+import { ExportButton } from "@/components/ui/export-button";
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import {
   buildCollateralYaml,
@@ -1230,27 +1231,24 @@ export function CollateralTool({
           <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>
             Import
           </Button>
-          <Button variant="outline" onClick={() => {
-            // Resolve "Same as" links before exporting
-            const resolved: CollateralFieldConfig[] = (allFieldConfigs ?? []).map((c) => {
-              const linked = (c as any).linkedTo;
-              if (!linked) return c as CollateralFieldConfig;
-              const source = (allFieldConfigs ?? []).find(
-                (s) => s.collateralType === linked.collateralType && s.collateralSubtype === linked.collateralSubtype,
-              );
-              return {
-                collateralType: c.collateralType,
-                collateralSubtype: c.collateralSubtype,
-                sections: (source?.sections ?? []) as CollateralFieldConfig["sections"],
-              };
-            });
-            downloadCollateralExcel(collateralPicklists, resolved);
-          }}>
-            Export Excel
-          </Button>
-          <Button variant="outline" onClick={() => setYamlOpen(true)}>
-            Export YAML
-          </Button>
+          <ExportButton
+            onExcelClick={() => {
+              const resolved: CollateralFieldConfig[] = (allFieldConfigs ?? []).map((c) => {
+                const linked = (c as any).linkedTo;
+                if (!linked) return c as CollateralFieldConfig;
+                const source = (allFieldConfigs ?? []).find(
+                  (s) => s.collateralType === linked.collateralType && s.collateralSubtype === linked.collateralSubtype,
+                );
+                return {
+                  collateralType: c.collateralType,
+                  collateralSubtype: c.collateralSubtype,
+                  sections: (source?.sections ?? []) as CollateralFieldConfig["sections"],
+                };
+              });
+              downloadCollateralExcel(collateralPicklists, resolved);
+            }}
+            onYamlClick={() => setYamlOpen(true)}
+          />
         </div>
       </div>
 

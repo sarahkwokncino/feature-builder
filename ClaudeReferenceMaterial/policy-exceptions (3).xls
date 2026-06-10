@@ -1,0 +1,581 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Version>16.00</Version>
+ </DocumentProperties>
+ <OfficeDocumentSettings xmlns="urn:schemas-microsoft-com:office:office">
+  <AllowPNG/>
+ </OfficeDocumentSettings>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>19500</WindowHeight>
+  <WindowWidth>32767</WindowWidth>
+  <WindowTopX>32767</WindowTopX>
+  <WindowTopY>32767</WindowTopY>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="s28" ss:Name="Neutral">
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#9C5700"/>
+   <Interior ss:Color="#FFEB9C" ss:Pattern="Solid"/>
+  </Style>
+  <Style ss:ID="s62">
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s63" ss:Parent="s28">
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+   <Interior/>
+  </Style>
+  <Style ss:ID="s64" ss:Parent="s28">
+   <Alignment ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Font ss:FontName="Aptos Narrow" ss:Size="11" ss:Color="#000000"/>
+   <Interior/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Policy Exception Templates">
+  <Table ss:ExpandedColumnCount="4" ss:ExpandedRowCount="44" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Column ss:Width="185.25"/>
+   <Column ss:Width="170.25"/>
+   <Column ss:AutoFitWidth="0" ss:Width="204.75"/>
+   <Column ss:Width="105"/>
+   <Row>
+    <Cell><Data ss:Type="String">object</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Type__c</Data></Cell>
+    <Cell><Data ss:Type="String">Name</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Severities__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Works taking place</Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Major;Critical</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Document</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Report on title </Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Major;Critical</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Lending Policy</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">LTGDV</Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Major;Critical</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Lending Policy</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">LTV</Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Critical;Major</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Lending Policy</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Maximum Loan to Cost Exceeded</Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Major;Critical</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Lending Policy </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Planning Risk </Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Major;Critical</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Lending Policy </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Sales/ Refinance Period &lt; 6 months</Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Major;Critical</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Lending Policy</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Term Exceeds Policy Guidelines</Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Major;Critical</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Adverse Credit</Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Major;Critical</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Borrower age</Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Major;Critical</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Environmental</Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Major;Critical</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Insufficient Guarantor Structure</Data></Cell>
+    <Cell><Data ss:Type="String">Minor;</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Loan Amount</Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Major;Critical</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Minimum equity</Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Major;Critical</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Underwriting</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Profit on Cost</Data></Cell>
+    <Cell><Data ss:Type="String">Minor;Major;Critical</Data></Cell>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell ss:Index="3" ss:StyleID="s62"/>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Selected/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>20</ActiveRow>
+     <ActiveCol>1</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Mitigation Reasons">
+  <Table ss:ExpandedColumnCount="4" ss:ExpandedRowCount="44" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Column ss:Width="229.5"/>
+   <Column ss:Width="259.5"/>
+   <Column ss:Width="305.25"/>
+   <Row>
+    <Cell><Data ss:Type="String">object</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c (Name lookup)</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Reason__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Comment_Required__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Works taking place</Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Initial site clearance commenced to satisfy planning conditions</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Report on title </Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Indemnity Policy in place</Data></Cell>
+    <Cell ss:StyleID="s62"/>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">LTGDV</Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Funder Approval Received</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">LTGDV</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Customer Relationship Duration</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">LTGDV</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Company Financial Strength</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">LTGDV</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Guarantor Support/Liquidity</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">LTV</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Customer Relationship Duration</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">LTV</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Company Financial Strength</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">LTV</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Guarantor Support/Liquidity</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Maximum Loan to Cost Exceeded</Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Planning gain taken into account </Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">0</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Maximum Loan to Cost Exceeded</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Customer Relationship Duration</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">0</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Planning Risk </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Judicial period covered by indemnity policy </Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Sales/ Refinance Period &lt; 6 months</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="String">Pre-sale in place</Data></Cell>
+    <Cell ss:StyleID="s63"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Term Exceeds Policy Guidelines</Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Funder agreed to exception </Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">0</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Adverse Credit</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Guarantor Support/Liquidity</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Adverse Credit</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Customer Relationship Duration</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Adverse Credit</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Historical Payment Performance</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Adverse Credit</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Low Collateral LTV</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Adverse Credit</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Company Financial Strength</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Adverse Credit</Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Investigated and satisfied with rationale</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Borrower age</Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Other Directors/ UBO in place</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Borrower age</Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Not a key person in transaction</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Environmental</Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Issue has been treated &amp; certificates held</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Environmental</Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Indemnity Policy in Place</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Insufficient Guarantor Structure</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Customer Relationship Duration</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Insufficient Guarantor Structure</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Historical Payment Performance</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Insufficient Guarantor Structure</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Low Collateral LTV</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Insufficient Guarantor Structure</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Company Financial Strength</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Insufficient Guarantor Structure</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Guarantor Support/Liquidity</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Loan Amount</Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Funder Approval Received</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Loan Amount</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Customer Relationship Duration</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Loan Amount</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Guarantor Support/Liquidity</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Minimum equity</Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Planning gain accounted for as equity </Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Minimum equity</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Customer Relationship Duration</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Minimum equity</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Low Collateral LTV</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Minimum equity</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Company Financial Strength</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Minimum equity</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Guarantor Support/Liquidity</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Profit on Cost</Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Asset to be held as investment</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Profit on Cost</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Customer Relationship Duration</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Profit on Cost</Data></Cell>
+    <Cell ss:StyleID="s64"><Data ss:Type="String">Sum of profit still considered significant</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Profit on Cost</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Low Collateral LTV</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Profit on Cost</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Company Financial Strength</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Profit on Cost</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="String">Guarantor Support/Liquidity</Data></Cell>
+    <Cell ss:StyleID="s62"><Data ss:Type="Boolean">1</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>1</ActiveRow>
+     <ActiveCol>3</ActiveCol>
+     <RangeSelection>R2C4:R44C4</RangeSelection>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="SF Object Reference">
+  <Table ss:ExpandedColumnCount="3" ss:ExpandedRowCount="7" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Row>
+    <Cell><Data ss:Type="String">Object</Data></Cell>
+    <Cell><Data ss:Type="String">Field (API Name)</Data></Cell>
+    <Cell><Data ss:Type="String">Description</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell><Data ss:Type="String">Name</Data></Cell>
+    <Cell><Data ss:Type="String">Exception name</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Type__c</Data></Cell>
+    <Cell><Data ss:Type="String">Exception type</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Severities__c</Data></Cell>
+    <Cell><Data ss:Type="String">Severities (semicolon-separated, e.g. Minor;Major;Critical)</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Template__c</Data></Cell>
+    <Cell><Data ss:Type="String">Lookup to LLC_BI__Policy_Exception_Template__c (by Name)</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Reason__c</Data></Cell>
+    <Cell><Data ss:Type="String">Mitigation reason text</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__Policy_Exception_Mitigation_Reason__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Comment_Required__c</Data></Cell>
+    <Cell><Data ss:Type="String">Boolean — whether a comment is required when selecting this reason</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>

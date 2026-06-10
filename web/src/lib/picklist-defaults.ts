@@ -82,10 +82,7 @@ export const CHECKLIST_PICKLISTS: Record<string, string[]> = {
 };
 
 export const CHECKLIST_PICKLIST_LABELS: Record<string, string> = {
-  category: "Category",
   assignedParty: "Assignee",
-  neededBy: "Needed By",
-  placeholderName: "Document Manager Placeholder",
 };
 
 export const CONDITIONS_PICKLISTS: Record<string, string[]> = {

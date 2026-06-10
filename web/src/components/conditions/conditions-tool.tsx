@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { usePlaygroundState } from "@/components/stages/playground-state-context";
 import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ import {
 } from "@/components/ui/dialog";
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
+import { ExportButton } from "@/components/ui/export-button";
 import {
   buildConditionsYaml,
   downloadConditionsYaml,
@@ -188,20 +190,11 @@ export function ConditionsTool({
           <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>
             Import
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => downloadConditionsExcel(conditionRows)}
+          <ExportButton
             disabled={records.length === 0}
-          >
-            Export Excel
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setYamlOpen(true)}
-            disabled={records.length === 0}
-          >
-            Export YAML
-          </Button>
+            onExcelClick={() => downloadConditionsExcel(conditionRows)}
+            onYamlClick={() => setYamlOpen(true)}
+          />
           <Button
             onClick={handleAdd}
             disabled={isLocked}
@@ -548,7 +541,7 @@ export function ConditionsPreviewPlayground({ projectId }: { projectId: Id<"proj
     return [...new Set([...fromPicklist, ...fromRecords])].sort();
   }, [stored, records]);
 
-  const [added, setAdded] = useState<PreviewCondition[]>([]);
+  const { addedConditions: added, setAddedConditions: setAdded } = usePlaygroundState();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");

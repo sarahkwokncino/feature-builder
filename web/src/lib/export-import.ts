@@ -206,6 +206,7 @@ export function parseCovenantsCSv(text: string): CovenantRecord[] | string {
 // ── Smart Checklist ────────────────────────────────────────────────────────────
 
 export type ChecklistLevel = "Loan" | "Relationship";
+export type DocmanPlaceholderRef = { name: string; level: string };
 
 export type ChecklistRecord = {
   name: string;
@@ -249,7 +250,7 @@ function getCustomPicklistValues(
 ): Map<string, Set<string>> {
   const custom = new Map<string, Set<string>>();
   for (const req of records) {
-    for (const key of ["category", "assignedParty", "neededBy"] as const) {
+    for (const key of ["assignedParty", "neededBy"] as const) {
       const val = req[key];
       const defaults = userPicklists.get(key) ?? CHECKLIST_PICKLISTS[key] ?? [];
       if (val && !defaults.includes(val)) {
@@ -279,13 +280,11 @@ function buildChecklistYamlSection(reqs: ChecklistRecord[], level: ChecklistLeve
     y += `      Name: "${yamlStr(req.name)}"\n`;
     y += `      LLC_BI__Is_Template__c: true\n`;
     y += `      # LLC_BI__Checklist__c: <Id of LLC_BI__Checklist__c where Name = '${checklistName}'>\n`;
-    if (req.category) y += `      LLC_BI__Category__c: "${yamlStr(req.category)}"\n`;
     if (req.description) y += `      LLC_BI__Description__c: "${yamlStr(req.description)}"\n`;
-    if (req.legalDescription) y += `      LLC_BI__Legal_Description__c: "${yamlStr(req.legalDescription)}"\n`;
     if (req.assignedParty) y += `      LLC_BI__Assigned_Party__c: "${yamlStr(req.assignedParty)}"\n`;
-    if (req.neededBy) y += `      LLC_BI__Needed_By__c: "${yamlStr(req.neededBy)}"\n`;
+    y += `      LLC_BI__Stage_Check__c: ${req.stageCheck ? "true" : "false"}\n`;
+    if (req.stageCheck && req.neededBy) y += `      LLC_BI__Needed_By__c: "${yamlStr(req.neededBy)}"\n`;
     y += `      LLC_BI__Do_Not_Auto_Generate__c: ${req.doNotAutoGenerate ?? false}\n`;
-    if (req.stageCheck) y += `      LLC_BI__Stage_Check__c: true\n`;
     if (req.placeholderName) {
       y += `      # Linked Document Manager Placeholder: "${yamlStr(req.placeholderName)}"\n`;
       y += `      LLC_BI__Document_Manager_Placeholder__c: "${yamlStr(req.placeholderName)}"\n`;
@@ -303,6 +302,7 @@ export function buildChecklistYaml(
   records: ChecklistRecord[],
   meta: { storyId: string; title: string; featureArea: string },
   userPicklists: Map<string, string[]>,
+  docmanPlaceholders?: DocmanPlaceholderRef[],
 ): string {
   const named = records.filter((r) => r.name.trim());
   let y = `story_id: "${meta.storyId}"\ntitle: "${yamlStr(meta.title)}"\nfeature_area: ${meta.featureArea}\n`;
@@ -333,19 +333,32 @@ export function buildChecklistYaml(
     y += `# ${"═".repeat(70)}\n`;
   }
 
-  const placeholderList = [
-    ...(CHECKLIST_PICKLISTS.placeholderName ?? []),
-    ...(userPicklists.get("placeholderName") ?? []),
-  ];
-  const uniquePlaceholders = [...new Set(placeholderList)];
-  if (uniquePlaceholders.length) {
+  // Build placeholder list: prefer live docmanPlaceholders, fall back to picklist values
+  const loanPhs = docmanPlaceholders
+    ? [...new Set(docmanPlaceholders.filter((p) => p.level === "Loans").map((p) => p.name))].sort()
+    : [...new Set([...(CHECKLIST_PICKLISTS.placeholderName ?? []), ...(userPicklists.get("placeholderName") ?? [])])];
+  const relPhs = docmanPlaceholders
+    ? [...new Set(docmanPlaceholders.filter((p) => p.level === "Relationships").map((p) => p.name))].sort()
+    : [];
+
+  if (loanPhs.length || relPhs.length) {
     y += `\n# ${"═".repeat(70)}\n`;
-    y += `# DOCUMENT MANAGER PLACEHOLDERS — VERIFY BEFORE DEPLOYING\n`;
-    y += `# The following placeholders are referenced by requirements above.\n`;
-    y += `# Ensure each exists in Document Manager before importing,\n`;
-    y += `# or create it first.\n`;
+    y += `# DOCUMENT MANAGER PLACEHOLDERS — AGENT ACTION REQUIRED\n`;
+    y += `# Before creating any LLC_BI__Requirement__c records that reference a\n`;
+    y += `# Document Manager placeholder, agents must:\n`;
+    y += `#   1. Check whether the LLC_BI__ClosingChecklist__c record already exists\n`;
+    y += `#      at the correct level (Loan or Relationship).\n`;
+    y += `#   2. If it does NOT exist, create it first at the correct level before\n`;
+    y += `#      creating the Smart Checklist item that references it.\n`;
     y += `# ${"═".repeat(70)}\n`;
-    for (const p of uniquePlaceholders) y += `#   - "${p}"\n`;
+    if (loanPhs.length) {
+      y += `#\n# Loan-level placeholders (LLC_BI__Type__c = "llc_bi__loan__c"):\n`;
+      for (const p of loanPhs) y += `#   - "${p}"\n`;
+    }
+    if (relPhs.length) {
+      y += `#\n# Relationship-level placeholders (LLC_BI__Type__c = "Account"):\n`;
+      for (const p of relPhs) y += `#   - "${p}"\n`;
+    }
     y += `# ${"═".repeat(70)}\n`;
   }
   return y;
@@ -355,8 +368,9 @@ export function downloadChecklistYaml(
   records: ChecklistRecord[],
   meta: { storyId: string; title: string; featureArea: string },
   userPicklists: Map<string, string[]>,
+  docmanPlaceholders?: DocmanPlaceholderRef[],
 ) {
-  const yaml = buildChecklistYaml(records, meta, userPicklists);
+  const yaml = buildChecklistYaml(records, meta, userPicklists, docmanPlaceholders);
   downloadBlob(
     new Blob([yaml], { type: "text/yaml" }),
     `${slugify(meta.storyId || "smart-checklist")}.yaml`,
@@ -366,13 +380,11 @@ export function downloadChecklistYaml(
 const EXCEL_COLS: { key: keyof ChecklistRecord; label: string }[] = [
   { key: "name", label: "Name" },
   { key: "checklistLevel", label: "Checklist_Level__c" },
-  { key: "category", label: "LLC_BI__Category__c" },
   { key: "description", label: "LLC_BI__Description__c" },
-  { key: "legalDescription", label: "LLC_BI__Legal_Description__c" },
   { key: "assignedParty", label: "LLC_BI__Assigned_Party__c" },
+  { key: "stageCheck", label: "LLC_BI__Stage_Check__c" },
   { key: "neededBy", label: "LLC_BI__Needed_By__c" },
   { key: "doNotAutoGenerate", label: "LLC_BI__Do_Not_Auto_Generate__c" },
-  { key: "stageCheck", label: "LLC_BI__Stage_Check__c" },
   { key: "placeholderName", label: "LLC_BI__Document_Manager_Placeholder__c" },
   { key: "criteriaUserWritten", label: "Criteria_User_Written__c" },
   { key: "criteriaGenerated", label: "LLC_BI__Advanced_Criteria__c" },
@@ -410,6 +422,10 @@ function buildXlsxSheet(rows: unknown[][], sheetName: string): string {
   return xml;
 }
 
+function buildXlsxSheetWithTitle(title: string, rows: unknown[][], sheetName: string): string {
+  return buildXlsxSheet([[title], [], ...rows], sheetName);
+}
+
 function buildRequirementSheet(reqs: ChecklistRecord[], level: ChecklistLevel): string {
   const { checklistName } = CHECKLIST_LEVEL_CONFIG[level];
   const sheetName = level === "Loan" ? "Loan Requirements" : "Relationship Requirements";
@@ -418,8 +434,13 @@ function buildRequirementSheet(reqs: ChecklistRecord[], level: ChecklistLevel): 
     [...EXCEL_COLS.map((c) => c.label), ...EXCEL_FIXED_COLS.map((c) => c.label)],
   ];
   for (const req of reqs) {
+    const hardStop = !!req.stageCheck;
     rows.push([
-      ...EXCEL_COLS.map((c) => String(req[c.key] ?? "")),
+      ...EXCEL_COLS.map((c) => {
+        if (c.key === "stageCheck") return hardStop ? "TRUE" : "FALSE";
+        if (c.key === "neededBy") return hardStop ? (req.neededBy ?? "") : "";
+        return String(req[c.key] ?? "");
+      }),
       ...EXCEL_FIXED_COLS.map((c) => c.value),
     ]);
   }
@@ -429,6 +450,7 @@ function buildRequirementSheet(reqs: ChecklistRecord[], level: ChecklistLevel): 
 export function downloadChecklistExcel(
   records: ChecklistRecord[],
   userPicklists: Map<string, string[]>,
+  docmanPlaceholders?: DocmanPlaceholderRef[],
 ) {
   const named = records.filter((r) => r.name.trim());
   const loanReqs = named.filter((r) => (r.checklistLevel ?? "Loan") === "Loan");
@@ -460,14 +482,20 @@ export function downloadChecklistExcel(
     sheetCustom = buildXlsxSheet(customRows, "Custom Picklist Values");
   }
 
-  const placeholderList: string[] = [
-    ...(CHECKLIST_PICKLISTS.placeholderName ?? []),
-    ...(userPicklists.get("placeholderName") ?? []),
-  ];
-  const uniquePlaceholders = [...new Set(placeholderList)];
+  // Build placeholder sheet using live docman data when available
+  const loanPhs = docmanPlaceholders
+    ? [...new Set(docmanPlaceholders.filter((p) => p.level === "Loans").map((p) => p.name))].sort()
+    : [...new Set([...(CHECKLIST_PICKLISTS.placeholderName ?? []), ...(userPicklists.get("placeholderName") ?? [])])];
+  const relPhs = docmanPlaceholders
+    ? [...new Set(docmanPlaceholders.filter((p) => p.level === "Relationships").map((p) => p.name))].sort()
+    : [];
+
   const phRows: unknown[][] = [
-    ["Document Manager Placeholder Name", "Action Required"],
-    ...uniquePlaceholders.map((p) => [p, "Verify placeholder exists in Document Manager, or create it before importing."]),
+    ["⚠️ AGENT ACTION REQUIRED — Before creating Smart Checklist items that reference a placeholder, check whether the LLC_BI__ClosingChecklist__c record already exists at the correct level. If it does NOT exist, create it first."],
+    [],
+    ["Document Manager Placeholder Name", "Level", "Action Required"],
+    ...loanPhs.map((p) => [p, "Loan", "Check if LLC_BI__ClosingChecklist__c exists at Loan level. Create first if missing."]),
+    ...relPhs.map((p) => [p, "Relationship", "Check if LLC_BI__ClosingChecklist__c exists at Relationship level. Create first if missing."]),
   ];
   const sheetPlaceholders = buildXlsxSheet(phRows, "Document Manager Placeholders");
 
@@ -504,15 +532,14 @@ export function parseChecklistYaml(text: string): ChecklistRecord[] | string {
     const name = gF("Name");
     if (!name) continue;
     const ph = gF("LLC_BI__Document_Manager_Placeholder__c");
+    const hardStop = gB("LLC_BI__Stage_Check__c");
     parsed.push({
       name,
-      category: gF("LLC_BI__Category__c") || undefined,
       description: gF("LLC_BI__Description__c") || undefined,
-      legalDescription: gF("LLC_BI__Legal_Description__c") || undefined,
       assignedParty: gF("LLC_BI__Assigned_Party__c") || undefined,
-      neededBy: gF("LLC_BI__Needed_By__c") || undefined,
+      neededBy: hardStop ? gF("LLC_BI__Needed_By__c") || undefined : undefined,
       doNotAutoGenerate: gB("LLC_BI__Do_Not_Auto_Generate__c"),
-      stageCheck: gB("LLC_BI__Stage_Check__c"),
+      stageCheck: hardStop,
       placeholderName: ph || undefined,
       criteriaGenerated: gF("LLC_BI__Advanced_Criteria__c") || undefined,
     });
@@ -521,13 +548,103 @@ export function parseChecklistYaml(text: string): ChecklistRecord[] | string {
   return parsed;
 }
 
+function parseChecklistSpreadsheetML(xml: string): ChecklistRecord[] | string {
+  const decode = (s: string) =>
+    s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+     .replace(/&quot;/g, '"').replace(/&#160;/g, " ").replace(/&apos;/g, "'").trim();
+
+  const indexAttrRe = /ss:Index="(\d+)"/i;
+
+  function sheetRows(sheetXml: string): string[][] {
+    const rows: string[][] = [];
+    const rowRe = /<Row[^>]*>([\s\S]*?)<\/Row>/gi;
+    let rowMatch;
+    while ((rowMatch = rowRe.exec(sheetXml)) !== null) {
+      const cells: string[] = [];
+      const cellNodes = [...rowMatch[1].matchAll(/<Cell([^>]*)>[\s\S]*?<\/Cell>/gi)];
+      for (const node of cellNodes) {
+        const idxMatch = node[1].match(indexAttrRe);
+        if (idxMatch) {
+          const targetIdx = parseInt(idxMatch[1], 10) - 1;
+          while (cells.length < targetIdx) cells.push("");
+        }
+        const dataMatch = node[0].match(/<Data[^>]*>([\s\S]*?)<\/Data>/i);
+        cells.push(dataMatch ? decode(dataMatch[1]) : "");
+      }
+      if (cells.length > 0) rows.push(cells);
+    }
+    return rows;
+  }
+
+  function parseSheet(rows: string[][]): ChecklistRecord[] {
+    const headerRowIdx = rows.findIndex((r) => r.includes("Name"));
+    if (headerRowIdx === -1) return [];
+    const headers = rows[headerRowIdx];
+    const colIdx: Partial<Record<keyof ChecklistRecord, number>> = {};
+    for (const col of EXCEL_COLS) {
+      const i = headers.indexOf(col.label);
+      if (i !== -1) colIdx[col.key] = i;
+    }
+    if (colIdx["name"] === undefined) return [];
+    const result: ChecklistRecord[] = [];
+    for (let i = headerRowIdx + 1; i < rows.length; i++) {
+      const cells = rows[i];
+      const get = (key: keyof ChecklistRecord) =>
+        colIdx[key] !== undefined ? (cells[colIdx[key]!] ?? "").trim() : "";
+      const getBool = (key: keyof ChecklistRecord) => { const v = get(key).toLowerCase(); return v === "true" || v === "1" || v === "y" || v === "yes"; };
+      const name = get("name");
+      if (!name || name.startsWith("#")) continue;
+      const levelRaw = get("checklistLevel");
+      const level: ChecklistLevel = levelRaw === "Relationship" ? "Relationship" : "Loan";
+      const hardStop = getBool("stageCheck");
+      result.push({
+        name,
+        checklistLevel: level,
+        description: get("description") || undefined,
+        assignedParty: get("assignedParty") || undefined,
+        neededBy: hardStop ? get("neededBy") || undefined : undefined,
+        doNotAutoGenerate: getBool("doNotAutoGenerate"),
+        stageCheck: hardStop,
+        placeholderName: get("placeholderName") || undefined,
+        criteriaUserWritten: get("criteriaUserWritten") || undefined,
+        criteriaGenerated: get("criteriaGenerated") || undefined,
+      });
+    }
+    return result;
+  }
+
+  // Process each worksheet independently so preamble rows from one sheet
+  // don't bleed into the data rows of another sheet.
+  const parsed: ChecklistRecord[] = [];
+  const sheetRe = /<Worksheet[^>]*>([\s\S]*?)<\/Worksheet>/gi;
+  let sheetMatch;
+  while ((sheetMatch = sheetRe.exec(xml)) !== null) {
+    parsed.push(...parseSheet(sheetRows(sheetMatch[1])));
+  }
+
+  if (!parsed.length) return "No rows with a Name value found.";
+  return parsed;
+}
+
 export function parseChecklistCsvExcel(
   text: string,
 ): ChecklistRecord[] | string {
   const raw = text.replace(/^\uFEFF/, "");
+
+  if (raw.trimStart().startsWith("<")) return parseChecklistSpreadsheetML(raw);
   const lines = raw.split(/\r?\n/).filter((l) => l.trim());
   if (lines.length < 2) return "File appears empty or has no data rows.";
-  const headers = parseCsvRow(lines[0]).map((h) => h.trim());
+
+  // Find the header row — skip any preamble rows (e.g. the Salesforce lookup note)
+  let headerLineIdx = 0;
+  for (let i = 0; i < Math.min(lines.length, 5); i++) {
+    if (parseCsvRow(lines[i]).some((c) => c.trim() === "Name")) {
+      headerLineIdx = i;
+      break;
+    }
+  }
+
+  const headers = parseCsvRow(lines[headerLineIdx]).map((h) => h.trim());
   const colIdx: Partial<Record<keyof ChecklistRecord, number>> = {};
   for (const col of EXCEL_COLS) {
     const i = headers.indexOf(col.label);
@@ -536,27 +653,25 @@ export function parseChecklistCsvExcel(
   if (colIdx["name"] === undefined)
     return 'Could not find a "Name" column. Make sure the file was exported from this tool.';
   const parsed: ChecklistRecord[] = [];
-  for (let i = 1; i < lines.length; i++) {
+  for (let i = headerLineIdx + 1; i < lines.length; i++) {
     const cells = parseCsvRow(lines[i]);
     const get = (key: keyof ChecklistRecord) =>
       colIdx[key] !== undefined ? (cells[colIdx[key]!] || "").trim() : "";
-    const getBool = (key: keyof ChecklistRecord) =>
-      get(key).toLowerCase() === "true";
+    const getBool = (key: keyof ChecklistRecord) => { const v = get(key).toLowerCase(); return v === "true" || v === "y" || v === "yes"; };
     const name = get("name");
     if (!name) continue;
     const ph = get("placeholderName");
     const levelRaw = get("checklistLevel");
     const level: ChecklistLevel = levelRaw === "Relationship" ? "Relationship" : "Loan";
+    const hardStop = getBool("stageCheck");
     parsed.push({
       name,
       checklistLevel: level,
-      category: get("category") || undefined,
       description: get("description") || undefined,
-      legalDescription: get("legalDescription") || undefined,
       assignedParty: get("assignedParty") || undefined,
-      neededBy: get("neededBy") || undefined,
+      neededBy: hardStop ? get("neededBy") || undefined : undefined,
       doNotAutoGenerate: getBool("doNotAutoGenerate"),
-      stageCheck: getBool("stageCheck"),
+      stageCheck: hardStop,
       placeholderName: ph || undefined,
       criteriaUserWritten: get("criteriaUserWritten") || undefined,
       criteriaGenerated: get("criteriaGenerated") || undefined,
@@ -1243,27 +1358,40 @@ export function parseConditionsCsvExcel(text: string): ConditionRecord[] | strin
 }
 
 function parseConditionsSpreadsheetML(xml: string): ConditionRecord[] | string {
-  // Decode XML entities
   const decode = (s: string) =>
     s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
      .replace(/&quot;/g, '"').replace(/&#160;/g, " ").replace(/&apos;/g, "'").trim();
 
-  // Extract all rows from all worksheets as arrays of cell strings
-  const rowPattern = /<Row[^>]*>([\s\S]*?)<\/Row>/gi;
-  const cellPattern = /<Cell[^>]*>[\s\S]*?<Data[^>]*>([\s\S]*?)<\/Data>[\s\S]*?<\/Cell>/gi;
+  const indexAttrRe = /ss:Index="(\d+)"/i;
+
+  function sheetRows(sheetXml: string): string[][] {
+    const rows: string[][] = [];
+    const rowRe = /<Row[^>]*>([\s\S]*?)<\/Row>/gi;
+    let rowMatch;
+    while ((rowMatch = rowRe.exec(sheetXml)) !== null) {
+      const cells: string[] = [];
+      const cellNodes = [...rowMatch[1].matchAll(/<Cell([^>]*)>[\s\S]*?<\/Cell>/gi)];
+      for (const node of cellNodes) {
+        const idxMatch = node[1].match(indexAttrRe);
+        if (idxMatch) {
+          const targetIdx = parseInt(idxMatch[1], 10) - 1;
+          while (cells.length < targetIdx) cells.push("");
+        }
+        const dataMatch = node[0].match(/<Data[^>]*>([\s\S]*?)<\/Data>/i);
+        cells.push(dataMatch ? decode(dataMatch[1]) : "");
+      }
+      if (cells.length > 0) rows.push(cells);
+    }
+    return rows;
+  }
 
   const allRows: string[][] = [];
-  let rowMatch;
-  while ((rowMatch = rowPattern.exec(xml)) !== null) {
-    const rowXml = rowMatch[1];
-    const cells: string[] = [];
-    let cellMatch;
-    const cellRe = new RegExp(cellPattern.source, "gi");
-    while ((cellMatch = cellRe.exec(rowXml)) !== null) {
-      cells.push(decode(cellMatch[1]));
-    }
-    if (cells.length > 0) allRows.push(cells);
+  const wsRe = /<Worksheet[^>]*>([\s\S]*?)<\/Worksheet>/gi;
+  let wsMatch;
+  while ((wsMatch = wsRe.exec(xml)) !== null) {
+    allRows.push(...sheetRows(wsMatch[1]));
   }
+  if (!allRows.length) allRows.push(...sheetRows(xml));
 
   if (allRows.length < 2) return "File appears empty or has no data rows.";
 
@@ -1828,13 +1956,32 @@ export function _parseDocmanExcelLegacy(text: string): DocmanExport | string {
 
 // ── Stages ────────────────────────────────────────────────────────────────────
 
+const ROUTE_BODY_COMPONENT: Record<string, string> = {
+  "Policy Exceptions":   "llc_bi__policyexceptions",
+  "Borrowing Structure": "llc_bi__multitierinvolvement",
+  "Security":            "llc_bi:collateralManagement",
+  "Covenants":           "nCino:covenantContainer",
+  "Conditions":          "nCino:conditions",
+  "Fees":                "nCino:feeManagement",
+};
+
+type StageField = { id: string; name: string; fieldType: string };
+type StageSubSection = { id: string; name: string; fields: StageField[] };
+type StageSubRoute = {
+  id: string;
+  name: string;
+  description?: string;
+  fields: StageField[];
+  sections?: StageSubSection[];
+};
+
 export type StageImportRow = {
   stageName: string;
   sectionName: string;
   isDefault?: boolean;
   isHidden?: boolean;
   description?: string;
-  subsections?: { id: string; name: string; fields: { id: string; name: string; fieldType: string }[] }[];
+  subsections?: StageSubRoute[];
 };
 
 type StageExportData = {
@@ -1847,7 +1994,7 @@ type StageExportData = {
       isDefault?: boolean;
       isHidden?: boolean;
       description?: string;
-      subsections?: { id: string; name: string; fields: { id: string; name: string; fieldType: string }[] }[];
+      subsections?: StageSubRoute[];
     }[];
   }[];
 };
@@ -1870,17 +2017,33 @@ export function buildStagesYaml(
     for (const sec of stage.sections) {
       lines.push(`      - name: "${yamlStr(sec.name)}"`);
       lines.push(`        isUserCreated: ${!sec.isDefault}`);
+      const bodyComponent = sec.isDefault ? (ROUTE_BODY_COMPONENT[sec.name] ?? null) : null;
+      if (bodyComponent) lines.push(`        nFORCE__Body__c: "${bodyComponent}"`);
       if (sec.isHidden) lines.push(`        isHidden: true`);
       if (sec.description) lines.push(`        description: "${yamlStr(sec.description)}"`);
       if (sec.subsections && sec.subsections.length > 0) {
         lines.push(`        subRoutes:`);
         for (const sub of sec.subsections) {
           lines.push(`          - name: "${yamlStr(sub.name)}"`);
-          if (sub.fields.length > 0) {
+          if (sub.description) lines.push(`            description: "${yamlStr(sub.description)}"`);
+          if (sub.fields && sub.fields.length > 0) {
             lines.push(`            fields:`);
             for (const f of sub.fields) {
               lines.push(`              - name: "${yamlStr(f.name)}"`);
               lines.push(`                fieldType: "${yamlStr(f.fieldType)}"`);
+            }
+          }
+          if (sub.sections && sub.sections.length > 0) {
+            lines.push(`            sections:`);
+            for (const sec2 of sub.sections) {
+              lines.push(`              - name: "${yamlStr(sec2.name)}"`);
+              if (sec2.fields.length > 0) {
+                lines.push(`                fields:`);
+                for (const f of sec2.fields) {
+                  lines.push(`                  - name: "${yamlStr(f.name)}"`);
+                  lines.push(`                    fieldType: "${yamlStr(f.fieldType)}"`);
+                }
+              }
             }
           }
         }
@@ -1900,20 +2063,37 @@ export function downloadStagesYaml(
 
 export function downloadStagesExcel(data: StageExportData) {
   const allRows: string[][] = [];
-  const COLS = ["Stage", "Route", "Is User Created", "Is Hidden", "Description", "Sub Route", "Field Name", "Field Type"];
+  const COLS = ["Stage", "Route", "Is User Created", "nFORCE__Body__c", "Is Hidden", "Description", "Sub Route", "Sub Route Description", "Section Name", "Field Name", "Field Type"];
 
   for (const stage of data.stages) {
     for (const sec of stage.sections) {
       const userCreated = !sec.isDefault ? "true" : "false";
+      const bodyComponent = sec.isDefault ? (ROUTE_BODY_COMPONENT[sec.name] ?? "") : "";
       if (!sec.subsections || sec.subsections.length === 0) {
-        allRows.push([stage.name, sec.name, userCreated, sec.isHidden ? "true" : "", sec.description ?? "", "", "", ""]);
+        allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", "", "", "", "", ""]);
       } else {
         for (const sub of sec.subsections) {
-          if (sub.fields.length === 0) {
-            allRows.push([stage.name, sec.name, userCreated, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, "", ""]);
+          const subDesc = sub.description ?? "";
+          const hasSections = sub.sections && sub.sections.length > 0;
+          const hasTopFields = sub.fields && sub.fields.length > 0;
+          if (!hasSections && !hasTopFields) {
+            allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, "", "", ""]);
           } else {
-            for (const f of sub.fields) {
-              allRows.push([stage.name, sec.name, userCreated, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, f.name, f.fieldType]);
+            if (hasTopFields) {
+              for (const f of sub.fields) {
+                allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, "", f.name, f.fieldType]);
+              }
+            }
+            if (hasSections) {
+              for (const sec2 of sub.sections!) {
+                if (sec2.fields.length === 0) {
+                  allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, sec2.name, "", ""]);
+                } else {
+                  for (const f of sec2.fields) {
+                    allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, sec2.name, f.name, f.fieldType]);
+                  }
+                }
+              }
             }
           }
         }
@@ -1943,6 +2123,185 @@ export function downloadStagesExcel(data: StageExportData) {
 
   const xml = `<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">${sheetsXml}</Workbook>`;
   downloadBlob(new Blob([xml], { type: "application/vnd.ms-excel" }), "stages-export.xls");
+}
+
+// ── All-config sheet builders (used by downloadAllConfigExcel) ────────────────
+
+function buildStagesSheetsXml(data: StageExportData): string {
+  const COLS = ["Stage", "Route", "Is User Created", "nFORCE__Body__c", "Is Hidden", "Description", "Sub Route", "Sub Route Description", "Section Name", "Field Name", "Field Type"];
+  const allRows: string[][] = [];
+
+  for (const stage of data.stages) {
+    for (const sec of stage.sections) {
+      const userCreated = !sec.isDefault ? "true" : "false";
+      const bodyComponent = sec.isDefault ? (ROUTE_BODY_COMPONENT[sec.name] ?? "") : "";
+      if (!sec.subsections || sec.subsections.length === 0) {
+        allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", "", "", "", "", ""]);
+      } else {
+        for (const sub of sec.subsections) {
+          const subDesc = sub.description ?? "";
+          const hasSections = sub.sections && sub.sections.length > 0;
+          const hasTopFields = sub.fields && sub.fields.length > 0;
+          if (!hasSections && !hasTopFields) {
+            allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, "", "", ""]);
+          } else {
+            if (hasTopFields) {
+              for (const f of sub.fields) {
+                allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, "", f.name, f.fieldType]);
+              }
+            }
+            if (hasSections) {
+              for (const sec2 of sub.sections!) {
+                if (sec2.fields.length === 0) {
+                  allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, sec2.name, "", ""]);
+                } else {
+                  for (const f of sec2.fields) {
+                    allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, sec2.name, f.name, f.fieldType]);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  let xml = buildXlsxSheetWithTitle("STAGES & UI CONFIGURATION — nFORCE__Route__c", [COLS, ...allRows], "Stages — All");
+  for (const stage of data.stages) {
+    const sheetName = ("Stage — " + stage.name).slice(0, 31).replace(/[\\/*?[\]:]/g, "");
+    const stageRows = allRows.filter((r) => r[0] === stage.name);
+    xml += buildXlsxSheetWithTitle(`STAGE: ${stage.name}`, [COLS, ...stageRows], sheetName);
+  }
+  return xml;
+}
+
+function buildFeesSheetsXml(records: FeeRecord[]): string {
+  const named = records.filter((r) => r.name.trim());
+  const feeRows: unknown[][] = [
+    ["object", "LLC_BI__Category__c", "LLC_BI__Picklist_1__c (Fee Name)", "LLC_BI__Picklist_2__c (Fee Paid By)", "LLC_BI__Picklist_4__c (Calculation Type)", "LLC_BI__Basis_Source__c", "LLC_BI__Percentage__c", "LLC_BI__Collection_Method__c", "LLC_BI__Currency_Field_1__c (Flat Amount)", "Applied To Products", "Notes"],
+    ...named.map((fee) => [
+      "LLC_BI__Template_Records__c",
+      "Fee Management",
+      fee.name,
+      fee.feePaidBy ?? "",
+      fee.calculationType ?? "",
+      fee.calculationType === "Percentage" ? (fee.basisSource ?? "") : "",
+      fee.calculationType === "Percentage" && fee.percentage !== undefined ? fee.percentage : "",
+      fee.collectionMethod ?? "",
+      fee.calculationType === "Flat Amount" && fee.amount !== undefined ? fee.amount : "",
+      fee.autoApply && fee.appliedToProducts ? fee.appliedToProducts.join(";") : "",
+      fee.notes ?? "",
+    ]),
+  ];
+  if (named.length === 0) feeRows.push(["# No fees defined", "", "", "", "", "", "", "", "", "", ""]);
+
+  const joinRows: unknown[][] = [
+    ["object", "LLC_BI__Template_Records__c (fee name)", "LLC_BI__Product__r.Name", "LLC_BI__Product__r.LLC_BI__Product_Line_Name__c", "LLC_BI__Product__r.LLC_BI__Product_Type_Name__c"],
+  ];
+  for (const fee of named) {
+    if (!fee.autoApply || !fee.appliedToProducts?.length) continue;
+    for (const prod of fee.appliedToProducts) {
+      const { productLine, productType, productName } = parseProductName(prod);
+      joinRows.push(["LLC_BI__Product_Template_Join__c", fee.name, productName || prod, productLine, productType]);
+    }
+  }
+  if (joinRows.length === 1) joinRows.push(["# No product assignments defined", "", "", "", ""]);
+
+  return (
+    buildXlsxSheetWithTitle("FEES — LLC_BI__Template_Records__c", feeRows, "Fees") +
+    buildXlsxSheetWithTitle("FEES — Product Assignments (LLC_BI__Product_Template_Join__c)", joinRows, "Fees — Product Assignments")
+  );
+}
+
+function buildConditionsSheetsXml(records: ConditionRecord[]): string {
+  const named = records.filter((r) => r.name.trim());
+  const precedent = named.filter((r) => r.conditionType === "Condition Precedent");
+  const subsequent = named.filter((r) => r.conditionType === "Condition Subsequent");
+
+  const makeRows = (reqs: ConditionRecord[]): unknown[][] => [
+    [...CONDITION_EXCEL_COLS.map((c) => c.label)],
+    ...reqs.map((req) => CONDITION_EXCEL_COLS.map((c) => String(req[c.key] ?? ""))),
+  ];
+  const precRows = makeRows(precedent);
+  if (precedent.length === 0) precRows.push(["# No condition precedents defined"]);
+  const subseqRows = makeRows(subsequent);
+  if (subsequent.length === 0) subseqRows.push(["# No condition subsequents defined"]);
+
+  return (
+    buildXlsxSheetWithTitle("CONDITIONS PRECEDENT — LLC_BI__Requirement__c (LLC_BI__Requirement_Type__c = Condition Precedent)", precRows, "Conditions Precedent") +
+    buildXlsxSheetWithTitle("CONDITIONS SUBSEQUENT — LLC_BI__Requirement__c (LLC_BI__Requirement_Type__c = Condition Subsequent)", subseqRows, "Conditions Subsequent")
+  );
+}
+
+function buildPolicyExceptionsSheetsXml(records: PolicyExceptionRecord[]): string {
+  const named = records.filter((r) => r.name.trim());
+
+  const excRows: unknown[][] = [
+    ["object", "Name", "LLC_BI__Type__c", "LLC_BI__Severities__c (semicolon-separated)"],
+    ...named.map((r) => ["LLC_BI__Policy_Exception_Template__c", r.name, r.type, r.severities.join(";")]),
+  ];
+  if (named.length === 0) excRows.push(["# No exceptions defined", "", "", ""]);
+
+  const mrRows: unknown[][] = [
+    ["object", "LLC_BI__Policy_Exception_Template__c (Name lookup)", "LLC_BI__Reason__c", "LLC_BI__Comment_Required__c"],
+  ];
+  for (const exc of named) {
+    for (const mr of exc.mitigationReasons) {
+      if (!mr.reason.trim()) continue;
+      mrRows.push(["LLC_BI__Policy_Exception_Mitigation_Reason__c", exc.name, mr.reason, mr.commentRequired ? "true" : "false"]);
+    }
+  }
+  if (mrRows.length === 1) mrRows.push(["# No mitigation reasons defined", "", "", ""]);
+
+  return (
+    buildXlsxSheetWithTitle("POLICY EXCEPTIONS — LLC_BI__Policy_Exception_Template__c", excRows, "Policy Exceptions") +
+    buildXlsxSheetWithTitle("POLICY EXCEPTIONS — Mitigation Reasons (LLC_BI__Policy_Exception_Mitigation_Reason__c)", mrRows, "PE — Mitigation Reasons")
+  );
+}
+
+export type AllConfigExcelInput = {
+  projectName: string;
+  stages: StageExportData;
+  fees: FeeRecord[];
+  conditions: ConditionRecord[];
+  policyExceptions: PolicyExceptionRecord[];
+};
+
+export function downloadAllConfigExcel(input: AllConfigExcelInput) {
+  const coverRows: unknown[][] = [
+    [`All Configuration Export — ${input.projectName}`],
+    [`Generated: ${today()}`],
+    [],
+    ["Tab", "Feature Builder", "Salesforce Object(s)"],
+    ["Stages — All / Stage — [Name]", "Stages & UI Builder", "nFORCE__Route__c"],
+    ["Fees", "Fees Builder", "LLC_BI__Template_Records__c"],
+    ["Fees — Product Assignments", "Fees Builder", "LLC_BI__Product_Template_Join__c"],
+    ["Conditions Precedent", "Conditions Builder", "LLC_BI__Requirement__c"],
+    ["Conditions Subsequent", "Conditions Builder", "LLC_BI__Requirement__c"],
+    ["Policy Exceptions", "Policy Exceptions Builder", "LLC_BI__Policy_Exception_Template__c"],
+    ["PE — Mitigation Reasons", "Policy Exceptions Builder", "LLC_BI__Policy_Exception_Mitigation_Reason__c"],
+  ];
+
+  const sheetsXml =
+    buildXlsxSheet(coverRows, "Contents") +
+    buildStagesSheetsXml(input.stages) +
+    buildFeesSheetsXml(input.fees) +
+    buildConditionsSheetsXml(input.conditions) +
+    buildPolicyExceptionsSheetsXml(input.policyExceptions);
+
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<?mso-application progid="Excel.Sheet"?>` +
+    `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">` +
+    `<Styles><Style ss:ID="h"><Font ss:Bold="1"/></Style></Styles>` +
+    sheetsXml +
+    `</Workbook>`;
+
+  downloadBlob(
+    new Blob([xml], { type: "application/vnd.ms-excel;charset=utf-8;" }),
+    `all-config-${slugify(input.projectName)}.xls`,
+  );
 }
 
 export function parseStagesFile(text: string, filename: string): StageImportRow[] | string {
@@ -2280,21 +2639,47 @@ export function parseRelationshipsFile(text: string, filename: string): Relation
 
 function parseStagesSpreadsheetML(text: string): StageImportRow[] | string {
   try {
+    const decode = (s: string) =>
+      s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
+       .replace(/&quot;/g, '"').replace(/&#160;/g, " ").replace(/&apos;/g, "'").trim();
+
+    const indexAttrRe = /ss:Index="(\d+)"/i;
+
+    function sheetRows(sheetXml: string): string[][] {
+      const rows: string[][] = [];
+      const rowRe = /<Row[^>]*>([\s\S]*?)<\/Row>/gi;
+      let rowMatch;
+      while ((rowMatch = rowRe.exec(sheetXml)) !== null) {
+        const cells: string[] = [];
+        const cellNodes = [...rowMatch[1].matchAll(/<Cell([^>]*)>[\s\S]*?<\/Cell>/gi)];
+        for (const node of cellNodes) {
+          const idxMatch = node[1].match(indexAttrRe);
+          if (idxMatch) {
+            const targetIdx = parseInt(idxMatch[1], 10) - 1;
+            while (cells.length < targetIdx) cells.push("");
+          }
+          const dataMatch = node[0].match(/<Data[^>]*>([\s\S]*?)<\/Data>/i);
+          cells.push(dataMatch ? decode(dataMatch[1]) : "");
+        }
+        if (cells.length > 0) rows.push(cells);
+      }
+      return rows;
+    }
+
     const wsMatch = text.match(/<Worksheet[^>]*ss:Name="All Stages"[^>]*>([\s\S]*?)<\/Worksheet>/);
     const wsText = wsMatch ? wsMatch[1] : text;
-    const rowMatches = [...wsText.matchAll(/<Row[^>]*>([\s\S]*?)<\/Row>/g)];
-    if (rowMatches.length < 2) return "No data rows found.";
-    const getHeader = (row: string) =>
-      [...row.matchAll(/<Data[^>]*>([\s\S]*?)<\/Data>/g)].map((m) => m[1].trim().toLowerCase());
-    const headers = getHeader(rowMatches[0][1]);
+    const allRows = sheetRows(wsText);
+
+    if (allRows.length < 2) return "No data rows found.";
+    const headers = allRows[0].map((h) => h.toLowerCase());
     const stageIdx = headers.indexOf("stage");
     const routeIdx = headers.indexOf("route");
     const descIdx = headers.indexOf("description");
     const hiddenIdx = headers.indexOf("is hidden");
     if (stageIdx === -1 || routeIdx === -1) return "Spreadsheet must have 'Stage' and 'Route' columns.";
     const rows: StageImportRow[] = [];
-    for (let i = 1; i < rowMatches.length; i++) {
-      const cells = [...rowMatches[i][1].matchAll(/<Data[^>]*>([\s\S]*?)<\/Data>/g)].map((m) => m[1].trim());
+    for (let i = 1; i < allRows.length; i++) {
+      const cells = allRows[i];
       const stageName = (cells[stageIdx] ?? "").trim();
       const sectionName = (cells[routeIdx] ?? "").trim();
       if (!stageName || !sectionName) continue;
@@ -2394,4 +2779,221 @@ export function parseInvolvementTypesFile(text: string, filename: string): Invol
   }
   if (!parsed.length) return "No data rows found.";
   return parsed;
+}
+
+// ── Policy Exceptions import ──────────────────────────────────────────────────
+
+export function parsePolicyExceptionsFile(
+  text: string,
+  filename: string,
+): PolicyExceptionRecord[] | string {
+  const lower = filename.toLowerCase();
+  if (lower.endsWith(".yaml") || lower.endsWith(".yml")) return parsePolicyExceptionsYaml(text);
+  if (lower.endsWith(".csv")) return parsePolicyExceptionsCsv(text);
+  return parsePolicyExceptionsSpreadsheetML(text);
+}
+
+function parsePolicyExceptionsYaml(text: string): PolicyExceptionRecord[] | string {
+  try {
+    const records: PolicyExceptionRecord[] = [];
+    let current: PolicyExceptionRecord | null = null;
+    let inMitigation = false;
+    let currentMr: PolicyExceptionMitigationReason | null = null;
+
+    for (const rawLine of text.split("\n")) {
+      const line = rawLine.replace(/\r$/, "");
+
+      // Template record start
+      const objMatch = line.match(/^\s{4}object:\s+LLC_BI__Policy_Exception_Template__c/);
+      if (objMatch) {
+        if (current) records.push(current);
+        current = { type: "", name: "", severities: [], mitigationReasons: [] };
+        inMitigation = false;
+        currentMr = null;
+        continue;
+      }
+
+      // Mitigation reason record start
+      const mrObjMatch = line.match(/^\s{4}object:\s+LLC_BI__Policy_Exception_Mitigation_Reason__c/);
+      if (mrObjMatch) {
+        if (currentMr && current) current.mitigationReasons.push(currentMr);
+        inMitigation = true;
+        currentMr = { reason: "", commentRequired: false };
+        continue;
+      }
+
+      if (!inMitigation && current) {
+        const nameMatch = line.match(/^\s+Name:\s+"?([^"]+)"?/);
+        const typeMatch = line.match(/^\s+LLC_BI__Type__c:\s+"?([^"]+)"?/);
+        const sevMatch = line.match(/^\s+LLC_BI__Severities__c:\s+"?([^"]+)"?/);
+        if (nameMatch) current.name = nameMatch[1].trim();
+        else if (typeMatch) current.type = typeMatch[1].trim();
+        else if (sevMatch) current.severities = sevMatch[1].split(";").map((s) => s.trim()).filter(Boolean);
+      } else if (inMitigation && currentMr) {
+        const reasonMatch = line.match(/^\s+LLC_BI__Reason__c:\s+"?([^"]*)"?/);
+        const commentMatch = line.match(/^\s+LLC_BI__Comment_Required__c:\s+(true|false)/i);
+        if (reasonMatch) currentMr.reason = reasonMatch[1].trim();
+        else if (commentMatch) currentMr.commentRequired = commentMatch[1].toLowerCase() === "true";
+      }
+    }
+    if (currentMr && current) current.mitigationReasons.push(currentMr);
+    if (current) records.push(current);
+
+    const valid = records.filter((r) => r.name.trim());
+    if (!valid.length) return "No policy exceptions found in YAML.";
+    return valid;
+  } catch (e) {
+    return `YAML parse error: ${String(e)}`;
+  }
+}
+
+function parsePolicyExceptionsCsv(text: string): PolicyExceptionRecord[] | string {
+  const lines = text.split("\n").map((l) => l.replace(/\r$/, ""));
+  if (!lines.length) return "Empty file.";
+
+  // Detect which sheet we're in based on header row
+  // Expected: two-section CSV — templates then mitigation reasons
+  // Template columns: Name, LLC_BI__Type__c, LLC_BI__Severities__c
+  // Mitigation columns: LLC_BI__Policy_Exception_Template__c (Name lookup), LLC_BI__Reason__c, LLC_BI__Comment_Required__c
+
+  const parseCsvRow = (row: string): string[] => {
+    const cells: string[] = [];
+    let cur = "";
+    let inQ = false;
+    for (let i = 0; i < row.length; i++) {
+      const ch = row[i];
+      if (ch === '"' && !inQ) { inQ = true; continue; }
+      if (ch === '"' && inQ) {
+        if (row[i + 1] === '"') { cur += '"'; i++; } else { inQ = false; }
+        continue;
+      }
+      if (ch === "," && !inQ) { cells.push(cur); cur = ""; continue; }
+      cur += ch;
+    }
+    cells.push(cur);
+    return cells;
+  };
+
+  const templateMap = new Map<string, PolicyExceptionRecord>();
+  let mode: "template" | "mitigation" | "none" = "none";
+
+  for (const line of lines) {
+    const row = parseCsvRow(line).map((c) => c.trim());
+    if (!row.some((c) => c)) continue;
+    if (row[0]?.startsWith("#")) continue;
+
+    const h = row.map((c) => c.toLowerCase());
+    if (h.includes("name") && h.includes("llc_bi__type__c")) { mode = "template"; continue; }
+    if (h.includes("llc_bi__reason__c")) { mode = "mitigation"; continue; }
+
+    if (mode === "template") {
+      const name = row[1]?.trim() || row[0]?.trim();
+      const type = row[2]?.trim() || "";
+      const sevStr = row[3]?.trim() || "";
+      if (!name || name === "LLC_BI__Policy_Exception_Template__c") continue;
+      const severities = sevStr ? sevStr.split(";").map((s) => s.trim()).filter(Boolean) : [];
+      templateMap.set(name, { name, type, severities, mitigationReasons: [] });
+    } else if (mode === "mitigation") {
+      const templateName = row[1]?.trim();
+      const reason = row[2]?.trim();
+      const commentReq = (row[3] ?? "").trim().toLowerCase();
+      if (!templateName || !reason || reason === "LLC_BI__Reason__c") continue;
+      const rec = templateMap.get(templateName);
+      if (rec) rec.mitigationReasons.push({ reason, commentRequired: commentReq === "true" || commentReq === "1" });
+    }
+  }
+
+  const results = [...templateMap.values()].filter((r) => r.name.trim());
+  if (!results.length) return "No policy exceptions found in CSV.";
+  return results;
+}
+
+function parsePolicyExceptionsSpreadsheetML(text: string): PolicyExceptionRecord[] | string {
+  try {
+    const templateMap = new Map<string, PolicyExceptionRecord>();
+
+    const getSheetXml = (name: string): string | null => {
+      const re = new RegExp(`<Worksheet[^>]*ss:Name="${name}"[^>]*>([\\s\\S]*?)</Worksheet>`);
+      return text.match(re)?.[1] ?? null;
+    };
+
+    // Parse a SpreadsheetML worksheet into rows of cell strings (ss:Index-aware)
+    const sheetRows = (sheetXml: string): string[][] => {
+      const rows: string[][] = [];
+      const rowMatches = sheetXml.matchAll(/<Row[^>]*>([\s\S]*?)<\/Row>/g);
+      for (const rm of rowMatches) {
+        const rowXml = rm[1];
+        const cells: string[] = [];
+        const cellMatches = rowXml.matchAll(/<Cell([^>]*)>([\s\S]*?)<\/Cell>/g);
+        for (const cm of cellMatches) {
+          const attrs = cm[1];
+          const inner = cm[2];
+          const idxAttr = attrs.match(/ss:Index="(\d+)"/);
+          const targetIdx = idxAttr ? parseInt(idxAttr[1], 10) - 1 : cells.length;
+          while (cells.length < targetIdx) cells.push("");
+          const dataMatch = inner.match(/<Data[^>]*>([\s\S]*?)<\/Data>/);
+          cells.push(dataMatch ? dataMatch[1].trim() : "");
+        }
+        rows.push(cells);
+      }
+      return rows;
+    };
+
+    // Sheet 1: Policy Exceptions templates
+    // standalone export uses "Policy Exception Templates"; all-config uses "Policy Exceptions"
+    const exSheet =
+      getSheetXml("Policy Exception Templates") ??
+      getSheetXml("Policy Exceptions") ??
+      getSheetXml("Sheet1");
+    if (exSheet) {
+      const rows = sheetRows(exSheet);
+      if (rows.length > 0) {
+        const headers = rows[0].map((h) => h.toLowerCase().trim());
+        const nameIdx = headers.findIndex((h) => h === "name");
+        const typeIdx = headers.findIndex((h) => h.includes("type__c") || h === "type");
+        const sevIdx = headers.findIndex((h) => h.includes("severities"));
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          const name = (row[nameIdx >= 0 ? nameIdx : 2] ?? "").trim();
+          const type = (row[typeIdx >= 0 ? typeIdx : 1] ?? "").trim();
+          const sevStr = (row[sevIdx >= 0 ? sevIdx : 3] ?? "").trim();
+          if (!name || name.startsWith("#")) continue;
+          const severities = sevStr ? sevStr.split(";").map((s) => s.trim()).filter(Boolean) : [];
+          templateMap.set(name, { name, type, severities, mitigationReasons: [] });
+        }
+      }
+    }
+
+    // Sheet 2: Mitigation Reasons
+    // standalone export uses "Mitigation Reasons"; all-config uses "PE — Mitigation Reasons"
+    const mrSheet =
+      getSheetXml("Mitigation Reasons") ??
+      getSheetXml("PE — Mitigation Reasons") ??
+      getSheetXml("Sheet2");
+    if (mrSheet) {
+      const rows = sheetRows(mrSheet);
+      if (rows.length > 0) {
+        const headers = rows[0].map((h) => h.toLowerCase().trim());
+        const templateIdx = headers.findIndex((h) => h.includes("template__c") || h.includes("template"));
+        const reasonIdx = headers.findIndex((h) => h.includes("reason__c") || h === "reason");
+        const commentIdx = headers.findIndex((h) => h.includes("comment_required") || h.includes("comment required"));
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          const templateName = (row[templateIdx >= 0 ? templateIdx : 1] ?? "").trim();
+          const reason = (row[reasonIdx >= 0 ? reasonIdx : 2] ?? "").trim();
+          const commentReqRaw = (row[commentIdx >= 0 ? commentIdx : 3] ?? "").trim().toLowerCase();
+          if (!templateName || !reason || reason.startsWith("#")) continue;
+          const commentRequired = commentReqRaw === "true" || commentReqRaw === "1" || commentReqRaw === "yes";
+          const rec = templateMap.get(templateName);
+          if (rec) rec.mitigationReasons.push({ reason, commentRequired });
+        }
+      }
+    }
+
+    const results = [...templateMap.values()].filter((r) => r.name.trim());
+    if (!results.length) return "No policy exceptions found in file.";
+    return results;
+  } catch (e) {
+    return `Excel parse error: ${String(e)}`;
+  }
 }

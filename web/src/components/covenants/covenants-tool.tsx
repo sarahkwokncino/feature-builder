@@ -29,6 +29,7 @@ import {
 } from "@/lib/picklist-defaults";
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
+import { ExportButton } from "@/components/ui/export-button";
 import {
   buildCovenantsYaml,
   downloadCovenantsYaml,
@@ -395,18 +396,10 @@ export function CovenantsTool({
               Import
             </Button>
           )}
-          <Button
-            variant="outline"
-            onClick={() => downloadCovenantsExcel(covenantPicklists)}
-          >
-            Export Excel
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setYamlOpen(true)}
-          >
-            Export YAML
-          </Button>
+          <ExportButton
+            onExcelClick={() => downloadCovenantsExcel(covenantPicklists)}
+            onYamlClick={() => setYamlOpen(true)}
+          />
         </div>
       </div>
 

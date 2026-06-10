@@ -4,6 +4,20 @@ import { useBuilderLock } from "@/lib/use-builder-lock";
 import { LockedBanner } from "@/components/ui/locked-banner";
 import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  pointerWithin,
+  useSensor,
+  useSensors,
+  useDroppable,
+  useDraggable,
+  type DragEndEvent,
+  type DragOverEvent,
+} from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+import type { Modifier } from "@dnd-kit/core";
 import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
@@ -19,6 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
+import { ExportButton } from "@/components/ui/export-button";
 import {
   buildDocmanYaml,
   downloadDocmanYaml,
@@ -28,6 +43,7 @@ import {
   type DocmanExport,
 } from "@/lib/export-import";
 import { toast } from "sonner";
+import { translateCriteria } from "@/lib/formgen";
 
 type DocmanLevel = "Relationships" | "Loans" | "Collateral" | "Product Package";
 type Placeholder = Doc<"docmanPlaceholders">;
@@ -49,45 +65,108 @@ const LEVEL_COLOURS: Record<DocmanLevel, { tab: string; badge: string; header: s
   "Product Package":{ tab: "border-purple-500 text-purple-700",badge: "bg-purple-100 text-purple-700",header: "bg-purple-50 text-purple-800" },
 };
 
-// ── Formgen translation ───────────────────────────────────────────────────────
 
-const FIELD_MAP: Record<string, string> = {
-  "product line":   "LLC_BI__Loan__c.LLC_BI__Product_Line__c",
-  "product type":   "LLC_BI__Loan__c.LLC_BI__Product_Type__c",
-  "product":        "LLC_BI__Loan__c.LLC_BI__Product__c",
-  "employee loan":  "LLC_BI__Loan__c.LLC_BI__Employee_Loan__c",
-  "loan type":      "LLC_BI__Loan__c.LLC_BI__Loan_Type__c",
-  "stage":          "LLC_BI__Loan__c.LLC_BI__Stage__c",
-  "loan purpose":   "LLC_BI__Loan__c.LLC_BI__Loan_Purpose__c",
-  "collateral type":"LLC_BI__Loan__c.LLC_BI__Collateral_Type__c",
-};
+// ── Drag-and-drop sub-components ─────────────────────────────────────────────
 
-function resolveField(raw: string): string {
-  return FIELD_MAP[raw.trim().toLowerCase()] ?? `LLC_BI__Loan__c.${raw.trim()}`;
+function DroppableCategory({
+  id,
+  isSelected,
+  isOver,
+  onClick,
+  children,
+}: {
+  id: string;
+  isSelected: boolean;
+  isOver: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  const { setNodeRef } = useDroppable({ id });
+  return (
+    <li
+      ref={setNodeRef}
+      onClick={onClick}
+      className={`flex items-center justify-between rounded px-3 py-1.5 cursor-pointer text-sm transition-colors ${
+        isOver
+          ? "bg-blue-100 ring-2 ring-[var(--color-blue)] ring-inset"
+          : isSelected
+          ? "bg-slate-100 text-slate-900 font-medium"
+          : "hover:bg-slate-50 text-slate-800"
+      }`}
+    >
+      {children}
+    </li>
+  );
 }
 
-function translateCriteria(english: string): string {
-  if (!english.trim()) return "";
-  const parts = english.split(/\b(AND|OR)\b/i);
-  const conditions: { field: string; value: string; negate: boolean }[] = [];
-  const connectors: string[] = [];
-  for (const token of parts) {
-    const t = token.trim();
-    if (/^AND$/i.test(t)) { connectors.push("AND"); continue; }
-    if (/^OR$/i.test(t))  { connectors.push("OR");  continue; }
-    if (!t) continue;
-    const m = t.match(/^(.+?)\s*(?:is(?:\s+not)?|!=|=)\s*(.+)$/i);
-    if (!m) continue;
-    const negate = /\bis\s+not\b/i.test(t) || t.includes("!=");
-    conditions.push({ field: resolveField(m[1]), value: m[2].trim(), negate });
-  }
-  if (conditions.length === 0) return "";
-  let expr = "1";
-  for (let i = 1; i < conditions.length; i++) expr += ` ${connectors[i - 1] ?? "AND"} ${i + 1}`;
-  const tags = conditions.map((c, i) =>
-    `{{COND="${i + 1}" FIELD="${c.field}" IS="${c.value}"${c.negate ? ' NEGATE="True"' : ""}}}`,
-  ).join("");
-  return `{{IF="${expr}"}}${tags}__GUID__{{ENDIF}}`;
+function DraggablePlaceholder({
+  placeholder,
+  usedPlaceholderNames,
+  usedPlaceholderMap,
+  onDelete,
+  onEdit,
+}: {
+  placeholder: Placeholder;
+  usedPlaceholderNames: Set<string>;
+  usedPlaceholderMap: Map<string, string[]>;
+  onDelete: () => void;
+  onEdit: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: placeholder._id,
+    data: { placeholder },
+  });
+
+  return (
+    <li
+      ref={setNodeRef}
+      className={`group flex items-start gap-1 rounded px-2 py-1.5 text-sm text-slate-800 transition-opacity ${
+        isDragging ? "opacity-30" : "hover:bg-slate-50"
+      }`}
+    >
+      {/* Drag handle */}
+      <span
+        {...listeners}
+        {...attributes}
+        className="cursor-grab shrink-0 text-slate-300 hover:text-slate-500 px-0.5 touch-none"
+        title="Drag to move to another category"
+      >
+        ⠿
+      </span>
+      <span className="flex-1 min-w-0 flex flex-wrap items-center gap-1.5 break-words">
+        <span className="break-words">{placeholder.name}</span>
+        {placeholder.fromChecklist && usedPlaceholderNames.has(placeholder.name) && (
+          <span className="shrink-0 rounded px-1 py-0.5 text-[9px] font-medium bg-amber-100 text-amber-700 border border-amber-200">
+            from Smart Checklist
+          </span>
+        )}
+      </span>
+      <div className="hidden group-hover:flex gap-1 shrink-0">
+        {placeholder.fromChecklist ? (
+          <span
+            title="Added from Smart Checklist — edit it there"
+            className="rounded px-1.5 py-0.5 text-[10px] text-slate-300 cursor-not-allowed"
+          >Edit</span>
+        ) : (
+          <button
+            onClick={onEdit}
+            className="rounded px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-slate-700 hover:bg-slate-100"
+          >Edit</button>
+        )}
+        {usedPlaceholderNames.has(placeholder.name) ? (
+          <span
+            title={`Used by: ${(usedPlaceholderMap.get(placeholder.name) ?? []).join(", ")} — remove from checklist first`}
+            className="rounded px-1.5 py-0.5 text-[10px] text-slate-300 cursor-not-allowed"
+          >✕</span>
+        ) : (
+          <button
+            onClick={onDelete}
+            className="rounded px-1.5 py-0.5 text-[10px] text-red-400 hover:text-red-600 hover:bg-red-50"
+          >✕</button>
+        )}
+      </div>
+    </li>
+  );
 }
 
 // ── Placeholder Builder Dialog ────────────────────────────────────────────────
@@ -97,11 +176,15 @@ function PlaceholderBuilderDialog({
   onOpenChange,
   placeholders,
   cardId,
+  usedPlaceholderNames,
+  usedPlaceholderMap,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   placeholders: Placeholder[];
   cardId: Id<"cards">;
+  usedPlaceholderNames: Set<string>;
+  usedPlaceholderMap: Map<string, string[]>;
 }) {
   const createPlaceholder = useMutation(api.docman.createPlaceholder);
   const updatePlaceholder = useMutation(api.docman.updatePlaceholder);
@@ -109,24 +192,39 @@ function PlaceholderBuilderDialog({
 
   const [selectedLevel, setSelectedLevel] = useState<DocmanLevel>(LEVELS[0]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  // Categories added by the user but not yet backed by a placeholder
   const [localCategories, setLocalCategories] = useState<string[]>([]);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newName, setNewName] = useState("");
   const [editingId, setEditingId] = useState<Id<"docmanPlaceholders"> | null>(null);
   const [editName, setEditName] = useState("");
-  const [editCategory, setEditCategory] = useState("");
+  const [dragOverCategory, setDragOverCategory] = useState<string | null | "__none__">(undefined as unknown as null);
+  const [activeDragName, setActiveDragName] = useState<string | null>(null);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+
+  const snapToPointer: Modifier = ({ activatorEvent, draggingNodeRect, transform }) => {
+    if (draggingNodeRect && activatorEvent instanceof PointerEvent) {
+      const offsetX = activatorEvent.clientX - draggingNodeRect.left;
+      const offsetY = activatorEvent.clientY - draggingNodeRect.top;
+      return { ...transform, x: transform.x + draggingNodeRect.width / 2 - offsetX, y: transform.y + draggingNodeRect.height / 2 - offsetY };
+    }
+    return transform;
+  };
 
   const levelPlaceholders = placeholders.filter((p) => p.level === selectedLevel);
 
-  // Merge categories from existing placeholders + locally added ones
+  function isNoCat(p: Placeholder) {
+    return !p.category || p.category === "No category";
+  }
+
   const categories = useMemo(() => {
-    const fromPlaceholders = levelPlaceholders.map((p) => p.category).filter(Boolean) as string[];
+    const fromPlaceholders = levelPlaceholders
+      .map((p) => p.category)
+      .filter((c): c is string => !!c && c !== "No category");
     const merged = new Set([...fromPlaceholders, ...localCategories]);
     return [...merged].sort();
   }, [levelPlaceholders.map((p) => p.category).join(","), localCategories.join(",")]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // When level changes, reset category selection and local categories
   function selectLevel(level: DocmanLevel) {
     setSelectedLevel(level);
     setSelectedCategory(null);
@@ -136,7 +234,7 @@ function PlaceholderBuilderDialog({
 
   const filteredByCategory = selectedCategory
     ? levelPlaceholders.filter((p) => p.category === selectedCategory)
-    : levelPlaceholders.filter((p) => !p.category);
+    : levelPlaceholders.filter(isNoCat);
 
   function handleAddCategory() {
     const name = newCategoryName.trim();
@@ -156,14 +254,57 @@ function PlaceholderBuilderDialog({
   async function handleSaveEdit(id: Id<"docmanPlaceholders">) {
     const name = editName.trim();
     if (!name) { setEditingId(null); return; }
-    await updatePlaceholder({ id, name, category: editCategory || undefined });
+    await updatePlaceholder({ id, name });
     setEditingId(null);
   }
 
-  // Count placeholders per category for the badge
   function catCount(cat: string | null) {
-    return levelPlaceholders.filter((p) => (cat === null ? !p.category : p.category === cat)).length;
+    return levelPlaceholders.filter((p) => (cat === null ? isNoCat(p) : p.category === cat)).length;
   }
+
+  function handleDragStart({ active }: { active: { data: { current?: { placeholder?: Placeholder } } } }) {
+    setActiveDragName(active.data.current?.placeholder?.name ?? null);
+  }
+
+  function handleDragOver({ over }: DragOverEvent) {
+    setDragOverCategory(over ? (over.id === "__no_category__" ? null : String(over.id)) : undefined as unknown as null);
+  }
+
+  async function handleDragEnd({ active, over }: DragEndEvent) {
+    setActiveDragName(null);
+    setDragOverCategory(undefined as unknown as null);
+    if (!over) return;
+    const ph = (active.data.current as { placeholder: Placeholder }).placeholder;
+    const targetCat = over.id === "__no_category__" ? undefined : String(over.id);
+    const currentCat = ph.category === "No category" ? undefined : (ph.category ?? undefined);
+    if (targetCat === currentCat) return;
+    await updatePlaceholder({ id: ph._id, category: targetCat });
+  }
+
+  // Droppable for "No category" — needs its own component instance
+  const NoCategoryDroppable = () => {
+    const { setNodeRef: setNoCatRef, isOver: noCatIsOver } = useDroppable({ id: "__no_category__" });
+    return (
+      <li
+        ref={setNoCatRef}
+        onClick={() => setSelectedCategory(null)}
+        className={`flex items-center justify-between rounded px-3 py-1.5 cursor-pointer text-sm transition-colors ${
+          noCatIsOver
+            ? "bg-blue-100 ring-2 ring-[var(--color-blue)] ring-inset"
+            : selectedCategory === null
+            ? "bg-slate-100 text-slate-900 font-medium"
+            : "hover:bg-slate-50 text-slate-500 italic"
+        }`}
+      >
+        <span>No category</span>
+        {catCount(null) > 0 && (
+          <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-slate-200 text-slate-600">
+            {catCount(null)}
+          </span>
+        )}
+      </li>
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -171,111 +312,102 @@ function PlaceholderBuilderDialog({
         <DialogHeader>
           <DialogTitle>Placeholder Builder</DialogTitle>
         </DialogHeader>
+        <p className="text-xs text-slate-500 -mt-1">Drag placeholders onto a category to move them.</p>
 
-        <div className="grid grid-cols-3 gap-0 divide-x divide-slate-200 rounded-lg border border-slate-200 overflow-hidden min-h-[380px]">
-          {/* Col 1: Level */}
-          <div className="flex flex-col">
-            <div className="bg-blue-50 border-b border-slate-200 px-3 py-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-blue-700">Level</p>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={pointerWithin}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="grid grid-cols-3 gap-0 divide-x divide-slate-200 rounded-lg border border-slate-200 overflow-hidden">
+            {/* Col 1: Level */}
+            <div className="flex flex-col">
+              <div className="bg-blue-50 border-b border-slate-200 px-3 py-2">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-blue-700">Level</p>
+              </div>
+              <ul className="p-1.5 space-y-0.5">
+                {LEVELS.map((level) => {
+                  const count = placeholders.filter((p) => p.level === level).length;
+                  return (
+                    <li
+                      key={level}
+                      onClick={() => selectLevel(level)}
+                      className={`flex items-center justify-between rounded px-3 py-2 cursor-pointer text-sm ${
+                        selectedLevel === level
+                          ? "bg-[var(--color-blue)]/10 text-[var(--color-blue)] font-medium"
+                          : "hover:bg-slate-50 text-slate-800"
+                      }`}
+                    >
+                      <span>{level}</span>
+                      {count > 0 && (
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${LEVEL_COLOURS[level].badge}`}>
+                          {count}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-            <ul className="flex-1 p-1.5 space-y-0.5">
-              {LEVELS.map((level) => {
-                const count = placeholders.filter((p) => p.level === level).length;
-                return (
-                  <li
-                    key={level}
-                    onClick={() => selectLevel(level)}
-                    className={`flex items-center justify-between rounded px-3 py-2 cursor-pointer text-sm ${
-                      selectedLevel === level
-                        ? "bg-[var(--color-blue)]/10 text-[var(--color-blue)] font-medium"
-                        : "hover:bg-slate-50 text-slate-800"
-                    }`}
-                  >
-                    <div>
-                      <div>{level}</div>
-                    </div>
-                    {count > 0 && (
-                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${LEVEL_COLOURS[level].badge}`}>
-                        {count}
-                      </span>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
 
-          {/* Col 2: Category */}
-          <div className="flex flex-col">
-            <div className={`border-b border-slate-200 px-3 py-2 ${LEVEL_COLOURS[selectedLevel].header}`}>
-              <p className="text-[11px] font-semibold uppercase tracking-wide">Category</p>
+            {/* Col 2: Category (droppable targets) */}
+            <div className="flex flex-col">
+              <div className={`border-b border-slate-200 px-3 py-2 ${LEVEL_COLOURS[selectedLevel].header}`}>
+                <p className="text-[11px] font-semibold uppercase tracking-wide">Category</p>
+              </div>
+              <ul className="overflow-y-auto p-1.5 space-y-0.5" style={{ height: "calc(13 * 2rem)" }}>
+                <NoCategoryDroppable />
+                {categories.map((cat) => {
+                  const isOver = dragOverCategory === cat;
+                  return (
+                    <DroppableCategory
+                      key={cat}
+                      id={cat}
+                      isSelected={selectedCategory === cat}
+                      isOver={isOver}
+                      onClick={() => setSelectedCategory(cat)}
+                    >
+                      <span className="truncate">{cat}</span>
+                      {catCount(cat) > 0 && (
+                        <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ml-1 shrink-0 ${
+                          selectedCategory === cat ? LEVEL_COLOURS[selectedLevel].badge : "bg-slate-100 text-slate-500"
+                        }`}>
+                          {catCount(cat)}
+                        </span>
+                      )}
+                    </DroppableCategory>
+                  );
+                })}
+              </ul>
+              <div className="border-t border-slate-200 p-2 flex gap-1.5">
+                <Input
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleAddCategory(); }}
+                  placeholder="New category…"
+                  className="h-7 text-xs"
+                />
+                <Button size="sm" onClick={handleAddCategory} className="h-7 px-2 text-xs shrink-0">+ Add</Button>
+              </div>
             </div>
-            <ul className="flex-1 overflow-auto p-1.5 space-y-0.5">
-              {/* "No category" option */}
-              <li
-                onClick={() => setSelectedCategory(null)}
-                className={`flex items-center justify-between rounded px-3 py-1.5 cursor-pointer text-sm ${
-                  selectedCategory === null
-                    ? "bg-slate-100 text-slate-900 font-medium"
-                    : "hover:bg-slate-50 text-slate-500 italic"
-                }`}
-              >
-                <span>No category</span>
-                {catCount(null) > 0 && (
-                  <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold bg-slate-200 text-slate-600">
-                    {catCount(null)}
-                  </span>
+
+            {/* Col 3: Placeholders (draggable) */}
+            <div className="flex flex-col">
+              <div className={`border-b border-slate-200 px-3 py-2 ${LEVEL_COLOURS[selectedLevel].header}`}>
+                <p className="text-[11px] font-semibold uppercase tracking-wide">
+                  Placeholders{selectedCategory ? ` — ${selectedCategory}` : " — No category"}
+                </p>
+                <p className="text-[10px] opacity-70 mt-0.5">LLC_BI__ClosingChecklist__c.Name</p>
+              </div>
+              <ul className="overflow-y-auto p-1.5 space-y-0.5" style={{ height: "calc(13 * 2rem)" }}>
+                {filteredByCategory.length === 0 && (
+                  <li className="px-2 py-2 text-xs text-slate-400 italic">No placeholders yet.</li>
                 )}
-              </li>
-              {categories.map((cat) => (
-                <li
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`flex items-center justify-between rounded px-3 py-1.5 cursor-pointer text-sm ${
-                    selectedCategory === cat
-                      ? `${LEVEL_COLOURS[selectedLevel].badge} font-medium`
-                      : "hover:bg-slate-50 text-slate-800"
-                  }`}
-                >
-                  <span className="truncate">{cat}</span>
-                  {catCount(cat) > 0 && (
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ml-1 shrink-0 ${
-                      selectedCategory === cat ? LEVEL_COLOURS[selectedLevel].badge : "bg-slate-100 text-slate-500"
-                    }`}>
-                      {catCount(cat)}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-            <div className="border-t border-slate-200 p-2 flex gap-1.5">
-              <Input
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleAddCategory(); }}
-                placeholder="New category…"
-                className="h-7 text-xs"
-              />
-              <Button size="sm" onClick={handleAddCategory} className="h-7 px-2 text-xs shrink-0">+ Add</Button>
-            </div>
-          </div>
-
-          {/* Col 3: Placeholders */}
-          <div className="flex flex-col">
-            <div className={`border-b border-slate-200 px-3 py-2 ${LEVEL_COLOURS[selectedLevel].header}`}>
-              <p className="text-[11px] font-semibold uppercase tracking-wide">
-                Placeholders{selectedCategory ? ` — ${selectedCategory}` : " — No category"}
-              </p>
-              <p className="text-[10px] opacity-70 mt-0.5">LLC_BI__ClosingChecklist__c.Name</p>
-            </div>
-            <ul className="flex-1 overflow-auto p-1.5 space-y-0.5">
-              {filteredByCategory.length === 0 && (
-                <li className="px-2 py-2 text-xs text-slate-400 italic">No placeholders yet.</li>
-              )}
-              {filteredByCategory.map((p) => (
-                <li key={p._id} className="group flex items-center gap-1 rounded px-2 py-1.5 text-sm hover:bg-slate-50 text-slate-800">
-                  {editingId === p._id ? (
-                    <div className="flex flex-col gap-1 flex-1">
+                {filteredByCategory.map((p) => (
+                  editingId === p._id ? (
+                    <li key={p._id} className="px-2 py-1.5">
                       <Input
                         autoFocus
                         value={editName}
@@ -288,41 +420,41 @@ function PlaceholderBuilderDialog({
                         placeholder="Name"
                         className="h-6 text-xs"
                       />
-                      <Input
-                        value={editCategory}
-                        onChange={(e) => setEditCategory(e.target.value)}
-                        placeholder="Category (optional)"
-                        className="h-6 text-xs"
-                      />
-                    </div>
+                    </li>
                   ) : (
-                    <span className="flex-1 truncate">{p.name}</span>
-                  )}
-                  {editingId !== p._id && (
-                    <div className="hidden group-hover:flex gap-1 shrink-0">
-                      <button
-                        onClick={() => { setEditingId(p._id); setEditName(p.name); setEditCategory(p.category ?? ""); }}
-                        className="rounded px-1.5 py-0.5 text-[10px] text-slate-400 hover:text-slate-700 hover:bg-slate-100"
-                      >Edit</button>
-                      <button onClick={() => deletePlaceholder({ id: p._id })}
-                        className="rounded px-1.5 py-0.5 text-[10px] text-red-400 hover:text-red-600 hover:bg-red-50">✕</button>
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
-            <div className="border-t border-slate-200 p-2 flex gap-1.5">
-              <Input
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); }}
-                placeholder="Add placeholder…"
-                className="h-7 text-xs"
-              />
-              <Button size="sm" onClick={handleAdd} className="h-7 px-2 text-xs shrink-0">+ Add</Button>
+                    <DraggablePlaceholder
+                      key={p._id}
+                      placeholder={p}
+                      usedPlaceholderNames={usedPlaceholderNames}
+                      usedPlaceholderMap={usedPlaceholderMap}
+                      onDelete={() => deletePlaceholder({ id: p._id })}
+                      onEdit={() => { setEditingId(p._id); setEditName(p.name); }}
+                    />
+                  )
+                ))}
+              </ul>
+              <div className="border-t border-slate-200 p-2 flex gap-1.5">
+                <Input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") handleAdd(); }}
+                  placeholder="Add placeholder…"
+                  className="h-7 text-xs"
+                />
+                <Button size="sm" onClick={handleAdd} className="h-7 px-2 text-xs shrink-0">+ Add</Button>
+              </div>
             </div>
           </div>
-        </div>
+
+          {/* Floating drag ghost */}
+          <DragOverlay modifiers={[snapToPointer]}>
+            {activeDragName && (
+              <div className="rounded bg-white shadow-lg border border-[var(--color-blue)] px-3 py-1.5 text-sm text-slate-800 font-medium pointer-events-none">
+                {activeDragName}
+              </div>
+            )}
+          </DragOverlay>
+        </DndContext>
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Close</Button>
@@ -739,6 +871,7 @@ export function DocmanTool({
     api.docman.listForCard,
     cardId ? { cardId } : "skip",
   ) as { groups: Group[]; placeholders: Placeholder[] } | undefined;
+  const checklistReqs = useQuery(api.checklist.listForProject, { projectId });
   const bulkImport = useMutation(api.docman.bulkImport);
 
   const [activeLevel, setActiveLevel] = useState<DocmanLevel>(LEVELS[0]);
@@ -749,6 +882,18 @@ export function DocmanTool({
 
   const groups = raw?.groups ?? [];
   const placeholders = raw?.placeholders ?? [];
+
+  // Map of placeholder name → checklist item names that reference it
+  const usedPlaceholderMap = useMemo(() => {
+    const map = new Map<string, string[]>();
+    for (const r of checklistReqs ?? []) {
+      if (!r.placeholderName) continue;
+      if (!map.has(r.placeholderName)) map.set(r.placeholderName, []);
+      map.get(r.placeholderName)!.push(r.name || "(unnamed)");
+    }
+    return map;
+  }, [checklistReqs]);
+  const usedPlaceholderNames = useMemo(() => new Set(usedPlaceholderMap.keys()), [usedPlaceholderMap]);
 
   // All hooks must be called before any early returns
   const exportData: DocmanExport = useMemo(() => {
@@ -834,8 +979,11 @@ export function DocmanTool({
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setImportOpen(true)} disabled={isLocked}>Import</Button>
-          <Button variant="outline" size="sm" onClick={() => downloadDocmanExcel(exportData)}>Export Excel</Button>
-          <Button variant="outline" size="sm" onClick={() => setYamlOpen(true)}>Export YAML</Button>
+          <ExportButton
+            size="sm"
+            onExcelClick={() => downloadDocmanExcel(exportData)}
+            onYamlClick={() => setYamlOpen(true)}
+          />
           <Button variant="outline" onClick={() => setPlaceholderBuilderOpen(true)} disabled={isLocked}>
             Placeholder Builder
           </Button>
@@ -888,6 +1036,8 @@ export function DocmanTool({
         onOpenChange={setPlaceholderBuilderOpen}
         placeholders={placeholders}
         cardId={cardId}
+        usedPlaceholderNames={usedPlaceholderNames}
+        usedPlaceholderMap={usedPlaceholderMap}
       />
 
       <YamlExportModal

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useBuilderLock } from "@/lib/use-builder-lock";
 import { LockedBanner } from "@/components/ui/locked-banner";
 import { useMutation, useQuery } from "convex/react";
@@ -24,6 +25,7 @@ import {
 } from "@/lib/picklist-defaults";
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
+import { ExportButton } from "@/components/ui/export-button";
 import {
   buildChecklistYaml,
   downloadChecklistYaml,
@@ -34,6 +36,7 @@ import {
   type ChecklistLevel,
 } from "@/lib/export-import";
 import { toast } from "sonner";
+import { translateCriteria } from "@/lib/formgen";
 
 const CHECKLIST_LEVELS: ChecklistLevel[] = ["Loan", "Relationship"];
 
@@ -53,6 +56,9 @@ export function ChecklistTool({
   const update = useMutation(api.checklist.update);
   const remove = useMutation(api.checklist.remove);
   const bulkImport = useMutation(api.checklist.bulkImport);
+  const syncDocmanPlaceholders = useMutation(api.docman.syncFromChecklist);
+
+  const docmanPlaceholders = useQuery(api.docman.listPlaceholdersForProject, { projectId }) ?? [];
 
   const [activeLevel, setActiveLevel] = useState<ChecklistLevel>("Loan");
   const [selectedId, setSelectedId] = useState<Id<"checklistReqs"> | null>(null);
@@ -62,14 +68,19 @@ export function ChecklistTool({
   const { isLocked, toggleLock } = useBuilderLock(projectId, "checklist");
 
   const stored = useQuery(api.picklists.listForScope, { scope: "checklist" });
+  const stagesData = useQuery(api.stages.listForProject, { projectId });
   const picklistMap = useMemo(() => {
     const m = new Map<string, string[]>();
     for (const k of Object.keys(CHECKLIST_PICKLISTS)) {
       m.set(k, CHECKLIST_PICKLISTS[k]);
     }
     if (stored) for (const p of stored) m.set(p.key, p.values);
+    // neededBy is always driven by stages — override any stored/default values
+    if (stagesData) {
+      m.set("neededBy", stagesData.stages.map((s) => s.name));
+    }
     return m;
-  }, [stored]);
+  }, [stored, stagesData]);
 
   const visibleRecords = useMemo(
     () => (records ?? []).filter((r) => (r.checklistLevel ?? "Loan") === activeLevel),
@@ -99,11 +110,9 @@ export function ChecklistTool({
       (records ?? []).map((r) => ({
         name: r.name,
         checklistLevel: (r.checklistLevel as ChecklistLevel | undefined) ?? "Loan",
-        category: r.category,
         assignedParty: r.assignedParty,
         neededBy: r.neededBy,
         description: r.description,
-        legalDescription: r.legalDescription,
         stageCheck: r.stageCheck,
         doNotAutoGenerate: r.doNotAutoGenerate,
         criteriaUserWritten: r.criteriaUserWritten,
@@ -114,8 +123,8 @@ export function ChecklistTool({
   );
 
   const buildPreview = useCallback(
-    (meta: YamlMeta) => buildChecklistYaml(checklistRows, meta, picklistMap),
-    [checklistRows, picklistMap],
+    (meta: YamlMeta) => buildChecklistYaml(checklistRows, meta, picklistMap, docmanPlaceholders),
+    [checklistRows, picklistMap, docmanPlaceholders],
   );
 
   function parseImportFile(text: string, filename: string): ChecklistRecord[] | string {
@@ -127,7 +136,35 @@ export function ChecklistTool({
 
   async function handleImportConfirm(rows: ChecklistRecord[], mode: ImportMode) {
     if (!cardId) return;
-    await bulkImport({ cardId, mode, records: rows });
+    // Auto-generate criteriaGenerated from criteriaUserWritten when absent
+    const enriched = rows.map((r) => ({
+      ...r,
+      criteriaGenerated: r.criteriaGenerated || (r.criteriaUserWritten ? translateCriteria(r.criteriaUserWritten) : undefined) || undefined,
+    }));
+    await bulkImport({ cardId, mode, records: enriched });
+
+    // Sync any new placeholder names to the Document Manager placeholder builder
+    const placeholderNames = [...new Set(rows.map((r) => r.placeholderName).filter(Boolean))] as string[];
+
+    if (placeholderNames.length) {
+      // Sync to Document Manager placeholder builder: Loan → Loans, Relationship → Relationships
+      const docmanPlaceholders = rows
+        .filter((r) => r.placeholderName)
+        .map((r) => ({
+          name: r.placeholderName!,
+          level: (r.checklistLevel === "Relationship" ? "Relationships" : "Loans") as "Loans" | "Relationships",
+        }));
+      // Deduplicate by name+level
+      const seen = new Set<string>();
+      const unique = docmanPlaceholders.filter(({ name, level }) => {
+        const key = `${name}::${level}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      await syncDocmanPlaceholders({ projectId, placeholders: unique });
+    }
+
     toast.success(`Imported ${rows.length} requirement${rows.length !== 1 ? "s" : ""}`);
   }
 
@@ -176,20 +213,11 @@ export function ChecklistTool({
           <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>
             Import
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => downloadChecklistExcel(checklistRows, picklistMap)}
+          <ExportButton
             disabled={records.length === 0}
-          >
-            Export Excel
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setYamlOpen(true)}
-            disabled={records.length === 0}
-          >
-            Export YAML
-          </Button>
+            onExcelClick={() => downloadChecklistExcel(checklistRows, picklistMap, docmanPlaceholders)}
+            onYamlClick={() => setYamlOpen(true)}
+          />
           <Button
             onClick={handleAdd}
             disabled={isLocked}
@@ -222,7 +250,7 @@ export function ChecklistTool({
 
       <div className="grid flex-1 gap-4 overflow-hidden lg:grid-cols-[280px_1fr]">
         {/* List */}
-        <div className="overflow-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+        <div className="rounded-lg border border-slate-200 bg-white shadow-sm overflow-y-auto" style={{ maxHeight: "calc(13 * 2.25rem)" }}>
           {visibleRecords.length === 0 ? (
             <div className="p-6 text-center text-sm text-slate-500">
               No {activeLevel.toLowerCase()} requirements yet.
@@ -274,6 +302,9 @@ export function ChecklistTool({
               allRecords={records}
               picklistMap={picklistMap}
               isLocked={isLocked}
+              projectId={projectId}
+              docmanPlaceholders={docmanPlaceholders}
+              syncDocmanPlaceholders={syncDocmanPlaceholders}
             />
           ) : (
             <div className="text-sm text-slate-500">
@@ -297,7 +328,7 @@ export function ChecklistTool({
         defaultMeta={defaultMeta}
         buildPreview={buildPreview}
         onDownload={(meta) =>
-          downloadChecklistYaml(checklistRows, meta, picklistMap)
+          downloadChecklistYaml(checklistRows, meta, picklistMap, docmanPlaceholders)
         }
       />
 
@@ -329,25 +360,59 @@ function RequirementDetail({
   allRecords,
   picklistMap,
   isLocked,
+  projectId,
+  docmanPlaceholders,
+  syncDocmanPlaceholders,
 }: {
   record: Doc<"checklistReqs">;
   allRecords: Doc<"checklistReqs">[];
   picklistMap: Map<string, string[]>;
   isLocked: boolean;
+  projectId: Id<"projects">;
+  docmanPlaceholders: { _id: string; name: string; level: string }[];
+  syncDocmanPlaceholders: (args: { projectId: Id<"projects">; placeholders: { name: string; level: "Loans" | "Relationships" }[] }) => Promise<unknown>;
 }) {
   const update = useMutation(api.checklist.update);
 
   const [name, setName] = useState(record.name);
-  const [category, setCategory] = useState(record.category ?? "");
   const [assignedParty, setAssignedParty] = useState(record.assignedParty ?? "");
   const [neededBy, setNeededBy] = useState(record.neededBy ?? "");
   const [description, setDescription] = useState(record.description ?? "");
-  const [legalDescription, setLegalDescription] = useState(record.legalDescription ?? "");
   const [stageCheck, setStageCheck] = useState(record.stageCheck ?? false);
   const [doNotAutoGenerate, setDoNotAutoGenerate] = useState(record.doNotAutoGenerate ?? false);
   const [criteriaUserWritten, setCriteriaUserWritten] = useState(record.criteriaUserWritten ?? "");
   const [criteriaGenerated, setCriteriaGenerated] = useState(record.criteriaGenerated ?? "");
   const [placeholderName, setPlaceholderName] = useState(record.placeholderName ?? "");
+  const [addingNewPlaceholder, setAddingNewPlaceholder] = useState(false);
+  const [newPlaceholderInput, setNewPlaceholderInput] = useState("");
+
+  const checklistLevel = record.checklistLevel ?? "Loan";
+  const docmanLevel = checklistLevel === "Relationship" ? "Relationships" : "Loans";
+
+  // Placeholders from Document Manager filtered to this checklist level
+  const levelDocmanOptions = useMemo(
+    () => [...new Set(docmanPlaceholders.filter((p) => p.level === docmanLevel).map((p) => p.name))].sort(),
+    [docmanPlaceholders, docmanLevel],
+  );
+
+  async function handleAddNewPlaceholder() {
+    const trimmed = newPlaceholderInput.trim();
+    if (!trimmed) return;
+    setPlaceholderName(trimmed);
+    setNewPlaceholderInput("");
+    setAddingNewPlaceholder(false);
+    // Sync to docman builder if it doesn't already exist at this level
+    const exists = docmanPlaceholders.some((p) => p.name === trimmed && p.level === docmanLevel);
+    if (!exists) {
+      await syncDocmanPlaceholders({ projectId, placeholders: [{ name: trimmed, level: docmanLevel }] });
+    }
+    // Persist immediately
+    await update({
+      id: record._id,
+      placeholderName: trimmed,
+    });
+    toast.success("Placeholder saved");
+  }
 
   async function persist() {
     const trimmed = name.trim();
@@ -368,11 +433,9 @@ function RequirementDetail({
     await update({
       id: record._id,
       name: trimmed,
-      category: category || undefined,
       assignedParty: assignedParty || undefined,
       neededBy: neededBy || undefined,
       description: description || undefined,
-      legalDescription: legalDescription || undefined,
       stageCheck,
       doNotAutoGenerate,
       criteriaUserWritten: criteriaUserWritten || undefined,
@@ -399,9 +462,6 @@ function RequirementDetail({
         )}
       </div>
       <div>
-        <PicklistField id="req-category" label="Category" value={category} onChange={setCategory} options={picklistMap.get("category") ?? []} disabled={isLocked} />
-      </div>
-      <div>
         <PicklistField id="req-assignee" label="Assignee" value={assignedParty} onChange={setAssignedParty} options={picklistMap.get("assignedParty") ?? []} disabled={isLocked} />
       </div>
       <div>
@@ -416,18 +476,72 @@ function RequirementDetail({
         />
       </div>
       <div>
-        <Label htmlFor="req-legal-desc">Legal Description</Label>
-        <Textarea
-          id="req-legal-desc"
-          rows={2}
-          value={legalDescription}
-          onChange={(e) => setLegalDescription(e.target.value)}
-          onBlur={persist}
-          disabled={isLocked}
-        />
-      </div>
-      <div>
-        <PicklistField id="req-placeholder" label="Document Manager Placeholder" value={placeholderName} onChange={setPlaceholderName} options={picklistMap.get("placeholderName") ?? []} disabled={isLocked} />
+        <Label>Document Manager Placeholder</Label>
+        <Select
+          value={addingNewPlaceholder ? "__add_new__" : (placeholderName || null)}
+          onValueChange={async (v: string | null) => {
+            if (v === "__add_new__") {
+              setAddingNewPlaceholder(true);
+              setNewPlaceholderInput("");
+              return;
+            }
+            setAddingNewPlaceholder(false);
+            setNewPlaceholderInput("");
+            const val = v ?? "";
+            setPlaceholderName(val);
+            await update({ id: record._id, placeholderName: val || undefined });
+          }}
+          disabled={isLocked || addingNewPlaceholder}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select from Document Manager…" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value={null}>— None —</SelectItem>
+            {!isLocked && (
+              <SelectItem value="__add_new__">
+                <span className="flex items-center gap-2 text-[var(--color-blue)] font-medium">
+                  <span className="text-base leading-none">+</span> Add a new placeholder…
+                </span>
+              </SelectItem>
+            )}
+            {levelDocmanOptions.map((opt) => (
+              <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {addingNewPlaceholder && (
+          <div className="mt-1.5 flex gap-1.5">
+            <Input
+              autoFocus
+              value={newPlaceholderInput}
+              onChange={(e) => setNewPlaceholderInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") { e.preventDefault(); handleAddNewPlaceholder(); }
+                if (e.key === "Escape") { setAddingNewPlaceholder(false); setNewPlaceholderInput(""); }
+              }}
+              placeholder="Type new placeholder name…"
+              className="h-7 text-xs"
+            />
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleAddNewPlaceholder}
+              disabled={!newPlaceholderInput.trim()}
+              className="h-7 px-2 text-xs shrink-0"
+            >Add</Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => { setAddingNewPlaceholder(false); setNewPlaceholderInput(""); }}
+              className="h-7 px-2 text-xs shrink-0 text-slate-400"
+            >Cancel</Button>
+          </div>
+        )}
+        <p className="mt-1 text-[11px] text-slate-400 leading-snug">
+          Only {docmanLevel.toLowerCase()} placeholders are shown. New placeholders are automatically added to the Document Manager builder under <span className="font-medium">Placeholder Builder &rarr; No category</span>. On import, any placeholder not yet in Document Manager will also be added there.
+        </p>
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
@@ -437,7 +551,11 @@ function RequirementDetail({
             rows={2}
             value={criteriaUserWritten}
             onChange={(e) => setCriteriaUserWritten(e.target.value)}
-            onBlur={persist}
+            onBlur={() => {
+              const generated = translateCriteria(criteriaUserWritten);
+              if (generated) setCriteriaGenerated(generated);
+              persist();
+            }}
             disabled={isLocked}
           />
         </div>
@@ -480,7 +598,15 @@ function RequirementDetail({
         </label>
       </div>
       {stageCheck && (
-        <PicklistField id="req-needed-by" label="Needed By" value={neededBy} onChange={setNeededBy} options={picklistMap.get("neededBy") ?? []} disabled={isLocked} />
+        <div>
+          <PicklistField id="req-needed-by" label="Needed By" value={neededBy} onChange={setNeededBy} options={picklistMap.get("neededBy") ?? []} disabled={isLocked} />
+          <p className="mt-1 text-xs text-slate-400">
+            Stages are managed in the{" "}
+            <Link href={`/projects/${projectId}/stages`} className="font-medium text-[var(--color-blue)] hover:underline">
+              Stages &amp; UI Builder →
+            </Link>
+          </p>
+        </div>
       )}
       {!isLocked && (
         <div className="flex justify-end pt-2">
@@ -625,9 +751,7 @@ export function ChecklistPreviewPlayground({
               <h4 className="mb-4 text-base font-semibold text-slate-900">{selected.name}</h4>
               <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm">
                 <DetailField label="Assignee" value={selected.assignedParty} />
-                <DetailField label="Category" value={selected.category} />
                 <DetailField label="Description" value={selected.description} wide />
-                <DetailField label="Legal Description" value={selected.legalDescription} wide />
                 <DetailField label="Document Manager Placeholder" value={selected.placeholderName} wide />
                 <div className="col-span-2 flex gap-6">
                   <div className="flex items-center gap-2">

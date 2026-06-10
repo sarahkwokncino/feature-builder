@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 
 const LEVEL_VALIDATOR = v.union(
   v.literal("Relationships"),
@@ -9,6 +10,49 @@ const LEVEL_VALIDATOR = v.union(
 );
 
 // ── Queries ───────────────────────────────────────────────────────────────────
+
+// Returns all docmanPlaceholders across every docman card for a project.
+// Used by the Smart Checklist builder to populate the placeholder dropdown.
+export const listPlaceholdersForProject = query({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, { projectId }) => {
+    const heatmaps = await ctx.db
+      .query("heatmaps")
+      .withIndex("byProject", (q) => q.eq("projectId", projectId))
+      .collect();
+
+    const results: Array<{ _id: string; name: string; level: string }> = [];
+    for (const hm of heatmaps) {
+      const phases = await ctx.db
+        .query("phases")
+        .withIndex("byHeatmap", (q) => q.eq("heatmapId", hm._id))
+        .collect();
+      for (const phase of phases) {
+        const subphases = await ctx.db
+          .query("subphases")
+          .withIndex("byPhase", (q) => q.eq("phaseId", phase._id))
+          .collect();
+        for (const sp of subphases) {
+          const cards = await ctx.db
+            .query("cards")
+            .withIndex("bySubphase", (q) => q.eq("subphaseId", sp._id))
+            .collect();
+          for (const card of cards) {
+            if (card.configuratorKind !== "docman") continue;
+            const phs = await ctx.db
+              .query("docmanPlaceholders")
+              .withIndex("byCard", (q) => q.eq("cardId", card._id))
+              .collect();
+            for (const p of phs) {
+              results.push({ _id: p._id, name: p.name, level: p.level });
+            }
+          }
+        }
+      }
+    }
+    return results;
+  },
+});
 
 export const listForCard = query({
   args: { cardId: v.id("cards") },
@@ -124,6 +168,98 @@ export const deletePlaceholder = mutation({
   args: { id: v.id("docmanPlaceholders") },
   handler: async (ctx, { id }) => {
     await ctx.db.delete(id);
+  },
+});
+
+// ── Sync from Checklist import ────────────────────────────────────────────────
+// Called after a checklist import. For each placeholder name, finds the docman
+// card(s) for the project, and inserts the placeholder if it doesn't exist yet.
+export const syncFromChecklist = mutation({
+  args: {
+    projectId: v.id("projects"),
+    placeholders: v.array(
+      v.object({
+        name: v.string(),
+        level: v.union(v.literal("Loans"), v.literal("Relationships")),
+      }),
+    ),
+  },
+  handler: async (ctx, { projectId, placeholders }) => {
+    if (!placeholders.length) return;
+
+    // Find all cards with configuratorKind === "docman" for this project by
+    // walking project → heatmaps → phases → subphases → cards.
+    const heatmaps = await ctx.db
+      .query("heatmaps")
+      .withIndex("byProject", (q) => q.eq("projectId", projectId))
+      .collect();
+
+    const docmanCardIds: Id<"cards">[] = [];
+    for (const hm of heatmaps) {
+      const phases = await ctx.db
+        .query("phases")
+        .withIndex("byHeatmap", (q) => q.eq("heatmapId", hm._id))
+        .collect();
+      for (const phase of phases) {
+        const subphases = await ctx.db
+          .query("subphases")
+          .withIndex("byPhase", (q) => q.eq("phaseId", phase._id))
+          .collect();
+        for (const sp of subphases) {
+          const cards = await ctx.db
+            .query("cards")
+            .withIndex("bySubphase", (q) => q.eq("subphaseId", sp._id))
+            .collect();
+          for (const card of cards) {
+            if (card.configuratorKind === "docman") {
+              docmanCardIds.push(card._id);
+            }
+          }
+        }
+      }
+    }
+
+    if (!docmanCardIds.length) return;
+
+    const now = Date.now();
+
+    for (const cardId of docmanCardIds) {
+      // Load existing placeholders for this card once
+      const existing = await ctx.db
+        .query("docmanPlaceholders")
+        .withIndex("byCard", (q) => q.eq("cardId", cardId))
+        .collect();
+
+      for (const { name, level } of placeholders) {
+        const alreadyExists = existing.some(
+          (p) => p.name === name && p.level === level,
+        );
+        if (alreadyExists) continue;
+
+        const order = existing.length;
+        const id = await ctx.db.insert("docmanPlaceholders", {
+          cardId,
+          name,
+          level,
+          category: "No category",
+          fromChecklist: true,
+          order,
+          createdAt: now,
+        });
+        // Keep local list in sync so duplicate detection works within the loop
+        existing.push({
+          _id: id,
+          _creationTime: now,
+          cardId,
+          name,
+          level,
+          category: "No category",
+          fromChecklist: true,
+          order,
+          createdAt: now,
+        });
+      }
+    }
   },
 });
 

@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
+import { ExportButton } from "@/components/ui/export-button";
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import {
   buildInvolvementTypesYaml,
@@ -308,8 +309,10 @@ export function EntityInvolvementTool({ projectId }: { projectId: Id<"projects">
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={() => setManageOpen(true)} disabled={isLocked}>Manage Involvement Types</Button>
           <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>Import</Button>
-          <Button variant="outline" onClick={() => downloadInvolvementTypesExcel(asRecords())}>Export Excel</Button>
-          <Button variant="outline" onClick={() => setYamlOpen(true)}>Export YAML</Button>
+          <ExportButton
+            onExcelClick={() => downloadInvolvementTypesExcel(asRecords())}
+            onYamlClick={() => setYamlOpen(true)}
+          />
         </div>
       </div>
 

@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
+import { ExportButton } from "@/components/ui/export-button";
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import { buildProductHierarchyYaml, parseProductHierarchyYaml, downloadProductHierarchyExcel, parseProductHierarchyExcel, type ProductHierarchyExport } from "@/lib/product-hierarchy-export";
 import { toast } from "sonner";
@@ -529,20 +530,11 @@ export function ProductHierarchyTool({ projectId }: { projectId: Id<"projects"> 
             Manage picklists
           </Button>
           <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>Import</Button>
-          <Button
-            variant="outline"
-            onClick={() => downloadProductHierarchyExcel(exportData)}
+          <ExportButton
             disabled={lines.length === 0}
-          >
-            Export Excel
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setYamlOpen(true)}
-            disabled={lines.length === 0}
-          >
-            Export YAML
-          </Button>
+            onExcelClick={() => downloadProductHierarchyExcel(exportData)}
+            onYamlClick={() => setYamlOpen(true)}
+          />
         </div>
       </div>
 

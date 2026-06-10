@@ -175,6 +175,7 @@ export default defineSchema({
     // category → exported as LLC_BI__DocType__c.Name; required on ClosingChecklist but optional here
     category: v.optional(v.string()),
     isDefault: v.optional(v.boolean()),         // always generated for this level
+    fromChecklist: v.optional(v.boolean()),     // true when auto-synced from checklist import
     order: v.number(),
     createdAt: v.number(),
   }).index("byCard", ["cardId"]),

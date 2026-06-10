@@ -68,6 +68,56 @@ export const remove = mutation({
   },
 });
 
+export const bulkImport = mutation({
+  args: {
+    projectId: v.id("projects"),
+    mode: v.union(v.literal("replace"), v.literal("append")),
+    records: v.array(
+      v.object({
+        type: v.string(),
+        name: v.string(),
+        severities: v.array(v.string()),
+        mitigationReasons: v.array(
+          v.object({ reason: v.string(), commentRequired: v.boolean() }),
+        ),
+      }),
+    ),
+  },
+  handler: async (ctx, { projectId, mode, records }) => {
+    if (mode === "replace") {
+      const existing = await ctx.db
+        .query("policyExceptions")
+        .withIndex("byProject", (q) => q.eq("projectId", projectId))
+        .collect();
+      for (const r of existing) await ctx.db.delete(r._id);
+    }
+
+    const now = Date.now();
+    let startOrder = 0;
+    if (mode === "append") {
+      const existing = await ctx.db
+        .query("policyExceptions")
+        .withIndex("byProject", (q) => q.eq("projectId", projectId))
+        .collect();
+      startOrder = existing.reduce((m, r) => Math.max(m, r.order), -1) + 1;
+    }
+
+    for (let i = 0; i < records.length; i++) {
+      const r = records[i];
+      await ctx.db.insert("policyExceptions", {
+        projectId,
+        type: r.type,
+        name: r.name,
+        severities: r.severities,
+        mitigationReasons: r.mitigationReasons,
+        order: startOrder + i,
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+  },
+});
+
 export const reorder = mutation({
   args: {
     projectId: v.id("projects"),

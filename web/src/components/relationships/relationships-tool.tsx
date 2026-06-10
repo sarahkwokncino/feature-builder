@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
+import { ExportButton } from "@/components/ui/export-button";
 import { ImportDialog, type ImportMode } from "@/components/import-dialog";
 import {
   buildRelationshipsYaml,
@@ -957,26 +958,24 @@ export function RelationshipsTool({ projectId }: { projectId: Id<"projects"> }) 
           <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>
             Import
           </Button>
-          <Button variant="outline" onClick={() => {
-            const resolved: RelationshipFieldConfig[] = (allFieldConfigs ?? []).map((c) => {
-              const linked = (c as any).linkedTo;
-              if (!linked) return c as RelationshipFieldConfig;
-              const source = (allFieldConfigs ?? []).find(
-                (s) => s.relationshipType === linked.relationshipType,
-              );
-              return {
-                relationshipType: c.relationshipType,
-                sections: (source?.sections ?? []) as RelationshipFieldConfig["sections"],
-              };
-            });
-            const allExportTypes = [...SYSTEM_TYPES, ...userTypes];
-            downloadRelationshipsExcel(allExportTypes, resolved, hiddenSystemTypes);
-          }}>
-            Export Excel
-          </Button>
-          <Button variant="outline" onClick={() => setYamlOpen(true)}>
-            Export YAML
-          </Button>
+          <ExportButton
+            onExcelClick={() => {
+              const resolved: RelationshipFieldConfig[] = (allFieldConfigs ?? []).map((c) => {
+                const linked = (c as any).linkedTo;
+                if (!linked) return c as RelationshipFieldConfig;
+                const source = (allFieldConfigs ?? []).find(
+                  (s) => s.relationshipType === linked.relationshipType,
+                );
+                return {
+                  relationshipType: c.relationshipType,
+                  sections: (source?.sections ?? []) as RelationshipFieldConfig["sections"],
+                };
+              });
+              const allExportTypes = [...SYSTEM_TYPES, ...userTypes];
+              downloadRelationshipsExcel(allExportTypes, resolved, hiddenSystemTypes);
+            }}
+            onYamlClick={() => setYamlOpen(true)}
+          />
         </div>
       </div>
 

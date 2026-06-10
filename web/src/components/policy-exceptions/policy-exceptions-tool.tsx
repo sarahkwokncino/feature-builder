@@ -2,16 +2,19 @@
 
 import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { usePlaygroundState } from "@/components/stages/playground-state-context";
 import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
+import { ExportButton } from "@/components/ui/export-button";
 import {
   buildPolicyExceptionsYaml,
   downloadPolicyExceptionsYaml,
   downloadPolicyExceptionsExcel,
+  parsePolicyExceptionsFile,
   type PolicyExceptionRecord,
 } from "@/lib/export-import";
 import { POLICY_EXCEPTION_TYPES } from "@/lib/picklist-defaults";
@@ -37,12 +40,18 @@ export function PolicyExceptionsTool({
   const records = useQuery(api.policyExceptions.listForProject, { projectId });
   const create = useMutation(api.policyExceptions.create);
   const remove = useMutation(api.policyExceptions.remove);
+  const bulkImport = useMutation(api.policyExceptions.bulkImport);
   const setPicklistValues = useMutation(api.picklists.setValues);
   const storedPicklists = useQuery(api.picklists.listForScope, { scope: "policy-exceptions" });
 
   const [selectedId, setSelectedId] = useState<Id<"policyExceptions"> | null>(null);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [manageTypesOpen, setManageTypesOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importMode, setImportMode] = useState<"replace" | "append">("append");
+  const [importPreview, setImportPreview] = useState<PolicyExceptionRecord[] | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importFileName, setImportFileName] = useState("");
   const { isLocked, toggleLock } = useBuilderLock(projectId, "policy-exceptions");
   const [newTypeName, setNewTypeName] = useState("");
 
@@ -66,6 +75,45 @@ export function PolicyExceptionsTool({
 
   async function handleRemoveType(type: string) {
     await setPicklistValues({ scope: "policy-exceptions", key: "types", values: allTypes.filter((t) => t !== type) });
+  }
+
+  function handleImportFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImportFileName(file.name);
+    setImportError(null);
+    setImportPreview(null);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string;
+      const result = parsePolicyExceptionsFile(text, file.name);
+      if (typeof result === "string") {
+        setImportError(result);
+      } else {
+        setImportPreview(result);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  async function handleImportConfirm() {
+    if (!importPreview) return;
+    const newTypes = [...new Set(importPreview.map((r) => r.type.trim()).filter(Boolean))].filter(
+      (t) => !allTypes.includes(t),
+    );
+    if (newTypes.length) {
+      await setPicklistValues({
+        scope: "policy-exceptions",
+        key: "types",
+        values: [...allTypes, ...newTypes],
+      });
+    }
+    await bulkImport({ projectId, mode: importMode, records: importPreview });
+    setImportOpen(false);
+    setImportPreview(null);
+    setImportError(null);
+    setImportFileName("");
+    toast.success(`Imported ${importPreview.length} exception${importPreview.length !== 1 ? "s" : ""}`);
   }
 
   // Keep selectedId pointing at a valid record
@@ -153,18 +201,16 @@ export function PolicyExceptionsTool({
           </Button>
           <Button
             variant="outline"
-            onClick={() => downloadPolicyExceptionsExcel(exportRows)}
-            disabled={records.length === 0}
+            disabled={isLocked}
+            onClick={() => { setImportPreview(null); setImportError(null); setImportFileName(""); setImportOpen(true); }}
           >
-            Export Excel
+            Import
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => setYamlOpen(true)}
+          <ExportButton
             disabled={records.length === 0}
-          >
-            Export YAML
-          </Button>
+            onExcelClick={() => downloadPolicyExceptionsExcel(exportRows)}
+            onYamlClick={() => setYamlOpen(true)}
+          />
           <Button
             onClick={handleAdd}
             disabled={isLocked}
@@ -260,6 +306,89 @@ export function PolicyExceptionsTool({
           )}
         </div>
       </div>
+
+      {/* Import dialog */}
+      <Dialog open={importOpen} onOpenChange={setImportOpen}>
+        <DialogContent className="!max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Import Policy Exceptions</DialogTitle>
+          </DialogHeader>
+          <p className="text-xs text-slate-500">
+            Accepts Excel (.xls), YAML (.yaml/.yml), or CSV (.csv) files exported from this builder.
+          </p>
+
+          <div className="space-y-3">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-700">File</label>
+              <input
+                type="file"
+                accept=".xls,.xlsx,.yaml,.yml,.csv"
+                onChange={handleImportFileChange}
+                className="block w-full text-sm text-slate-700 file:mr-3 file:rounded file:border file:border-slate-300 file:bg-white file:px-3 file:py-1 file:text-xs hover:file:bg-slate-50"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-xs font-medium text-slate-700">Import mode</label>
+              <div className="flex gap-4">
+                {(["append", "replace"] as const).map((m) => (
+                  <label key={m} className="flex cursor-pointer items-center gap-2 text-sm">
+                    <input
+                      type="radio"
+                      name="pe-import-mode"
+                      value={m}
+                      checked={importMode === m}
+                      onChange={() => setImportMode(m)}
+                      className="h-4 w-4 border-slate-300"
+                    />
+                    <span className="capitalize">{m}</span>
+                    <span className="text-xs text-slate-400">
+                      {m === "append" ? "(keep existing)" : "(delete existing first)"}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {importError && (
+              <p className="rounded bg-red-50 px-3 py-2 text-xs text-red-700">{importError}</p>
+            )}
+
+            {importPreview && (
+              <div className="rounded border border-slate-200 bg-slate-50 p-3">
+                <p className="mb-2 text-xs font-medium text-slate-700">
+                  Preview — {importPreview.length} exception{importPreview.length !== 1 ? "s" : ""} from &ldquo;{importFileName}&rdquo;
+                </p>
+                <ul className="max-h-48 overflow-y-auto space-y-1">
+                  {importPreview.map((r, i) => (
+                    <li key={i} className="text-xs text-slate-700">
+                      <span className="font-medium">{r.name}</span>
+                      <span className="ml-1 text-slate-400">({r.type})</span>
+                      {r.severities.length > 0 && (
+                        <span className="ml-1 text-slate-400">· {r.severities.join(", ")}</span>
+                      )}
+                      {r.mitigationReasons.length > 0 && (
+                        <span className="ml-1 text-slate-400">· {r.mitigationReasons.length} reason{r.mitigationReasons.length !== 1 ? "s" : ""}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setImportOpen(false)}>Cancel</Button>
+            <Button
+              disabled={!importPreview || !!importError}
+              onClick={handleImportConfirm}
+              className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
+            >
+              Import {importPreview ? `(${importPreview.length})` : ""}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Manage Types dialog */}
       <Dialog open={manageTypesOpen} onOpenChange={setManageTypesOpen}>
@@ -359,7 +488,7 @@ export function PolicyExceptionsPreviewPlayground({
     [records],
   );
 
-  const [added, setAdded] = useState<PreviewException[]>([]);
+  const { addedExceptions: added, setAddedExceptions: setAdded } = usePlaygroundState();
   const [dialogOpen, setDialogOpen] = useState(false);
 
   // dialog state

@@ -51,6 +51,28 @@ export const addValue = mutation({
   },
 });
 
+// Adds any values not already present, in one call.
+export const ensureValues = mutation({
+  args: { scope: SCOPE, key: v.string(), values: v.array(v.string()) },
+  handler: async (ctx, { scope, key, values }) => {
+    const existing = await ctx.db
+      .query("picklists")
+      .withIndex("byScopeKey", (q) => q.eq("scope", scope).eq("key", key))
+      .first();
+    if (existing) {
+      const merged = [...existing.values];
+      for (const v of values) {
+        if (!merged.includes(v)) merged.push(v);
+      }
+      if (merged.length !== existing.values.length) {
+        await ctx.db.patch(existing._id, { values: merged });
+      }
+    } else {
+      await ctx.db.insert("picklists", { scope, key, values });
+    }
+  },
+});
+
 export const removeValue = mutation({
   args: { scope: SCOPE, key: v.string(), value: v.string() },
   handler: async (ctx, { scope, key, value }) => {

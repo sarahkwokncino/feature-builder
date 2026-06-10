@@ -16,8 +16,15 @@ import {
   buildStagesYaml,
   downloadStagesYaml,
   downloadStagesExcel,
+  downloadFeesYaml,
+  downloadConditionsYaml,
+  downloadPolicyExceptionsYaml,
+  downloadAllConfigExcel,
   parseStagesFile,
   type StageImportRow,
+  type FeeRecord,
+  type ConditionRecord,
+  type PolicyExceptionRecord,
 } from "@/lib/export-import";
 import { EntityInvolvementPlayground, ManageInvolvementTypesDialog } from "@/components/entity-involvement/entity-involvement-tool";
 import { CollateralPreviewPlayground } from "@/components/collateral/collateral-tool";
@@ -27,6 +34,7 @@ import { FeesPreviewPlayground } from "@/components/fees/fees-tool";
 import { PolicyExceptionsPreviewPlayground } from "@/components/policy-exceptions/policy-exceptions-tool";
 import { DocmanPreviewPlayground } from "@/components/docman/docman-tool";
 import { ChecklistPreviewPlayground } from "@/components/checklist/checklist-tool";
+import { PlaygroundStateProvider } from "@/components/stages/playground-state-context";
 import { COLLATERAL_TYPE_SUBTYPE_MAP, COLLATERAL_SUBTYPE_KEY_PREFIX } from "@/lib/picklist-defaults";
 
 const ALL_TABS = ["Details", "Document Generation", "Document Manager", "Smart Checklist", "Chatter", "Approval"] as const;
@@ -80,6 +88,12 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
   const addSectionInputRef = useRef<HTMLInputElement>(null);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
+
+  // Data for "All Configuration" export
+  const allFees = useQuery(api.fees.listForProject, { projectId });
+  const allConditions = useQuery(api.conditions.listForProject, { projectId });
+  const allPolicyExceptions = useQuery(api.policyExceptions.listForProject, { projectId });
 
   // Seed default stages/sections on first load (mutation is idempotent)
   useEffect(() => {
@@ -220,7 +234,13 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
             isDefault: s.isDefault,
             isHidden: s.isHidden,
             description: s.description,
-            subsections: s.subsections as StageImportRow["subsections"],
+            subsections: (s.subsections as Subsection[] | undefined)?.map((sub) => ({
+              id: sub.id,
+              name: sub.name,
+              description: sub.description,
+              fields: sub.fields,
+              sections: sub.sections,
+            })),
           })),
       })),
     };
@@ -238,6 +258,7 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
   }
 
   return (
+    <PlaygroundStateProvider>
     <div className="flex h-full flex-col">
       {isLocked && <LockedBanner onUnlock={toggleLock} />}
       {/* Stage path bar */}
@@ -246,8 +267,7 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
           <h2 className="text-lg font-semibold text-slate-900">Stages — {project.name}</h2>
           <div className="flex items-center gap-2">
             <Button size="sm" variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>Import</Button>
-            <Button size="sm" variant="outline" onClick={() => downloadStagesExcel(buildExportData())}>Export Excel</Button>
-            <Button size="sm" variant="outline" onClick={() => setYamlOpen(true)}>Export YAML</Button>
+            <Button size="sm" variant="outline" onClick={() => setExportOpen(true)}>Export</Button>
             <Button
               size="sm"
               onClick={() => { setAddingStage(true); setNewStageName(""); }}
@@ -511,6 +531,72 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
         onDownload={(meta) => downloadStagesYaml(buildExportData(), meta)}
       />
 
+      <ExportDialog
+        open={exportOpen}
+        onOpenChange={setExportOpen}
+        projectName={project.name}
+        onExport={(scope, format) => {
+          const stageMeta = {
+            storyId: "",
+            title: `Stages — ${project.name}`,
+            featureArea: "Stages",
+          };
+          if (scope === "ui") {
+            if (format === "yaml") {
+              setExportOpen(false);
+              downloadStagesYaml(buildExportData(), stageMeta);
+            } else {
+              setExportOpen(false);
+              downloadStagesExcel(buildExportData());
+            }
+          } else {
+            const fees: FeeRecord[] = (allFees ?? []).map((f) => ({
+              name: f.name,
+              feePaidBy: f.feePaidBy,
+              calculationType: f.calculationType as FeeRecord["calculationType"],
+              basisSource: f.basisSource,
+              percentage: f.percentage,
+              amount: f.amount,
+              collectionMethod: f.collectionMethod,
+              autoApply: f.autoApply,
+              appliedToProducts: f.appliedToProducts,
+              notes: f.notes,
+            }));
+            const conditions: ConditionRecord[] = (allConditions ?? []).map((c) => ({
+              name: c.name,
+              conditionType: c.conditionType as ConditionRecord["conditionType"],
+              category: c.category,
+              assignedParty: c.assignedParty,
+              description: c.description,
+              legalDescription: c.legalDescription,
+            }));
+            const exceptions: PolicyExceptionRecord[] = (allPolicyExceptions ?? []).map((e) => ({
+              type: e.type,
+              name: e.name,
+              severities: (e.severities ?? []) as string[],
+              mitigationReasons: (e.mitigationReasons ?? []) as PolicyExceptionRecord["mitigationReasons"],
+            }));
+            setExportOpen(false);
+            if (format === "yaml") {
+              // YAML doesn't support multiple sheets — download one file per builder
+              const allMeta = { storyId: "", title: `All Configuration — ${project.name}`, featureArea: "All" };
+              downloadStagesYaml(buildExportData(), stageMeta);
+              downloadFeesYaml(fees, { ...allMeta, title: `Fees — ${project.name}`, featureArea: "Fees" });
+              downloadConditionsYaml(conditions, { ...allMeta, title: `Conditions — ${project.name}`, featureArea: "Conditions" });
+              downloadPolicyExceptionsYaml(exceptions, { ...allMeta, title: `Policy Exceptions — ${project.name}`, featureArea: "Policy Exceptions" });
+            } else {
+              downloadAllConfigExcel({
+                projectName: project.name,
+                stages: buildExportData(),
+                fees,
+                conditions,
+                policyExceptions: exceptions,
+              });
+            }
+          }
+        }}
+      />
+
       <ImportDialog<StageImportRow>
         open={importOpen}
         onOpenChange={setImportOpen}
@@ -526,6 +612,7 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
         )}
       />
     </div>
+    </PlaygroundStateProvider>
   );
 }
 
@@ -1377,6 +1464,106 @@ function FieldRow({
         className="text-xs text-red-400 hover:text-red-600"
         title="Delete field"
       >×</button>
+    </div>
+  );
+}
+
+// ── Export Dialog ─────────────────────────────────────────────────────────────
+
+function ExportDialog({
+  open,
+  onOpenChange,
+  projectName,
+  onExport,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  projectName: string;
+  onExport: (scope: "ui" | "all", format: "yaml" | "excel") => void;
+}) {
+  const [scope, setScope] = useState<"ui" | "all">("ui");
+  const [format, setFormat] = useState<"yaml" | "excel">("yaml");
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => onOpenChange(false)}>
+      <div
+        className="w-[420px] rounded-xl bg-white shadow-xl border border-slate-200 p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="text-base font-semibold text-slate-900 mb-1">Export</h3>
+        <p className="text-xs text-slate-500 mb-5">{projectName}</p>
+
+        {/* Scope */}
+        <div className="mb-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">What to export</p>
+          <div className="space-y-2">
+            {([
+              { value: "ui", label: "UI Configuration", desc: "Stages and routes only" },
+              { value: "all", label: "All Configuration", desc: "Stages + Fees, Conditions, and Policy Exceptions" },
+            ] as const).map(({ value, label, desc }) => (
+              <label key={value} className={`flex items-start gap-3 rounded-lg border px-4 py-3 cursor-pointer transition-colors ${scope === value ? "border-[var(--color-blue)] bg-[var(--color-blue)]/5" : "border-slate-200 hover:border-slate-300"}`}>
+                <input
+                  type="radio"
+                  name="export-scope"
+                  value={value}
+                  checked={scope === value}
+                  onChange={() => setScope(value)}
+                  className="mt-0.5 accent-[var(--color-blue)]"
+                />
+                <div>
+                  <p className="text-sm font-medium text-slate-800">{label}</p>
+                  <p className="text-xs text-slate-500">{desc}</p>
+                </div>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Format */}
+        <div className="mb-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">File format</p>
+          <div className="flex gap-3">
+            {([
+              { value: "yaml", label: "YAML", desc: ".yaml" },
+              { value: "excel", label: "Excel", desc: ".xls" },
+            ] as const).map(({ value, label, desc }) => (
+              <label key={value} className={`flex flex-1 items-center gap-2 rounded-lg border px-4 py-3 cursor-pointer transition-colors ${format === value ? "border-[var(--color-blue)] bg-[var(--color-blue)]/5" : "border-slate-200 hover:border-slate-300"}`}>
+                <input
+                  type="radio"
+                  name="export-format"
+                  value={value}
+                  checked={format === value}
+                  onChange={() => setFormat(value)}
+                  className="accent-[var(--color-blue)]"
+                />
+                <div>
+                  <p className="text-sm font-medium text-slate-800">{label}</p>
+                  <p className="text-xs text-slate-400">{desc}</p>
+                </div>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {scope === "all" && (
+          <p className="text-xs text-slate-400 mb-4 rounded-md bg-slate-50 border border-slate-200 px-3 py-2">
+            All Configuration exports multiple files — one per feature builder.
+          </p>
+        )}
+
+        <div className="flex justify-end gap-2">
+          <Button size="sm" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button
+            size="sm"
+            className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
+            onClick={() => onExport(scope, format)}
+          >
+            Download
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

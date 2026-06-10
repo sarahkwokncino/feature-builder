@@ -2,12 +2,14 @@
 
 import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePlaygroundState } from "@/components/stages/playground-state-context";
 import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { YamlExportModal, type YamlMeta } from "@/components/yaml-export-modal";
+import { ExportButton } from "@/components/ui/export-button";
 import {
   buildFeesYaml,
   downloadFeesYaml,
@@ -151,20 +153,11 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
           <Button variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>
             Import
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => downloadFeesExcel(exportRows)}
+          <ExportButton
             disabled={records.length === 0}
-          >
-            Export Excel
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setYamlOpen(true)}
-            disabled={records.length === 0}
-          >
-            Export YAML
-          </Button>
+            onExcelClick={() => downloadFeesExcel(exportRows)}
+            onYamlClick={() => setYamlOpen(true)}
+          />
           <Button
             onClick={handleAdd}
             disabled={isLocked}
@@ -767,7 +760,7 @@ export function FeesPreviewPlayground({ projectId }: { projectId: Id<"projects">
     [records],
   );
 
-  const [added, setAdded] = useState<PreviewFee[]>([]);
+  const { addedFees: added, setAddedFees: setAdded } = usePlaygroundState();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<Set<string>>(new Set());

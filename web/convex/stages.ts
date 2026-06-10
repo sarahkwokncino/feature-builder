@@ -204,19 +204,31 @@ export const reorderStages = mutation({
 export const createSection = mutation({
   args: { stageId: v.id("stages"), projectId: v.id("projects"), name: v.string() },
   handler: async (ctx, { stageId, projectId, name }) => {
-    const existing = await ctx.db
-      .query("stageSections")
-      .withIndex("byStage", (q) => q.eq("stageId", stageId))
-      .collect();
     const now = Date.now();
-    return await ctx.db.insert("stageSections", {
-      stageId,
-      projectId,
-      name,
+
+    // Create on the target stage
+    const existing = await ctx.db.query("stageSections").withIndex("byStage", (q) => q.eq("stageId", stageId)).collect();
+    const newId = await ctx.db.insert("stageSections", {
+      stageId, projectId, name,
       order: existing.length,
-      createdAt: now,
-      updatedAt: now,
+      createdAt: now, updatedAt: now,
     });
+
+    // Mirror to all other stages in the project (user can hide individually)
+    const allStages = await ctx.db.query("stages").withIndex("byProject", (q) => q.eq("projectId", projectId)).collect();
+    for (const stage of allStages) {
+      if (stage._id === stageId) continue;
+      const stageExisting = await ctx.db.query("stageSections").withIndex("byStage", (q) => q.eq("stageId", stage._id)).collect();
+      // Skip if a section with this name already exists on that stage
+      if (stageExisting.some((s) => s.name === name)) continue;
+      await ctx.db.insert("stageSections", {
+        stageId: stage._id, projectId, name,
+        order: stageExisting.length,
+        createdAt: now, updatedAt: now,
+      });
+    }
+
+    return newId;
   },
 });
 
@@ -239,12 +251,33 @@ export const updateSection = mutation({
     }))),
   },
   handler: async (ctx, { id, name, isHidden, description, subsections }) => {
+    const section = await ctx.db.get(id);
+    if (!section) return;
+
     const patch: Record<string, unknown> = { updatedAt: Date.now() };
     if (name !== undefined) patch.name = name;
     if (isHidden !== undefined) patch.isHidden = isHidden;
     if (description !== undefined) patch.description = description;
     if (subsections !== undefined) patch.subsections = subsections;
     await ctx.db.patch(id, patch);
+
+    // For user-added (non-default) sections, mirror content + rename to
+    // same-named sections on other stages. isHidden is intentionally NOT
+    // mirrored — each stage controls its own visibility independently.
+    if (!section.isDefault && (subsections !== undefined || description !== undefined || name !== undefined)) {
+      const allSections = await ctx.db
+        .query("stageSections")
+        .withIndex("byProject", (q) => q.eq("projectId", section.projectId))
+        .collect();
+      const mirrors = allSections.filter((s) => s._id !== id && s.name === section.name);
+      const mirrorPatch: Record<string, unknown> = { updatedAt: Date.now() };
+      if (subsections !== undefined) mirrorPatch.subsections = subsections;
+      if (description !== undefined) mirrorPatch.description = description;
+      if (name !== undefined) mirrorPatch.name = name;
+      for (const mirror of mirrors) {
+        await ctx.db.patch(mirror._id, mirrorPatch);
+      }
+    }
   },
 });
 
@@ -253,7 +286,14 @@ export const deleteSection = mutation({
   handler: async (ctx, { id }) => {
     const section = await ctx.db.get(id);
     if (!section || section.isDefault) return; // default sections cannot be deleted
-    await ctx.db.delete(id);
+    // Delete mirrors on all other stages too
+    const allSections = await ctx.db
+      .query("stageSections")
+      .withIndex("byProject", (q) => q.eq("projectId", section.projectId))
+      .collect();
+    for (const s of allSections) {
+      if (s.name === section.name && !s.isDefault) await ctx.db.delete(s._id);
+    }
   },
 });
 
