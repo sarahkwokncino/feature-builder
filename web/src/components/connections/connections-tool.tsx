@@ -26,6 +26,12 @@ import {
 import { toast } from "sonner";
 import { useBuilderLock } from "@/lib/use-builder-lock";
 import { LockedBanner } from "@/components/ui/locked-banner";
+import {
+  HelpDialog,
+  HelpSection,
+  HelpTip,
+  HelpTable,
+} from "@/components/ui/help-dialog";
 
 // ── Manage Roles Dialog ───────────────────────────────────────────────────────
 
@@ -367,6 +373,7 @@ export function ConnectionsTool({ projectId }: { projectId: Id<"projects"> }) {
   const [manageOpen, setManageOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const asRecords = useCallback((): ConnectionRoleRecord[] =>
     (roles ?? []).map((r) => ({
@@ -421,6 +428,7 @@ export function ConnectionsTool({ projectId }: { projectId: Id<"projects"> }) {
             onExcelClick={() => downloadConnectionsExcel(asRecords())}
             onYamlClick={() => setYamlOpen(true)}
           />
+          <Button variant="outline" onClick={() => setHelpOpen(true)}>? Help</Button>
         </div>
       </div>
 
@@ -475,7 +483,39 @@ export function ConnectionsTool({ projectId }: { projectId: Id<"projects"> }) {
         buildPreview={buildPreview}
         onDownload={(meta) => downloadConnectionsYaml(asRecords(), meta)}
       />
+
+      <ConnectionsHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
       </div>
     </div>
+  );
+}
+
+function ConnectionsHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  return (
+    <HelpDialog open={open} onOpenChange={onOpenChange} title="Connection Roles Builder — Help">
+      <HelpSection title="What are Connections?">
+        <p>Connections in nCino link two Relationship records together with a named role, describing how one party relates to another — for example, an Individual is a <strong>Director</strong> of a Business, or a <strong>Shareholder</strong>. They build the borrowing group structure visible on each relationship record and on the loan.</p>
+      </HelpSection>
+
+      <HelpSection title="Key concepts">
+        <HelpTable rows={[
+          ["Connection Role Name", "The label for the link between two parties (e.g. Director, Shareholder, Guarantor, Beneficial Owner, Spouse)."],
+          ["Self Reciprocating", "When checked, the same role label appears on both sides of the connection (e.g. 'Business Partner' ↔ 'Business Partner')."],
+          ["Reciprocal Role", "When set, the counterparty sees a different label (e.g. From: 'Director of' → To: 'Has Director'). Mutually exclusive with Self Reciprocating."],
+        ]} />
+      </HelpSection>
+
+      <HelpSection title="How to use this builder">
+        <p><strong>Manage Roles</strong> — opens the role editor where you add, edit, and remove Connection Roles. For each role, you can set the name, whether it is self-reciprocating, and (if not) the reciprocal role label seen by the counterparty. Click <strong>+ Add Role</strong> to create a new one.</p>
+        <p><strong>Import</strong> — import connection roles from a YAML, CSV, or XLS export.</p>
+        <p><strong>Export</strong> — downloads all configured roles as Excel or YAML.</p>
+      </HelpSection>
+
+      <HelpSection title="What the main screen shows">
+        <p>The main page shows a summary of all configured roles as pills. Click <strong>Manage Roles</strong> to edit them. There is no separate detail panel — all editing is done in the Manage Roles dialog.</p>
+      </HelpSection>
+
+      <HelpTip>In nCino, configure connection roles under <strong>nCino Admin &gt; Connections</strong>. These roles populate the Connection Role picklist when linking two Relationship records.</HelpTip>
+    </HelpDialog>
   );
 }

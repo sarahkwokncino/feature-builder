@@ -446,6 +446,7 @@ export function ProductHierarchyTool({ projectId }: { projectId: Id<"projects"> 
   const [picklistOpen, setPicklistOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const { isLocked, toggleLock } = useBuilderLock(projectId, "product-hierarchy");
 
   // Simulator state
@@ -535,6 +536,7 @@ export function ProductHierarchyTool({ projectId }: { projectId: Id<"projects"> 
             onExcelClick={() => downloadProductHierarchyExcel(exportData)}
             onYamlClick={() => setYamlOpen(true)}
           />
+          <Button variant="outline" onClick={() => setHelpOpen(true)}>? Help</Button>
         </div>
       </div>
 
@@ -694,6 +696,8 @@ export function ProductHierarchyTool({ projectId }: { projectId: Id<"projects"> 
         }}
       />
 
+      <ProductHierarchyHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
+
       <ImportDialog<ProductHierarchyExport>
         open={importOpen}
         onOpenChange={setImportOpen}
@@ -715,5 +719,47 @@ export function ProductHierarchyTool({ projectId }: { projectId: Id<"projects"> 
       />
       </div>
     </div>
+  );
+}
+
+// ── Help Dialog ───────────────────────────────────────────────────────────────
+
+import { HelpDialog, HelpScreenshot, HelpSection, HelpTip, HelpBullets, HelpTable } from "@/components/ui/help-dialog";
+
+function ProductHierarchyHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  return (
+    <HelpDialog open={open} onOpenChange={onOpenChange} title="Product Hierarchy — How it works">
+      <p className="leading-relaxed">
+        The Product Hierarchy drives the three-level product selection dropdowns on every new loan — <strong>Product Line → Product Type → Product</strong>. The combination a banker selects determines the loan product and how nCino routes and classifies the deal.
+      </p>
+
+      <HelpScreenshot src="/product-hierarchy-help.png" alt="Product Line, Product Type and Product dropdowns on a loan" caption="Product Line, Product Type, and Product dropdowns as they appear on the nCino loan form" />
+
+      <HelpSection title="How to use this builder">
+        <p className="text-xs text-slate-600">Click <strong>Manage picklists</strong> to open the editor. The editor has five columns:</p>
+        <HelpTable rows={[
+          ["Product Lines (col 1)", "Add or rename your top-level lending divisions (e.g. Commercial, Retail, Agriculture). Click a line to see its Product Types in the next column."],
+          ["Product Types (col 2)", "Add types within the selected Product Line (e.g. Term Loan, Line of Credit). Click a type to see its Products."],
+          ["Products (col 3)", "Add the specific products within the selected Type. Each product maps to one loan product in nCino."],
+          ["Product Code (col 4)", "Enter the LLC_BI__lookupKey__c for the selected product — used for core banking integration. Leave blank if not applicable."],
+          ["Full Product Name (col 5)", "Read-only preview showing how the name will appear in nCino: Product Line – Product Type – Product."],
+        ]} />
+        <p className="text-xs text-slate-600 mt-2">The <strong>Preview Playground</strong> below the header lets you simulate the dropdown experience as a banker would see it — it is for visual checking only and is not saved or exported.</p>
+      </HelpSection>
+
+      <HelpSection title="Field notes">
+        <HelpBullets items={[
+          "The full product name in nCino is <strong>Product Line – Product Type – Product</strong> concatenated.",
+          "Set <strong>Product Code</strong> on each product if your bank uses a core integration — leave blank if not.",
+          "Mark a product as <strong>Line of Credit</strong> if it is a revolving facility — this changes nCino behaviour (e.g. draw management).",
+          "Use <strong>Exclude from Loan Products</strong> for products that should not appear on the standard loan product picklist.",
+        ]} />
+      </HelpSection>
+
+      <HelpTip>
+        <p className="font-semibold mb-1">Where to configure in Salesforce</p>
+        <p>Product Lines, Product Types, and Products are standard nCino records loaded via Data Loader or Salesforce Inspector using the exported file from this builder.</p>
+      </HelpTip>
+    </HelpDialog>
   );
 }

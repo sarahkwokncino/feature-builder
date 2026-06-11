@@ -28,6 +28,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  HelpDialog,
+  HelpSection,
+  HelpTip,
+  HelpTable,
+  HelpScreenshot,
+} from "@/components/ui/help-dialog";
 
 const ALL_SEVERITIES = ["Minor", "Major", "Critical"] as const;
 
@@ -48,6 +55,7 @@ export function PolicyExceptionsTool({
   const [yamlOpen, setYamlOpen] = useState(false);
   const [manageTypesOpen, setManageTypesOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const [importMode, setImportMode] = useState<"replace" | "append">("append");
   const [importPreview, setImportPreview] = useState<PolicyExceptionRecord[] | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
@@ -211,6 +219,7 @@ export function PolicyExceptionsTool({
             onExcelClick={() => downloadPolicyExceptionsExcel(exportRows)}
             onYamlClick={() => setYamlOpen(true)}
           />
+          <Button variant="outline" onClick={() => setHelpOpen(true)}>? Help</Button>
           <Button
             onClick={handleAdd}
             disabled={isLocked}
@@ -439,8 +448,45 @@ export function PolicyExceptionsTool({
         buildPreview={buildPreview}
         onDownload={(meta) => downloadPolicyExceptionsYaml(exportRows, meta)}
       />
+
+      <PolicyExceptionsHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
       </div>
     </div>
+  );
+}
+
+function PolicyExceptionsHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  return (
+    <HelpDialog open={open} onOpenChange={onOpenChange} title="Policy Exceptions Builder — Help">
+      <HelpSection title="What are Policy Exceptions?">
+        <p>Policy Exceptions record instances where a loan departs from the institution&apos;s lending policy, requiring formal acknowledgement and mitigating factors. They are tracked per loan with severities and an approval workflow, and the loan-level summary shows counts by severity (Minor, Major, Critical).</p>
+      </HelpSection>
+
+      <HelpScreenshot src="/help-policy-exceptions.png" alt="Policy Exceptions on a loan" caption="Policy Exceptions panel on a loan record in nCino" />
+
+      <HelpSection title="Key concepts">
+        <HelpTable rows={[
+          ["Exception Type", "The area or policy being breached (configurable — these are your named exception categories)."],
+          ["Exception Name", "The specific exception within a type. Each Type has its own list of named exceptions."],
+          ["Severity", "Minor, Major, or Critical — fixed system values. Drives the summary counters and colour-coding on the loan."],
+          ["Mitigation Reasons", "The valid reasons that can be offered to justify the exception. Configurable per exception name."],
+          ["Comment Required", "Whether the approver must provide a free-text comment when selecting a given mitigation reason."],
+        ]} />
+      </HelpSection>
+
+      <HelpSection title="How to use this builder">
+        <p><strong>Manage Exception Types</strong> — opens the type/name editor where you define Exception Types and the named exceptions within each type. Use the left panel to add/remove Types; select a Type to manage its Exceptions and their severities and mitigation reasons on the right.</p>
+        <p><strong>Import</strong> — import a previously exported policy exception configuration (YAML or XLS).</p>
+        <p><strong>Export</strong> — downloads all exception types, names, severities, and mitigation reasons as Excel or YAML.</p>
+        <p><strong>+ Add Exception</strong> — adds a new exception record using the Types you have configured. Fill in the detail panel on the right.</p>
+      </HelpSection>
+
+      <HelpSection title="Preview Playground">
+        <p>The preview section simulates the Policy Exceptions panel on a loan record to show how approvers will see and interact with exceptions. It is a <strong>sandbox only</strong> — not saved or exported.</p>
+      </HelpSection>
+
+      <HelpTip>In nCino, configure policy exceptions under <strong>nCino Admin &gt; Policy Exception Types</strong>. Severity values (Minor/Major/Critical) are fixed system values and cannot be changed.</HelpTip>
+    </HelpDialog>
   );
 }
 

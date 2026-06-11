@@ -28,6 +28,13 @@ import { FEES_PICKLISTS } from "@/lib/picklist-defaults";
 import { toast } from "sonner";
 import { useBuilderLock } from "@/lib/use-builder-lock";
 import { LockedBanner } from "@/components/ui/locked-banner";
+import {
+  HelpDialog,
+  HelpSection,
+  HelpTip,
+  HelpTable,
+  HelpScreenshot,
+} from "@/components/ui/help-dialog";
 
 export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
   const project = useQuery(api.projects.get, { id: projectId });
@@ -45,6 +52,7 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
   const detailPanelRef = useRef<HTMLDivElement>(null);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   // Derive ProductLine-ProductType-Product strings from the product hierarchy
   const allProducts = useMemo(() => {
@@ -158,6 +166,7 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
             onExcelClick={() => downloadFeesExcel(exportRows)}
             onYamlClick={() => setYamlOpen(true)}
           />
+          <Button variant="outline" onClick={() => setHelpOpen(true)}>? Help</Button>
           <Button
             onClick={handleAdd}
             disabled={isLocked}
@@ -359,8 +368,43 @@ export function FeesTool({ projectId }: { projectId: Id<"projects"> }) {
         buildPreview={buildPreview}
         onDownload={(meta) => downloadFeesYaml(exportRows, meta)}
       />
+
+      <FeesHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
       </div>
     </div>
+  );
+}
+
+function FeesHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  return (
+    <HelpDialog open={open} onOpenChange={onOpenChange} title="Fees Builder — Help">
+      <HelpSection title="What are Fees in nCino?">
+        <p>Fees define the charges applied to a loan — both lender-side and borrower-side — including how they are calculated and how and when they are collected. Fees can be templated at the product level and applied to individual loans, or added ad hoc per deal.</p>
+      </HelpSection>
+
+      <HelpScreenshot src="/help-fees.png" alt="Fees on a loan" caption="Fees panel on a loan record in nCino" />
+
+      <HelpSection title="Key concepts">
+        <HelpTable rows={[
+          ["Fee Type", "The named charge (e.g. Arrangement Fee, Broker Fee, Exit Fee). User-configurable."],
+          ["Fee Paid By", "Borrower or Lender."],
+          ["Calculation Type", "Flat Amount (fixed sum) or Percentage (of a basis source)."],
+          ["Basis Source", "The amount the percentage applies to (e.g. Loan Amount). Only used when Calculation Type is Percentage."],
+          ["Collection Method", "How the fee is recovered: Deducted from Loan (retained at drawdown), Cash (paid separately), or Add to Loan (capitalised)."],
+          ["Auto Apply", "When checked, this fee is automatically added to any loan using a matching product."],
+          ["Applied to Products", "Restricts the fee to specific Product Line-Type-Product combinations from the Product Hierarchy."],
+        ]} />
+      </HelpSection>
+
+      <HelpSection title="How to use this builder">
+        <p><strong>+ Add Fee</strong> — creates a new fee. Fill in the name, calculation type, and other fields in the detail panel on the right. Products are sourced from the Product Hierarchy Builder.</p>
+        <p><strong>Import</strong> — import fees from a previously exported YAML or XLS file.</p>
+        <p><strong>Export</strong> — downloads all configured fees as Excel or YAML.</p>
+        <p>Use the <strong>Configure / Matrix tabs</strong> to switch between the list view and a product-fee matrix overview.</p>
+      </HelpSection>
+
+      <HelpTip>Products shown in &ldquo;Applied to Products&rdquo; are sourced from the <strong>Product Hierarchy Builder</strong>. Configure products there first before assigning fees to specific products.</HelpTip>
+    </HelpDialog>
   );
 }
 

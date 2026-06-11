@@ -42,6 +42,13 @@ import {
 import { toast } from "sonner";
 import { useBuilderLock } from "@/lib/use-builder-lock";
 import { LockedBanner } from "@/components/ui/locked-banner";
+import {
+  HelpDialog,
+  HelpSection,
+  HelpTip,
+  HelpTable,
+  HelpScreenshot,
+} from "@/components/ui/help-dialog";
 
 const CONDITION_TYPES: ConditionType[] = ["Condition Precedent", "Condition Subsequent"];
 
@@ -64,6 +71,7 @@ export function ConditionsTool({
   const [picklistOpen, setPicklistOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const { isLocked, toggleLock } = useBuilderLock(projectId, "conditions");
 
   const stored = useQuery(api.picklists.listForScope, { scope: "conditions" });
@@ -195,6 +203,7 @@ export function ConditionsTool({
             onExcelClick={() => downloadConditionsExcel(conditionRows)}
             onYamlClick={() => setYamlOpen(true)}
           />
+          <Button variant="outline" onClick={() => setHelpOpen(true)}>? Help</Button>
           <Button
             onClick={handleAdd}
             disabled={isLocked}
@@ -358,8 +367,41 @@ export function ConditionsTool({
           </div>
         )}
       />
+
+      <ConditionsHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
       </div>
     </div>
+  );
+}
+
+function ConditionsHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  return (
+    <HelpDialog open={open} onOpenChange={onOpenChange} title="Conditions Builder — Help">
+      <HelpSection title="What are Conditions?">
+        <p>Conditions are formal requirements placed on a loan that must be satisfied before or after it closes. They carry legal weight and are formally tracked with named parties and due dates. Conditions are distinct from Smart Checklist items — they represent contractual obligations rather than process tasks.</p>
+      </HelpSection>
+
+      <HelpScreenshot src="/help-conditions.png" alt="Conditions on a loan" caption="Conditions panel on a loan record in nCino" />
+
+      <HelpSection title="Key concepts">
+        <HelpTable rows={[
+          ["Condition Precedent", "Must be met before a key milestone, typically drawdown. Shown on the 'Condition Precedent' tab."],
+          ["Condition Subsequent", "Must be met after booking or completion. Shown on the 'Condition Subsequent' tab."],
+          ["Task Type", "Sub-category label shown on the condition row (e.g. Pre-offer, Post-offer). Configurable via Manage picklists."],
+          ["Assigned Party", "The role responsible for clearing the condition."],
+          ["Days After Booking", "For Condition Subsequent — how many days post-booking the condition falls due."],
+        ]} />
+      </HelpSection>
+
+      <HelpSection title="How to use this builder">
+        <p><strong>Manage picklists</strong> — opens the picklist editor to configure available values for Task Type, Assigned Party, Status, and other dropdown fields used on condition records.</p>
+        <p><strong>Import</strong> — import conditions from a YAML, XLS, or CSV export to bulk-load your configuration.</p>
+        <p><strong>Export</strong> — downloads all conditions and picklist values as Excel or YAML.</p>
+        <p><strong>+ Add condition</strong> — creates a new condition. Fill in the fields in the detail panel on the right. Use the <strong>Condition Precedent / Condition Subsequent</strong> tabs to switch between the two types.</p>
+      </HelpSection>
+
+      <HelpTip>In nCino, configure conditions under <strong>nCino Admin &gt; Conditions</strong>. Task Type values map to the Task Type picklist on the Condition record.</HelpTip>
+    </HelpDialog>
   );
 }
 

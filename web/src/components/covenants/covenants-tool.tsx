@@ -46,6 +46,14 @@ import {
 import { toast } from "sonner";
 import { useBuilderLock } from "@/lib/use-builder-lock";
 import { LockedBanner } from "@/components/ui/locked-banner";
+import {
+  HelpDialog,
+  HelpSection,
+  HelpBullets,
+  HelpTip,
+  HelpTable,
+  HelpScreenshot,
+} from "@/components/ui/help-dialog";
 
 type PreviewCovenant = {
   id: string;
@@ -283,6 +291,7 @@ export function CovenantsTool({
   const [picklistOpen, setPicklistOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const { isLocked, toggleLock } = useBuilderLock(projectId, "covenants");
 
 
@@ -400,6 +409,7 @@ export function CovenantsTool({
             onExcelClick={() => downloadCovenantsExcel(covenantPicklists)}
             onYamlClick={() => setYamlOpen(true)}
           />
+          <Button variant="outline" onClick={() => setHelpOpen(true)}>? Help</Button>
         </div>
       </div>
 
@@ -557,7 +567,45 @@ export function CovenantsTool({
           </div>
         )}
       />
+
+      <CovenantsHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
       </div>
     </div>
+  );
+}
+
+function CovenantsHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  return (
+    <HelpDialog open={open} onOpenChange={onOpenChange} title="Covenant Type Builder — Help">
+      <HelpSection title="What are Covenants?">
+        <p>Covenants are ongoing obligations placed on a borrower as a condition of a loan — for example, providing periodic financial statements or maintaining a minimum cash balance. They are tracked against the loan and relationships in nCino with a monitoring schedule.</p>
+      </HelpSection>
+
+      <HelpScreenshot src="/help-covenants-loan.png" alt="Covenants on a loan record" caption="Covenants panel on a loan record in nCino" />
+
+      <HelpSection title="What does this builder configure?">
+        <p>This builder defines the <strong>picklist values</strong> that appear when creating a covenant on a loan. You are configuring the available options — not creating individual covenant records.</p>
+        <HelpTable rows={[
+          ["Category", "Top-level grouping of covenants (e.g. Financial, Legal). Controls which Types are available."],
+          ["Covenant Type", "The specific obligation within a category. Each Category has its own Type list."],
+          ["Frequency Template", "How often compliance is due (e.g. Monthly, Quarterly, Annually)."],
+          ["Grace Days", "Days after the due date before a covenant is considered overdue."],
+        ]} />
+      </HelpSection>
+
+      <HelpSection title="How to use this builder">
+        <p><strong>Manage picklists</strong> — opens the picklist editor where you add/edit/remove values for Category, Frequency, and Covenant Types per category. Use the tabs at the top to switch between picklist types. Category/Type is hierarchical: adding a Category creates a linked Type tab for that category.</p>
+        <p><strong>Import</strong> — import covenant records from a previous YAML or CSV export to pre-populate the preview playground.</p>
+        <p><strong>Export</strong> — downloads your configured picklist values as Excel or YAML for use in nCino configuration.</p>
+      </HelpSection>
+
+      <HelpScreenshot src="/help-covenants-create.png" alt="Create covenant dialog" caption="Create Covenant dialog — uses the picklists you configure here" />
+
+      <HelpSection title="Preview Playground">
+        <p>The preview table below the picklist configuration is a <strong>sandbox only</strong> — it is not saved or exported. Use it to test how your Category / Type combinations look when creating a covenant on a real loan.</p>
+      </HelpSection>
+
+      <HelpTip>In nCino, configure covenants under <strong>nCino Admin &gt; Covenants</strong>. The picklist values you configure here map directly to the Category and Type fields on the Covenant record.</HelpTip>
+    </HelpDialog>
   );
 }

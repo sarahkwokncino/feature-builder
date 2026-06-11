@@ -33,6 +33,13 @@ import {
   COLLATERAL_TYPE_SUBTYPE_MAP,
   COLLATERAL_SUBTYPE_KEY_PREFIX,
 } from "@/lib/picklist-defaults";
+import {
+  HelpDialog,
+  HelpSection,
+  HelpTip,
+  HelpTable,
+  HelpScreenshot,
+} from "@/components/ui/help-dialog";
 
 // ── Manage Collaterals Dialog ─────────────────────────────────────────────────
 
@@ -1133,6 +1140,7 @@ export function CollateralTool({
   const [manageOpen, setManageOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const { isLocked, toggleLock } = useBuilderLock(projectId, "collateral");
 
   const setValues = useMutation(api.picklists.setValues);
@@ -1249,6 +1257,7 @@ export function CollateralTool({
             }}
             onYamlClick={() => setYamlOpen(true)}
           />
+          <Button variant="outline" onClick={() => setHelpOpen(true)}>? Help</Button>
         </div>
       </div>
 
@@ -1346,7 +1355,43 @@ export function CollateralTool({
         buildPreview={buildPreview}
         onDownload={(meta) => downloadCollateralYaml(collateralPicklists, meta)}
       />
+
+      <CollateralHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
       </div>
     </div>
+  );
+}
+
+function CollateralHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  return (
+    <HelpDialog open={open} onOpenChange={onOpenChange} title="Collateral Builder — Help">
+      <HelpSection title="What is Collateral?">
+        <p>Collateral configuration in nCino defines the security assets pledged against a loan — what types of security are accepted, how they are classified, and what information must be captured for each. Each combination of Type and Subtype gets its own field layout on the Collateral record.</p>
+      </HelpSection>
+
+      <HelpScreenshot src="/help-collateral.png" alt="Collateral configuration" caption="Collateral configuration in nCino" />
+
+      <HelpSection title="Key concepts">
+        <HelpTable rows={[
+          ["Collateral Type", "Top-level category of security (e.g. Property Non Development, Personal Guarantee)."],
+          ["Collateral Subtype", "Specific variant within a type (e.g. Residential, Commercial under Property Non Development)."],
+          ["Field Sections", "Named groups of fields configured per Type/Subtype combination (e.g. 'Property Details', 'Valuation')."],
+          ["Same as / Clone", "A Type/Subtype can mirror another's field config, or have it cloned as an editable starting point."],
+        ]} />
+      </HelpSection>
+
+      <HelpSection title="How to use this builder">
+        <p><strong>Manage Collaterals</strong> — opens the picklist editor where you define Collateral Types and their Subtypes. Use the left panel to add/remove Types; select a Type to manage its Subtypes on the right. These values populate the Type and Subtype dropdowns on the Collateral record in nCino.</p>
+        <p><strong>Field configuration</strong> — once Types and Subtypes are set, use the field layout panel (main area) to add Sections and Fields for each Type/Subtype. Select a Type/Subtype from the selector, then add sections and fields within each section. You can use &ldquo;Same as&rdquo; to share a field layout with another subtype, or &ldquo;Clone&rdquo; to copy it as a starting point.</p>
+        <p><strong>Import</strong> — import a previously exported collateral configuration.</p>
+        <p><strong>Export</strong> — downloads Types, Subtypes, and all field configurations as Excel or YAML.</p>
+      </HelpSection>
+
+      <HelpSection title="Preview">
+        <p>The preview panel on the right simulates how the Collateral record form will look in nCino for the selected Type/Subtype. It is a <strong>preview only</strong> — not saved or exported separately.</p>
+      </HelpSection>
+
+      <HelpTip>In nCino, configure collateral under <strong>nCino Admin &gt; Collateral</strong>. Types and Subtypes map to the Collateral Type and Collateral Sub-Type picklists on the Collateral record.</HelpTip>
+    </HelpDialog>
   );
 }

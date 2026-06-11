@@ -27,6 +27,12 @@ import {
 import { toast } from "sonner";
 import { useBuilderLock } from "@/lib/use-builder-lock";
 import { LockedBanner } from "@/components/ui/locked-banner";
+import {
+  HelpDialog,
+  HelpSection,
+  HelpTip,
+  HelpTable,
+} from "@/components/ui/help-dialog";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -895,6 +901,7 @@ export function RelationshipsTool({ projectId }: { projectId: Id<"projects"> }) 
   const [manageOpen, setManageOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const { isLocked, toggleLock } = useBuilderLock(projectId, "relationships");
 
   const userTypes = useMemo(() => stored?.find((r) => r.key === "types")?.values ?? [], [stored]);
@@ -976,6 +983,7 @@ export function RelationshipsTool({ projectId }: { projectId: Id<"projects"> }) 
             }}
             onYamlClick={() => setYamlOpen(true)}
           />
+          <Button variant="outline" onClick={() => setHelpOpen(true)}>? Help</Button>
         </div>
       </div>
 
@@ -1041,7 +1049,39 @@ export function RelationshipsTool({ projectId }: { projectId: Id<"projects"> }) 
         buildPreview={buildPreview}
         onDownload={(meta) => downloadRelationshipsYaml(typeValues, meta)}
       />
+
+      <RelationshipsHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
       </div>
     </div>
+  );
+}
+
+function RelationshipsHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  return (
+    <HelpDialog open={open} onOpenChange={onOpenChange} title="Relationships Builder — Help">
+      <HelpSection title="What are Relationships in nCino?">
+        <p>Relationship records represent the parties involved in lending — individuals, businesses, and other entities — storing their contact and financial profile. The Relationship Type determines the layout of fields shown on the record and what information is captured.</p>
+      </HelpSection>
+
+      <HelpSection title="Key concepts">
+        <HelpTable rows={[
+          ["System Types", "Five built-in types that cannot be removed: Individual, Business, Household, Lender, Vendor. They can be hidden from the dropdown if not used in your implementation."],
+          ["Custom Types", "User-defined types added freely (e.g. Trust, Partnership, Charity). Each gets its own field layout."],
+          ["Field Sections", "Named groups of fields per Relationship Type (e.g. 'Personal Details', 'Bank Details'). Each section contains individual fields."],
+          ["Field Type", "Each field is assigned a Salesforce field type (Free Text, Date, Currency, Picklist, Multi-Select, Lookup, Checkbox, etc.)."],
+          ["Same as / Clone", "A type can mirror another type's field layout, or have it cloned as an editable starting point."],
+        ]} />
+      </HelpSection>
+
+      <HelpSection title="How to use this builder">
+        <p><strong>Manage Relationship Types</strong> — opens the type editor where you add and remove Custom Types, and toggle which System Types are hidden. Click <strong>+ Add Type</strong> to create a new custom type.</p>
+        <p><strong>Type selector panel</strong> — the main area shows a type selector on the left. Select a type to configure its field sections and fields on the right.</p>
+        <p><strong>Field sections</strong> — for each type, click <strong>+ Add Section</strong> to create a named section, then add fields within it. Use &ldquo;Same as&rdquo; to share another type&apos;s layout, or &ldquo;Clone&rdquo; to copy it.</p>
+        <p><strong>Import</strong> — import a previously exported relationship configuration.</p>
+        <p><strong>Export</strong> — downloads all types and field configurations as Excel or YAML.</p>
+      </HelpSection>
+
+      <HelpTip>In nCino, configure relationship types under <strong>nCino Admin &gt; Relationship Types</strong>. System types (Individual, Business, etc.) are standard nCino objects — field customisation maps to their field sets.</HelpTip>
+    </HelpDialog>
   );
 }

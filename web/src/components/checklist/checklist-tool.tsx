@@ -37,6 +37,14 @@ import {
 } from "@/lib/export-import";
 import { toast } from "sonner";
 import { translateCriteria } from "@/lib/formgen";
+import {
+  HelpDialog,
+  HelpSection,
+  HelpBullets,
+  HelpTip,
+  HelpTable,
+  HelpScreenshot,
+} from "@/components/ui/help-dialog";
 
 const CHECKLIST_LEVELS: ChecklistLevel[] = ["Loan", "Relationship"];
 
@@ -65,6 +73,7 @@ export function ChecklistTool({
   const [picklistOpen, setPicklistOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const { isLocked, toggleLock } = useBuilderLock(projectId, "checklist");
 
   const stored = useQuery(api.picklists.listForScope, { scope: "checklist" });
@@ -218,6 +227,7 @@ export function ChecklistTool({
             onExcelClick={() => downloadChecklistExcel(checklistRows, picklistMap, docmanPlaceholders)}
             onYamlClick={() => setYamlOpen(true)}
           />
+          <Button variant="outline" onClick={() => setHelpOpen(true)}>? Help</Button>
           <Button
             onClick={handleAdd}
             disabled={isLocked}
@@ -350,8 +360,44 @@ export function ChecklistTool({
           </div>
         )}
       />
+
+      <ChecklistHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
       </div>
     </div>
+  );
+}
+
+function ChecklistHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  return (
+    <HelpDialog open={open} onOpenChange={onOpenChange} title="Smart Checklist Builder — Help">
+      <HelpSection title="What is Smart Checklist?">
+        <p>Smart Checklist is nCino&apos;s task-tracking module on a loan record. It lists named requirements that must be completed, waived, or flagged as an exception as the deal progresses through stages. Requirements can be linked to Document Manager placeholders so uploading a document automatically marks the checklist item.</p>
+      </HelpSection>
+
+      <HelpScreenshot src="/help-checklist.png" alt="Smart Checklist on a loan" caption="Smart Checklist panel on a loan record in nCino" />
+
+      <HelpSection title="What does this builder configure?">
+        <HelpTable rows={[
+          ["Requirement Name", "The label shown on the checklist item on the loan record."],
+          ["Level", "Loan or Relationship — determines which object tab the requirement appears on."],
+          ["Assigned Party", "The role responsible for completing this requirement."],
+          ["Needed By", "Which stage this requirement should be resolved by."],
+          ["Stage Check", "Whether the requirement must be cleared before advancing to the next stage."],
+          ["Placeholder", "Links this requirement to a Document Manager placeholder. Uploading the document marks this item complete."],
+          ["Description", "Guidance text shown alongside the requirement on the loan."],
+        ]} />
+      </HelpSection>
+
+      <HelpSection title="How to use this builder">
+        <p><strong>Manage picklists</strong> — opens the picklist editor to configure the available values for Assigned Party, Status, and other dropdown fields used on checklist items.</p>
+        <p><strong>Import</strong> — import requirements from a YAML, XLS, or CSV export to bulk-load your checklist configuration.</p>
+        <p><strong>Export</strong> — downloads all requirements and picklist values as Excel or YAML.</p>
+        <p><strong>+ Add requirement</strong> — creates a new checklist requirement. Fill in the fields in the detail panel on the right.</p>
+        <p>Use the <strong>Loan / Relationship tabs</strong> to switch between the two levels. Items are saved per level independently.</p>
+      </HelpSection>
+
+      <HelpTip>In nCino, configure Smart Checklist requirements under <strong>nCino Admin &gt; Smart Checklist</strong>. The &ldquo;Needed By&rdquo; picklist is driven by the stages you configure in the Stages &amp; UI Builder.</HelpTip>
+    </HelpDialog>
   );
 }
 

@@ -44,6 +44,14 @@ import {
 } from "@/lib/export-import";
 import { toast } from "sonner";
 import { translateCriteria } from "@/lib/formgen";
+import {
+  HelpDialog,
+  HelpSection,
+  HelpBullets,
+  HelpTip,
+  HelpTable,
+  HelpScreenshot,
+} from "@/components/ui/help-dialog";
 
 type DocmanLevel = "Relationships" | "Loans" | "Collateral" | "Product Package";
 type Placeholder = Doc<"docmanPlaceholders">;
@@ -878,6 +886,7 @@ export function DocmanTool({
   const [placeholderBuilderOpen, setPlaceholderBuilderOpen] = useState(false);
   const [yamlOpen, setYamlOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
   const { isLocked, toggleLock } = useBuilderLock(projectId, "docman");
 
   const groups = raw?.groups ?? [];
@@ -984,6 +993,7 @@ export function DocmanTool({
             onExcelClick={() => downloadDocmanExcel(exportData)}
             onYamlClick={() => setYamlOpen(true)}
           />
+          <Button variant="outline" size="sm" onClick={() => setHelpOpen(true)}>? Help</Button>
           <Button variant="outline" onClick={() => setPlaceholderBuilderOpen(true)} disabled={isLocked}>
             Placeholder Builder
           </Button>
@@ -1047,6 +1057,8 @@ export function DocmanTool({
         buildPreview={buildPreview}
         onDownload={(meta) => downloadDocmanYaml(exportData, meta)}
       />
+
+      <DocmanHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
 
       <ImportDialog<DocmanExport>
         open={importOpen}
@@ -1248,5 +1260,39 @@ export function DocmanPreviewPlayground() {
         </div>
       </div>
     </div>
+  );
+}
+
+function DocmanHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  return (
+    <HelpDialog open={open} onOpenChange={onOpenChange} title="Document Manager Builder — Help">
+      <HelpSection title="What is Document Manager?">
+        <p>Document Manager is nCino&apos;s centralised document repository on a loan record. Placeholders define expected documents (e.g. &ldquo;Valuation Report&rdquo;, &ldquo;Application Form&rdquo;) and track their status as the loan progresses. Documents can be filtered by category and level, and linked to relationships.</p>
+      </HelpSection>
+
+      <HelpScreenshot src="/help-docman.png" alt="Document Manager on a loan" caption="Document Manager panel on a loan record in nCino" />
+
+      <HelpSection title="Key concepts">
+        <HelpTable rows={[
+          ["Level", "Which object the placeholder belongs to: Loans, Relationships, Collateral, or Product Package. Use the level tabs to switch."],
+          ["Placeholder", "An expected document (e.g. 'Application Form'). Can be Default (always generated) or Conditional (only appears when a group condition is met)."],
+          ["Category", "Groups placeholders within a level (e.g. Application, Legal, Credit Update). Placeholders can be uncategorised."],
+          ["Conditional Group", "A named condition (e.g. 'Borrower is a company') that triggers a set of placeholders. Each placeholder belongs to at most one group."],
+        ]} />
+      </HelpSection>
+
+      <HelpSection title="How to use this builder">
+        <p><strong>Placeholder Builder</strong> — opens the main editor where you add, edit, and organise placeholders. Each row shows the placeholder name, its category, and whether it is default or conditional. Drag rows to reorder. Click <strong>+ Add placeholder</strong> to create a new one and fill in its name, category, and group assignment.</p>
+        <p><strong>Conditional Groups panel</strong> — shown alongside the placeholder list. Click <strong>+ New group</strong> to create a named condition, then assign placeholders to it by editing each placeholder&apos;s group field.</p>
+        <p><strong>Import</strong> — import placeholder configuration from a YAML, CSV, or XLS export.</p>
+        <p><strong>Export</strong> — downloads all placeholders and conditional groups as Excel or YAML.</p>
+      </HelpSection>
+
+      <HelpSection title="Preview Playground">
+        <p>The preview at the bottom of the page is a <strong>sandbox only</strong> — it simulates the Document Manager tab on a loan to show how your placeholders will appear. It is not saved or exported.</p>
+      </HelpSection>
+
+      <HelpTip>Placeholders linked from Smart Checklist are marked with a checklist badge and cannot be deleted here — remove the link from the Smart Checklist Builder first.</HelpTip>
+    </HelpDialog>
   );
 }

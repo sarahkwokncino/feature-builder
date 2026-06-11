@@ -69,6 +69,14 @@ import { DocmanPreviewPlayground } from "@/components/docman/docman-tool";
 import { ChecklistPreviewPlayground } from "@/components/checklist/checklist-tool";
 import { PlaygroundStateProvider } from "@/components/stages/playground-state-context";
 import { COLLATERAL_TYPE_SUBTYPE_MAP, COLLATERAL_SUBTYPE_KEY_PREFIX, COVENANT_CATEGORY_TYPE_MAP, COV_TYPE_KEY_PREFIX } from "@/lib/picklist-defaults";
+import {
+  HelpDialog,
+  HelpSection,
+  HelpBullets,
+  HelpTip,
+  HelpTable,
+  HelpSteps,
+} from "@/components/ui/help-dialog";
 
 const ALL_TABS = ["Details", "Document Generation", "Document Manager", "Smart Checklist", "Chatter", "Approval"] as const;
 
@@ -225,6 +233,7 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const [importOpen, setImportOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   // Data for "All Configuration" export
   const allFees = useQuery(api.fees.listForProject, { projectId });
@@ -434,6 +443,7 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
           <div className="flex items-center gap-2">
             <Button size="sm" variant="outline" onClick={() => setImportOpen(true)} disabled={isLocked}>Import</Button>
             <Button size="sm" variant="outline" onClick={() => setExportOpen(true)}>Export</Button>
+            <Button size="sm" variant="outline" onClick={() => setHelpOpen(true)}>? Help</Button>
             <Button
               size="sm"
               onClick={() => { setAddingStage(true); setNewStageName(""); }}
@@ -886,6 +896,8 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
           </div>
         )}
       />
+
+      <StagesHelpDialog open={helpOpen} onOpenChange={setHelpOpen} />
     </div>
     </PlaygroundStateProvider>
   );
@@ -2224,5 +2236,104 @@ function ExportDialog({
         </div>
       </div>
     </div>
+  );
+}
+
+// ── Stages & UI Builder Help Dialog ──────────────────────────────────────────
+
+function StagesHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  return (
+    <HelpDialog open={open} onOpenChange={onOpenChange} title="Stages & UI Builder — Help">
+      <HelpSection title="What does this builder configure?">
+        <p>This builder defines the loan pathway in nCino — the stages a loan moves through, and the UI layout of each stage: which routes appear in the left navigation, what sub routes exist within each route, and what fields are captured in each sub route.</p>
+        <p>It also sets the <strong>Key Fields</strong> and <strong>Guidance for Success</strong> shown to bankers at each stage via the Loan Path settings in nCino.</p>
+      </HelpSection>
+
+      <HelpSection title="The Stage Bar">
+        <p>The stage bar at the top shows the full loan pipeline from left to right (e.g. Prospect → Application → Approved → …). Each stage chip represents a discrete step in the lending process.</p>
+        <HelpTable rows={[
+          ["Select a stage", "Click any stage chip to switch to that stage. The rest of the builder updates to show that stage's configuration."],
+          ["Add a stage", "Click <strong>+ Add Stage</strong> (top right), type the name, and press Enter or click Add. New stages are added to the end."],
+          ["Rename a stage", "Hover over a stage chip — a pencil icon ✎ appears. Click it, type the new name, then press Enter or click away to save."],
+          ["Delete a stage", "Hover over a stage chip and click the × icon. Fixed stages (shown in grey) cannot be renamed or deleted."],
+          ["Reorder stages", "Drag a stage chip left or right using the grab handle (⠿) that appears on hover. Fixed stages cannot be moved."],
+        ]} />
+        <HelpTip>Fixed stages are pre-defined milestones in the loan lifecycle (e.g. &ldquo;Closed&rdquo;) that cannot be renamed, deleted, or reordered.</HelpTip>
+      </HelpSection>
+
+      <HelpSection title="Key Fields & Guidance for Success">
+        <p>The panel below the stage bar configures what bankers see on the <strong>Loan Path</strong> screen at each stage (Settings &gt; User Interface &gt; Path Settings &gt; Loan Path in nCino).</p>
+        <HelpTable rows={[
+          ["Key Fields", "Up to 5 field labels shown prominently at this stage, highlighting the most important data points bankers need to check or complete."],
+          ["Guidance for Success", "Free-text guidance (use new lines for separate bullet points) giving bankers direction on what needs to happen at this stage."],
+        ]} />
+        <HelpSteps steps={[
+          "Click <strong>Edit</strong> (next to Key Fields) or <strong>+ Add key fields &amp; guidance</strong> to open the editor.",
+          "Fill in up to 5 Key Field labels and/or the Guidance text.",
+          "Click <strong>Save</strong>. Each stage stores its own independent Key Fields and Guidance.",
+        ]} />
+        <HelpTip>Key Fields and Guidance are exported in a separate <strong>Loan Path Settings</strong> tab when you use Export → UI Config or Export → All Config.</HelpTip>
+      </HelpSection>
+
+      <HelpSection title="The Details Tab — Routes">
+        <p>The <strong>Details</strong> tab is the main layout editor. The left sidebar lists the <strong>Routes</strong> — these are the sections in the left-hand navigation of the Details tab on a loan record in nCino (e.g. &ldquo;Application&rdquo;, &ldquo;Security&rdquo;, &ldquo;Fees&rdquo;).</p>
+        <HelpTable rows={[
+          ["Add a route", "Click <strong>+ Add</strong> at the top of the left sidebar, type the name, then press Enter or click Add."],
+          ["Rename a route", "Hover over a route in the sidebar — a ✎ icon appears. Click it to rename inline."],
+          ["Hide a route", "Hover over a route and click <strong>Hide</strong>. The route remains but appears struck-through in the sidebar and shows a 'Hidden' badge. It will not appear on the loan. Click <strong>Show</strong> to re-enable it."],
+          ["Delete a route", "Hover and click × to delete. Default routes (pre-configured system sections) cannot be deleted, only hidden."],
+          ["Reorder routes", "Drag routes up and down using the grab handle (⠿) on the left of each row."],
+          ["Select a route", "Click a route to open its configuration in the right panel."],
+        ]} />
+      </HelpSection>
+
+      <HelpSection title="Sub Routes">
+        <p>For user-created routes, the right panel shows a <strong>Sub Route tab bar</strong>. Sub routes are the horizontal tabs within a route on the loan record (e.g. &ldquo;Details&rdquo;, &ldquo;Documents&rdquo; within a custom route).</p>
+        <HelpTable rows={[
+          ["Add a sub route", "Click <strong>+ Add Sub Route</strong> in the tab bar. A new sub route tab is created immediately."],
+          ["Rename a sub route", "Double-click the sub route tab name to rename it inline."],
+          ["Delete a sub route", "Click the × on the sub route tab."],
+          ["Switch sub routes", "Click the tab to edit that sub route's content."],
+        ]} />
+      </HelpSection>
+
+      <HelpSection title="Sections & Fields within a Sub Route">
+        <p>Each sub route has a <strong>Description</strong> (plain-English brief for the configurator) and one or more <strong>Sections</strong>. Sections group related fields within the sub route.</p>
+        <HelpTable rows={[
+          ["Add a section", "Click <strong>+ Add Section</strong> within the sub route panel."],
+          ["Rename a section", "Click the section name — it becomes an inline editable field."],
+          ["Delete a section", "Click the × button on the section header."],
+          ["Add a field", "Click <strong>+ Add Field</strong> within a section. Set the field name and type (Text, Number, Date, Picklist, etc.)."],
+          ["Bulk add fields", "Click <strong>Paste list</strong> in a section header, paste field names separated by new lines, then confirm. All names become fields with type Text."],
+          ["Edit a field", "Click the field name to rename it inline. Use the Type dropdown to change the field type."],
+          ["Delete a field", "Click × on the field row."],
+          ["Picklist values", "For Picklist or Multi-Select fields, a values input appears. Enter comma-separated values, or paste one value per line."],
+        ]} />
+      </HelpSection>
+
+      <HelpSection title="Other tabs (Document Manager, Smart Checklist, etc.)">
+        <p>The other tabs in the stage — <strong>Document Manager</strong>, <strong>Smart Checklist</strong>, <strong>Document Generation</strong>, <strong>Chatter</strong>, and <strong>Approval</strong> — show a preview of that feature for the current stage.</p>
+        <HelpBullets items={[
+          "<strong>Document Manager</strong> and <strong>Smart Checklist</strong> show a live preview playground reflecting your current configuration. To add or edit placeholders or checklist requirements, use the link to their dedicated builder — changes made there will be reflected here automatically.",
+          "<strong>Document Generation</strong> — contact the nCino team to configure this.",
+          "<strong>Chatter</strong> and <strong>Approval</strong> are optional tabs. Toggle them on/off using the pills on the right of the tab bar — each stage can have its own combination.",
+        ]} />
+      </HelpSection>
+
+      <HelpSection title="Default routes with dedicated builders">
+        <p>Some pre-configured routes (Security, Covenants, Conditions, Fees, Policy Exceptions, Borrowing Structure) have their data configured in a dedicated feature builder. When you select one of these routes, a link to the relevant builder is shown. The preview playground reflects current configuration. To change what is shown, navigate to that builder — changes are reflected here automatically.</p>
+      </HelpSection>
+
+      <HelpSection title="Export">
+        <HelpTable rows={[
+          ["Export UI Config", "Exports stages, routes, sub routes, fields, Key Fields, and Guidance for Success only — no feature builder data."],
+          ["Export All Config", "Exports everything: UI config plus all feature builder data (Fees, Conditions, Covenants, Collateral, Smart Checklist, Document Manager, Connections, Relationships, Product Hierarchy) in one file."],
+          ["YAML format", "One YAML file per builder (multiple downloads). Use for Jira story attachments."],
+          ["Excel format", "One multi-tab spreadsheet. Use for handover to the configuration team."],
+        ]} />
+      </HelpSection>
+
+      <HelpTip>Changes are saved automatically as you work — there is no Save button. The Lock toggle (padlock icon) prevents accidental edits.</HelpTip>
+    </HelpDialog>
   );
 }
