@@ -324,6 +324,7 @@ export default defineSchema({
     name: v.string(),
     isFixed: v.optional(v.boolean()),   // true for Booked and Complete — cannot rename/delete
     keyFields: v.optional(v.array(v.string())), // up to 5 key field labels
+    guidanceForSuccess: v.optional(v.string()),  // freetext guidance shown below the stage bar
     enabledTabs: v.optional(v.array(v.string())), // tabs enabled for this stage; undefined = all on
     order: v.number(),
     createdAt: v.number(),
@@ -346,6 +347,9 @@ export default defineSchema({
         id: v.string(),
         name: v.string(),
         fieldType: v.string(),
+        picklistValues: v.optional(v.array(v.string())),
+        length: v.optional(v.number()),
+        decimalPlaces: v.optional(v.number()),
       })),
       sections: v.optional(v.array(v.object({
         id: v.string(),
@@ -354,6 +358,9 @@ export default defineSchema({
           id: v.string(),
           name: v.string(),
           fieldType: v.string(),
+          picklistValues: v.optional(v.array(v.string())),
+          length: v.optional(v.number()),
+          decimalPlaces: v.optional(v.number()),
         })),
       }))),
     }))),

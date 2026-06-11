@@ -2,6 +2,24 @@
 
 import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  horizontalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
 import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
@@ -19,12 +37,27 @@ import {
   downloadFeesYaml,
   downloadConditionsYaml,
   downloadPolicyExceptionsYaml,
+  downloadCovenantsYaml,
+  downloadCollateralYaml,
+  downloadInvolvementTypesYaml,
+  downloadChecklistYaml,
+  downloadDocmanYaml,
+  downloadConnectionsYaml,
+  downloadRelationshipsYaml,
   downloadAllConfigExcel,
   parseStagesFile,
   type StageImportRow,
   type FeeRecord,
   type ConditionRecord,
   type PolicyExceptionRecord,
+  type CovenantPicklists,
+  type CollateralPicklists,
+  type CollateralFieldConfig,
+  type InvolvementTypeRecord,
+  type ChecklistRecord,
+  type DocmanExport,
+  type ConnectionRoleRecord,
+  type RelationshipFieldConfig,
 } from "@/lib/export-import";
 import { EntityInvolvementPlayground, ManageInvolvementTypesDialog } from "@/components/entity-involvement/entity-involvement-tool";
 import { CollateralPreviewPlayground } from "@/components/collateral/collateral-tool";
@@ -35,7 +68,7 @@ import { PolicyExceptionsPreviewPlayground } from "@/components/policy-exception
 import { DocmanPreviewPlayground } from "@/components/docman/docman-tool";
 import { ChecklistPreviewPlayground } from "@/components/checklist/checklist-tool";
 import { PlaygroundStateProvider } from "@/components/stages/playground-state-context";
-import { COLLATERAL_TYPE_SUBTYPE_MAP, COLLATERAL_SUBTYPE_KEY_PREFIX } from "@/lib/picklist-defaults";
+import { COLLATERAL_TYPE_SUBTYPE_MAP, COLLATERAL_SUBTYPE_KEY_PREFIX, COVENANT_CATEGORY_TYPE_MAP, COV_TYPE_KEY_PREFIX } from "@/lib/picklist-defaults";
 
 const ALL_TABS = ["Details", "Document Generation", "Document Manager", "Smart Checklist", "Chatter", "Approval"] as const;
 
@@ -59,6 +92,107 @@ const DEFAULT_TABS = ALL_TABS.filter((t) => !OPTIONAL_TABS.includes(t as typeof 
 
 type TabName = typeof ALL_TABS[number];
 
+function SortableStageItem({
+  stage,
+  isSelected,
+  isEditing,
+  editName,
+  isDragging,
+  isLocked,
+  onSelect,
+  onStartEdit,
+  onEditChange,
+  onCommitEdit,
+  onCancelEdit,
+  onDelete,
+}: {
+  stage: Doc<"stages">;
+  isSelected: boolean;
+  isEditing: boolean;
+  editName: string;
+  isDragging: boolean;
+  isLocked: boolean;
+  onSelect: () => void;
+  onStartEdit: () => void;
+  onEditChange: (v: string) => void;
+  onCommitEdit: () => void;
+  onCancelEdit: () => void;
+  onDelete: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id: stage._id,
+    disabled: !!stage.isFixed || isLocked,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-center">
+      <button
+        onClick={onSelect}
+        className={`group relative flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium transition-colors ${
+          isSelected ? "bg-[var(--color-blue)] text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+        }`}
+      >
+        {/* Drag handle — only for non-fixed stages */}
+        {!stage.isFixed && !isLocked && (
+          <span
+            {...listeners}
+            {...attributes}
+            onClick={(e) => e.stopPropagation()}
+            className="hidden cursor-grab active:cursor-grabbing touch-none group-hover:inline-flex items-center opacity-40 hover:opacity-80 -ml-1 mr-0.5"
+            title="Drag to reorder"
+          >
+            <svg width="8" height="14" viewBox="0 0 8 14" fill="currentColor">
+              <circle cx="2" cy="2" r="1.2"/><circle cx="6" cy="2" r="1.2"/>
+              <circle cx="2" cy="7" r="1.2"/><circle cx="6" cy="7" r="1.2"/>
+              <circle cx="2" cy="12" r="1.2"/><circle cx="6" cy="12" r="1.2"/>
+            </svg>
+          </span>
+        )}
+
+        {isEditing ? (
+          <input
+            autoFocus
+            value={editName}
+            onChange={(e) => onEditChange(e.target.value)}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === "Enter") onCommitEdit();
+              if (e.key === "Escape") onCancelEdit();
+            }}
+            onBlur={onCommitEdit}
+            onClick={(e) => e.stopPropagation()}
+            className="w-32 rounded border border-white/50 bg-white/20 px-1 text-sm text-white placeholder:text-white/60 focus:outline-none"
+          />
+        ) : (
+          <span>{stage.name}</span>
+        )}
+
+        {/* Rename / delete on hover */}
+        {!isEditing && !stage.isFixed && (
+          <span className="ml-1 hidden items-center gap-0.5 group-hover:flex" onClick={(e) => e.stopPropagation()}>
+            <span
+              onClick={onStartEdit}
+              className="cursor-pointer rounded px-0.5 text-xs opacity-70 hover:opacity-100"
+              title="Rename"
+            >✎</span>
+            <span
+              onClick={onDelete}
+              className="cursor-pointer rounded px-0.5 text-xs text-red-300 hover:text-red-100"
+              title="Delete"
+            >×</span>
+          </span>
+        )}
+      </button>
+    </div>
+  );
+}
+
 export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
   const project = useQuery(api.projects.get, { id: projectId });
   const data = useQuery(api.stages.listForProject, { projectId });
@@ -80,6 +214,7 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
   const [newStageName, setNewStageName] = useState("");
   const [editingStageId, setEditingStageId] = useState<Id<"stages"> | null>(null);
   const [editStageName, setEditStageName] = useState("");
+  const [draggingStageId, setDraggingStageId] = useState<Id<"stages"> | null>(null);
   const [addingSectionForStage, setAddingSectionForStage] = useState<Id<"stages"> | null>(null);
   const [newSectionName, setNewSectionName] = useState("");
   const [editingSectionId, setEditingSectionId] = useState<Id<"stageSections"> | null>(null);
@@ -87,6 +222,7 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
   const addStageInputRef = useRef<HTMLInputElement>(null);
   const addSectionInputRef = useRef<HTMLInputElement>(null);
   const [yamlOpen, setYamlOpen] = useState(false);
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
   const [importOpen, setImportOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
 
@@ -94,6 +230,18 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
   const allFees = useQuery(api.fees.listForProject, { projectId });
   const allConditions = useQuery(api.conditions.listForProject, { projectId });
   const allPolicyExceptions = useQuery(api.policyExceptions.listForProject, { projectId });
+  const allCovenantsPicklists = useQuery(api.picklists.listForScope, { scope: "covenants" });
+  const allCollateralPicklists = useQuery(api.picklists.listForScope, { scope: "collateral" });
+  const allCollateralFieldConfigs = useQuery(api.collateral.listFieldConfigs, { projectId });
+  const allInvolvementTypes = useQuery(api.involvementTypes.list, { projectId });
+  const allProductHierarchy = useQuery(api.productHierarchy.listForProject, { projectId });
+  const allChecklistReqs = useQuery(api.checklist.listForProject, { projectId });
+  const allChecklistPicklists = useQuery(api.picklists.listForScope, { scope: "checklist" });
+  const allDocmanData = useQuery(api.docman.listForProject, { projectId });
+  const allDocmanPlaceholders = useQuery(api.docman.listPlaceholdersForProject, { projectId });
+  const allConnections = useQuery(api.connections.list, { projectId });
+  const allRelationshipsPicklists = useQuery(api.picklists.listForScope, { scope: "relationships" });
+  const allRelationshipFieldConfigs = useQuery(api.relationships.listFieldConfigs, { projectId });
 
   // Seed default stages/sections on first load (mutation is idempotent)
   useEffect(() => {
@@ -221,11 +369,29 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
     await reorderSections({ stageId: section.stageId, ids: newOrder.map((s) => s._id) });
   }
 
+  function hasFieldErrors(): boolean {
+    for (const sec of sections) {
+      const subs = (sec.subsections as Subsection[] | undefined) ?? [];
+      for (const sub of subs) {
+        for (const f of [...sub.fields, ...sub.sections.flatMap((s) => s.fields)]) {
+          const cfg = NUMERIC_CONFIG[f.fieldType];
+          if (!cfg) continue;
+          const len = f.length ?? cfg[1];
+          const dp = f.decimalPlaces ?? cfg[2];
+          if (len + dp > cfg[0] || dp > cfg[3]) return true;
+        }
+      }
+    }
+    return false;
+  }
+
   function buildExportData() {
     return {
       stages: stages.map((stage) => ({
         name: stage.name,
         isFixed: stage.isFixed,
+        keyFields: stage.keyFields,
+        guidanceForSuccess: stage.guidanceForSuccess,
         enabledTabs: stage.enabledTabs,
         sections: sections
           .filter((s) => s.stageId === stage._id)
@@ -280,102 +446,88 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
         </div>
 
         {/* Stage pipeline */}
-        <div className="flex flex-wrap items-center gap-1">
-          {stages.map((stage, idx) => (
-            <div key={stage._id} className="flex items-center">
-              {/* Stage pill */}
-              <button
-                onClick={() => setSelectedStageId(stage._id)}
-                className={`group relative flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium transition-colors ${
-                  selectedStageId === stage._id
-                    ? "bg-[var(--color-blue)] text-white"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                }`}
-              >
-                {editingStageId === stage._id ? (
-                  <input
-                    autoFocus
-                    value={editStageName}
-                    onChange={(e) => setEditStageName(e.target.value)}
-                    onKeyDown={(e) => {
-                      e.stopPropagation();
-                      if (e.key === "Enter") handleRenameStage();
-                      if (e.key === "Escape") setEditingStageId(null);
-                    }}
-                    onBlur={handleRenameStage}
-                    onClick={(e) => e.stopPropagation()}
-                    className="w-32 rounded border border-white/50 bg-white/20 px-1 text-sm text-white placeholder:text-white/60 focus:outline-none"
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={(e) => setDraggingStageId(e.active.id as Id<"stages">)}
+          onDragEnd={async (e) => {
+            setDraggingStageId(null);
+            const { active, over } = e;
+            if (!over || active.id === over.id) return;
+            const oldIdx = stages.findIndex((s) => s._id === active.id);
+            const newIdx = stages.findIndex((s) => s._id === over.id);
+            if (oldIdx === -1 || newIdx === -1) return;
+            // Prevent non-fixed stages from swapping into fixed positions and vice-versa
+            const movingStage = stages[oldIdx];
+            const targetStage = stages[newIdx];
+            if (movingStage.isFixed || targetStage.isFixed) return;
+            const reordered = arrayMove(stages, oldIdx, newIdx);
+            await reorderStages({ projectId, ids: reordered.map((s) => s._id) });
+          }}
+          onDragCancel={() => setDraggingStageId(null)}
+        >
+          <SortableContext items={stages.map((s) => s._id)} strategy={horizontalListSortingStrategy}>
+            <div className="flex flex-wrap items-center gap-1">
+              {stages.map((stage, idx) => (
+                <div key={stage._id} className="flex items-center">
+                  <SortableStageItem
+                    stage={stage}
+                    isSelected={selectedStageId === stage._id}
+                    isEditing={editingStageId === stage._id}
+                    editName={editStageName}
+                    isDragging={draggingStageId === stage._id}
+                    isLocked={isLocked}
+                    onSelect={() => setSelectedStageId(stage._id)}
+                    onStartEdit={() => { setEditingStageId(stage._id); setEditStageName(stage.name); }}
+                    onEditChange={setEditStageName}
+                    onCommitEdit={handleRenameStage}
+                    onCancelEdit={() => setEditingStageId(null)}
+                    onDelete={() => handleDeleteStage(stage)}
                   />
-                ) : (
-                  <span>{stage.name}</span>
-                )}
+                  {idx < stages.length - 1 && (
+                    <span className="mx-0.5 text-slate-300">›</span>
+                  )}
+                </div>
+              ))}
 
-                {/* Actions shown on hover */}
-                {!editingStageId && (
-                  <span className="ml-1 hidden items-center gap-0.5 group-hover:flex" onClick={(e) => e.stopPropagation()}>
-                    {/* Move left */}
-                    {idx > 0 && !stage.isFixed && (
-                      <span
-                        onClick={() => handleMoveStage(stage, -1)}
-                        className="cursor-pointer rounded px-0.5 text-xs opacity-70 hover:opacity-100"
-                        title="Move left"
-                      >←</span>
-                    )}
-                    {/* Move right */}
-                    {idx < stages.length - 1 && !stage.isFixed && !stages[idx + 1]?.isFixed && (
-                      <span
-                        onClick={() => handleMoveStage(stage, 1)}
-                        className="cursor-pointer rounded px-0.5 text-xs opacity-70 hover:opacity-100"
-                        title="Move right"
-                      >→</span>
-                    )}
-                    {/* Rename */}
-                    {!stage.isFixed && (
-                      <span
-                        onClick={() => { setEditingStageId(stage._id); setEditStageName(stage.name); }}
-                        className="cursor-pointer rounded px-0.5 text-xs opacity-70 hover:opacity-100"
-                        title="Rename"
-                      >✎</span>
-                    )}
-                    {/* Delete */}
-                    {!stage.isFixed && (
-                      <span
-                        onClick={() => handleDeleteStage(stage)}
-                        className="cursor-pointer rounded px-0.5 text-xs text-red-300 hover:text-red-100"
-                        title="Delete"
-                      >×</span>
-                    )}
-                  </span>
-                )}
-              </button>
-
-              {/* Arrow separator */}
-              {idx < stages.length - 1 && (
-                <span className="mx-0.5 text-slate-300">›</span>
+              {/* Inline add stage input */}
+              {addingStage && (
+                <div className="flex items-center gap-1">
+                  <span className="text-slate-300">›</span>
+                  <Input
+                    ref={addStageInputRef}
+                    value={newStageName}
+                    onChange={(e) => setNewStageName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") handleAddStage();
+                      if (e.key === "Escape") setAddingStage(false);
+                    }}
+                    placeholder="Stage name…"
+                    className="h-8 w-40 text-sm"
+                  />
+                  <Button size="sm" onClick={handleAddStage} disabled={!newStageName.trim()}>Add</Button>
+                  <Button size="sm" variant="ghost" onClick={() => setAddingStage(false)}>Cancel</Button>
+                </div>
               )}
             </div>
-          ))}
+          </SortableContext>
 
-          {/* Inline add stage input */}
-          {addingStage && (
-            <div className="flex items-center gap-1">
-              <span className="text-slate-300">›</span>
-              <Input
-                ref={addStageInputRef}
-                value={newStageName}
-                onChange={(e) => setNewStageName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleAddStage();
-                  if (e.key === "Escape") setAddingStage(false);
-                }}
-                placeholder="Stage name…"
-                className="h-8 w-40 text-sm"
-              />
-              <Button size="sm" onClick={handleAddStage} disabled={!newStageName.trim()}>Add</Button>
-              <Button size="sm" variant="ghost" onClick={() => setAddingStage(false)}>Cancel</Button>
-            </div>
-          )}
-        </div>
+          <DragOverlay>
+            {draggingStageId ? (() => {
+              const s = stages.find((s) => s._id === draggingStageId);
+              return s ? (
+                <div className="flex items-center gap-1.5 rounded bg-[var(--color-blue)] px-3 py-1.5 text-sm font-medium text-white shadow-lg opacity-90">
+                  <svg width="8" height="14" viewBox="0 0 8 14" fill="currentColor" className="opacity-60">
+                    <circle cx="2" cy="2" r="1.2"/><circle cx="6" cy="2" r="1.2"/>
+                    <circle cx="2" cy="7" r="1.2"/><circle cx="6" cy="7" r="1.2"/>
+                    <circle cx="2" cy="12" r="1.2"/><circle cx="6" cy="12" r="1.2"/>
+                  </svg>
+                  {s.name}
+                </div>
+              ) : null;
+            })() : null}
+          </DragOverlay>
+        </DndContext>
 
         {selectedStage?.isFixed && (
           <p className="mt-2 text-xs text-slate-400">
@@ -383,6 +535,17 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
           </p>
         )}
       </div>
+
+      {/* Key Fields & Guidance for Success panel */}
+      {selectedStage && (
+        <KeyFieldsGuidancePanel
+          stage={selectedStage}
+          isLocked={isLocked}
+          onSave={(keyFields, guidanceForSuccess) =>
+            updateStage({ id: selectedStage._id, keyFields, guidanceForSuccess })
+          }
+        />
+      )}
 
       {/* Bottom panel — tabs + content */}
       {selectedStage ? (
@@ -465,7 +628,7 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
                 onCancelEditSection={() => setEditingSectionId(null)}
                 onDeleteSection={handleDeleteSection}
                 onToggleSectionHidden={handleToggleSectionHidden}
-                onMoveSection={handleMoveSection}
+                onReorderSections={async (ids) => { await reorderSections({ stageId: selectedStage._id, ids }); }}
                 onSaveSection={(id, patch) => updateSection({ id, ...patch })}
               />
             ) : activeTab === "Document Manager" ? (
@@ -535,6 +698,7 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
         open={exportOpen}
         onOpenChange={setExportOpen}
         projectName={project.name}
+        hasFieldErrors={hasFieldErrors()}
         onExport={(scope, format) => {
           const stageMeta = {
             storyId: "",
@@ -576,6 +740,100 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
               severities: (e.severities ?? []) as string[],
               mitigationReasons: (e.mitigationReasons ?? []) as PolicyExceptionRecord["mitigationReasons"],
             }));
+            // Build covenants picklists
+            const covCategories = allCovenantsPicklists?.find((p) => p.key === "category")?.values ?? [];
+            const covFrequencies = allCovenantsPicklists?.find((p) => p.key === "frequency")?.values ?? [];
+            const covTypesByCategory: Record<string, string[]> = {};
+            for (const cat of covCategories) {
+              const stored = allCovenantsPicklists?.find((p) => p.key === `${COV_TYPE_KEY_PREFIX}${cat}`);
+              covTypesByCategory[cat] = stored?.values ?? COVENANT_CATEGORY_TYPE_MAP[cat] ?? [];
+            }
+            const covenants: CovenantPicklists = { categories: covCategories, covenantTypesByCategory: covTypesByCategory, frequencies: covFrequencies };
+
+            // Build collateral picklists
+            const collateralTypes = allCollateralPicklists?.find((r) => r.key === "types")?.values ?? Object.keys(COLLATERAL_TYPE_SUBTYPE_MAP);
+            const subtypesByType: Record<string, string[]> = {};
+            for (const type of collateralTypes) {
+              const row = allCollateralPicklists?.find((r) => r.key === COLLATERAL_SUBTYPE_KEY_PREFIX + type);
+              subtypesByType[type] = row?.values ?? COLLATERAL_TYPE_SUBTYPE_MAP[type] ?? [];
+            }
+            const collateral: CollateralPicklists = { types: collateralTypes, subtypesByType };
+            const collateralFieldConfigs: CollateralFieldConfig[] = (allCollateralFieldConfigs ?? []) as CollateralFieldConfig[];
+
+            // Build involvement types
+            const involvementTypes: InvolvementTypeRecord[] = (allInvolvementTypes ?? []).map((r) => ({ name: r.name }));
+
+            // Build product hierarchy
+            const phData = allProductHierarchy;
+            const lineMap = new Map((phData?.lines ?? []).map((l) => [l._id, l]));
+            const typeMap = new Map((phData?.types ?? []).map((t) => [t._id, t]));
+            const productHierarchy = {
+              lines: (phData?.lines ?? []).map((l) => ({ name: l.name, productObject: l.productObject })),
+              types: (phData?.types ?? []).map((t) => ({ name: t.name, productLineName: lineMap.get(t.productLineId)?.name ?? "", usageType: t.usageType })),
+              products: (phData?.products ?? []).map((p) => ({ name: p.name, productLineName: lineMap.get(p.productLineId)?.name ?? "", productTypeName: typeMap.get(p.productTypeId)?.name ?? "", productCode: p.productCode })),
+            };
+
+            // Build checklist
+            const checklist: ChecklistRecord[] = (allChecklistReqs ?? []).map((r) => ({
+              name: r.name,
+              checklistLevel: r.checklistLevel as ChecklistRecord["checklistLevel"],
+              category: r.category,
+              assignedParty: r.assignedParty,
+              neededBy: r.neededBy,
+              description: r.description,
+              legalDescription: r.legalDescription,
+              stageCheck: r.stageCheck,
+              doNotAutoGenerate: r.doNotAutoGenerate,
+              criteriaUserWritten: r.criteriaUserWritten,
+              criteriaGenerated: r.criteriaGenerated,
+              placeholderName: r.placeholderName,
+            }));
+            const checklistPicklists = new Map<string, string[]>();
+            for (const row of allChecklistPicklists ?? []) {
+              checklistPicklists.set(row.key, row.values);
+            }
+
+            // Build docman
+            const phIdToName = new Map((allDocmanPlaceholders ?? []).map((p) => [p._id, p.name]));
+            const docman: DocmanExport = {
+              placeholders: (allDocmanData?.placeholders ?? []).map((p) => ({
+                name: p.name,
+                level: p.level as DocmanExport["placeholders"][number]["level"],
+                category: p.category,
+                isDefault: p.isDefault,
+              })),
+              groups: (allDocmanData?.groups ?? []).map((g) => ({
+                name: g.name,
+                level: g.level as DocmanExport["groups"][number]["level"],
+                criteriaUserWritten: g.criteriaUserWritten,
+                criteriaFormgen: g.criteriaFormgen,
+                placeholderNames: g.placeholderIds.map((id) => phIdToName.get(id) ?? id).filter(Boolean),
+              })),
+            };
+
+            // Build connections
+            const connections: ConnectionRoleRecord[] = (allConnections ?? []).map((r) => ({
+              name: r.name,
+              fromType: r.fromType,
+              toType: r.toType,
+              description: r.description,
+              selfReciprocating: r.selfReciprocating,
+              reciprocalRole: r.reciprocalRole,
+            }));
+
+            // Build relationships
+            const SYSTEM_TYPES = ["Individual", "Business", "Household", "Lender", "Vendor"];
+            const userRelTypes = allRelationshipsPicklists?.find((r) => r.key === "types")?.values ?? [];
+            const hiddenRelTypes = allRelationshipsPicklists?.find((r) => r.key === "hidden-types")?.values ?? [];
+            const allRelTypes = [...SYSTEM_TYPES, ...userRelTypes];
+            const relFieldConfigs: RelationshipFieldConfig[] = (allRelationshipFieldConfigs ?? []).map((c) => ({
+              relationshipType: c.relationshipType,
+              sections: c.sections.map((s) => ({
+                name: s.name,
+                fields: s.fields.map((f) => ({ name: f.name, fieldType: f.fieldType, picklistValues: f.picklistValues })),
+              })),
+            }));
+
             setExportOpen(false);
             if (format === "yaml") {
               // YAML doesn't support multiple sheets — download one file per builder
@@ -584,6 +842,13 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
               downloadFeesYaml(fees, { ...allMeta, title: `Fees — ${project.name}`, featureArea: "Fees" });
               downloadConditionsYaml(conditions, { ...allMeta, title: `Conditions — ${project.name}`, featureArea: "Conditions" });
               downloadPolicyExceptionsYaml(exceptions, { ...allMeta, title: `Policy Exceptions — ${project.name}`, featureArea: "Policy Exceptions" });
+              downloadCovenantsYaml(covenants, { ...allMeta, title: `Covenant Types — ${project.name}`, featureArea: "Covenants" });
+              downloadCollateralYaml(collateral, { ...allMeta, title: `Collateral Types — ${project.name}`, featureArea: "Collateral" });
+              downloadInvolvementTypesYaml(involvementTypes, { ...allMeta, title: `Entity Involvement Types — ${project.name}`, featureArea: "Relationships" });
+              downloadChecklistYaml(checklist, { ...allMeta, title: `Smart Checklist — ${project.name}`, featureArea: "SmartChecklist" }, checklistPicklists);
+              downloadDocmanYaml(docman, { ...allMeta, title: `Document Manager — ${project.name}`, featureArea: "DocumentManager" });
+              downloadConnectionsYaml(connections, { ...allMeta, title: `Connections — ${project.name}`, featureArea: "Connections" });
+              downloadRelationshipsYaml(allRelTypes, { ...allMeta, title: `Relationships — ${project.name}`, featureArea: "Relationships" });
             } else {
               downloadAllConfigExcel({
                 projectName: project.name,
@@ -591,6 +856,16 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
                 fees,
                 conditions,
                 policyExceptions: exceptions,
+                covenants,
+                collateral,
+                collateralFieldConfigs,
+                involvementTypes,
+                productHierarchy,
+                checklist,
+                checklistPicklists,
+                docman,
+                connections,
+                relationships: { types: allRelTypes, fieldConfigs: relFieldConfigs, hiddenTypes: hiddenRelTypes },
               });
             }
           }
@@ -616,6 +891,337 @@ export function StagesTool({ projectId }: { projectId: Id<"projects"> }) {
   );
 }
 
+// ── Key Fields & Guidance for Success Panel ───────────────────────────────────
+
+function KeyFieldsGuidancePanel({
+  stage,
+  isLocked,
+  onSave,
+}: {
+  stage: Doc<"stages">;
+  isLocked: boolean;
+  onSave: (keyFields: string[], guidanceForSuccess: string) => Promise<unknown>;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [keyFieldInputs, setKeyFieldInputs] = useState<string[]>([]);
+  const [guidance, setGuidance] = useState("");
+
+  useEffect(() => {
+    setEditing(false);
+  }, [stage._id]);
+
+  function openEdit() {
+    setKeyFieldInputs(
+      stage.keyFields && stage.keyFields.length > 0
+        ? [...stage.keyFields, ...Array(5 - stage.keyFields.length).fill("")]
+        : ["", "", "", "", ""],
+    );
+    setGuidance(stage.guidanceForSuccess ?? "");
+    setEditing(true);
+  }
+
+  async function handleSave() {
+    const fields = keyFieldInputs.map((f) => f.trim()).filter(Boolean);
+    await onSave(fields, guidance.trim());
+    setEditing(false);
+  }
+
+  const hasContent = (stage.keyFields && stage.keyFields.length > 0) || stage.guidanceForSuccess;
+
+  return (
+    <div className="flex-shrink-0 border-b border-slate-200 bg-slate-50 px-6 py-3">
+      {editing ? (
+        <div className="flex gap-8">
+          {/* Key Fields editor */}
+          <div className="w-72 shrink-0">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Key Fields (up to 5)</p>
+            <div className="space-y-1.5">
+              {keyFieldInputs.slice(0, 5).map((val, i) => (
+                <Input
+                  key={i}
+                  value={val}
+                  onChange={(e) => {
+                    const next = [...keyFieldInputs];
+                    next[i] = e.target.value;
+                    setKeyFieldInputs(next);
+                  }}
+                  placeholder={`Field ${i + 1}`}
+                  className="h-7 text-xs"
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Guidance editor */}
+          <div className="flex-1">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Guidance for Success</p>
+            <textarea
+              value={guidance}
+              onChange={(e) => setGuidance(e.target.value)}
+              placeholder={"Enter guidance text (use new lines for bullet points)"}
+              rows={6}
+              className="w-full rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs leading-relaxed text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-col justify-start gap-2 pt-6">
+            <Button size="sm" onClick={handleSave} className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]">Save</Button>
+            <Button size="sm" variant="outline" onClick={() => setEditing(false)}>Cancel</Button>
+          </div>
+        </div>
+      ) : (
+        <div className="flex items-start gap-8">
+          {/* Key Fields display */}
+          <div className="w-72 shrink-0">
+            <div className="flex items-center gap-2 mb-1">
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Key Fields</p>
+              {!isLocked && (
+                <button
+                  onClick={openEdit}
+                  className="text-xs text-[var(--color-blue)] hover:underline"
+                >
+                  Edit
+                </button>
+              )}
+            </div>
+            {stage.keyFields && stage.keyFields.length > 0 ? (
+              <ul className="space-y-0.5">
+                {stage.keyFields.map((f, i) => (
+                  <li key={i} className="text-xs text-slate-700">• {f}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-xs text-slate-400 italic">No key fields configured.</p>
+            )}
+          </div>
+
+          {/* Guidance display */}
+          <div className="flex-1">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Guidance for Success</p>
+            {stage.guidanceForSuccess ? (
+              <ul className="space-y-0.5">
+                {stage.guidanceForSuccess.split("\n").filter((l) => l.trim()).map((line, i) => (
+                  <li key={i} className="text-xs text-slate-700">• {line.trim()}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-xs text-slate-400 italic">No guidance configured.</p>
+            )}
+          </div>
+
+          {/* Edit button on the right if no content yet (cleaner empty state) */}
+          {!hasContent && !isLocked && (
+            <button
+              onClick={openEdit}
+              className="shrink-0 text-xs text-[var(--color-blue)] hover:underline"
+            >
+              + Add key fields &amp; guidance
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Sortable Routes List ──────────────────────────────────────────────────────
+
+function SortableRouteItem({
+  section,
+  isSelected,
+  editingSectionId,
+  editSectionName,
+  onSelect,
+  onEditSectionNameChange,
+  onConfirmEditSection,
+  onCancelEditSection,
+  onStartEditSection,
+  onToggleSectionHidden,
+  onDeleteSection,
+}: {
+  section: Doc<"stageSections">;
+  isSelected: boolean;
+  editingSectionId: Id<"stageSections"> | null;
+  editSectionName: string;
+  onSelect: () => void;
+  onEditSectionNameChange: (v: string) => void;
+  onConfirmEditSection: () => void;
+  onCancelEditSection: () => void;
+  onStartEditSection: () => void;
+  onToggleSectionHidden: () => void;
+  onDeleteSection: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section._id });
+  const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.4 : 1 };
+  const isEditing = editingSectionId === section._id;
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className={`group flex items-center gap-1 px-2 py-0.5 ${
+        isSelected ? "bg-slate-100" : "hover:bg-slate-50"
+      } ${section.isHidden ? "opacity-50" : ""}`}
+    >
+      {/* Drag handle — always visible, clearly signifies draggability */}
+      <span
+        {...listeners}
+        {...attributes}
+        className="flex shrink-0 cursor-grab items-center text-slate-300 hover:text-slate-500 active:cursor-grabbing touch-none px-0.5"
+        title="Drag to reorder"
+      >
+        <svg width="10" height="16" viewBox="0 0 10 16" fill="currentColor">
+          <circle cx="3" cy="3" r="1.5"/>
+          <circle cx="7" cy="3" r="1.5"/>
+          <circle cx="3" cy="8" r="1.5"/>
+          <circle cx="7" cy="8" r="1.5"/>
+          <circle cx="3" cy="13" r="1.5"/>
+          <circle cx="7" cy="13" r="1.5"/>
+        </svg>
+      </span>
+
+      {/* Name / inline edit */}
+      <div className="flex-1 min-w-0">
+        {isEditing ? (
+          <Input
+            autoFocus
+            value={editSectionName}
+            onChange={(e) => onEditSectionNameChange(e.target.value)}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === "Enter") onConfirmEditSection();
+              if (e.key === "Escape") onCancelEditSection();
+            }}
+            onBlur={onConfirmEditSection}
+            className="h-6 text-xs"
+          />
+        ) : (
+          <button
+            onClick={onSelect}
+            className={`w-full truncate py-1.5 text-left text-sm ${
+              isSelected ? "font-medium text-slate-900" : "text-slate-700"
+            } ${section.isHidden ? "line-through" : ""}`}
+          >
+            {section.name}
+          </button>
+        )}
+      </div>
+
+      {/* Hover actions */}
+      {!isEditing && (
+        <div className="flex shrink-0 items-center gap-0.5 opacity-0 group-hover:opacity-100">
+          <button
+            onClick={onStartEditSection}
+            className="rounded px-1 py-0.5 text-[10px] text-slate-400 hover:bg-slate-200 hover:text-slate-700"
+            title="Rename"
+          >✎</button>
+          <button
+            onClick={onToggleSectionHidden}
+            className="rounded px-1 py-0.5 text-[10px] text-slate-400 hover:bg-slate-200 hover:text-slate-700"
+            title={section.isHidden ? "Show section" : "Hide section"}
+          >{section.isHidden ? "Show" : "Hide"}</button>
+          {!section.isDefault && (
+            <button
+              onClick={onDeleteSection}
+              className="rounded px-1 py-0.5 text-[10px] text-red-400 hover:bg-red-50 hover:text-red-600"
+              title="Delete"
+            >×</button>
+          )}
+        </div>
+      )}
+    </li>
+  );
+}
+
+function SortableRoutesList({
+  sections,
+  selectedSectionId,
+  editingSectionId,
+  editSectionName,
+  onSelect,
+  onEditSectionNameChange,
+  onConfirmEditSection,
+  onCancelEditSection,
+  onStartEditSection,
+  onToggleSectionHidden,
+  onDeleteSection,
+  onReorderSections,
+}: {
+  sections: Doc<"stageSections">[];
+  selectedSectionId: Id<"stageSections"> | null;
+  editingSectionId: Id<"stageSections"> | null;
+  editSectionName: string;
+  onSelect: (id: Id<"stageSections">) => void;
+  onEditSectionNameChange: (v: string) => void;
+  onConfirmEditSection: () => void;
+  onCancelEditSection: () => void;
+  onStartEditSection: (s: Doc<"stageSections">) => void;
+  onToggleSectionHidden: (s: Doc<"stageSections">) => void;
+  onDeleteSection: (id: Id<"stageSections">) => void;
+  onReorderSections: (ids: Id<"stageSections">[]) => Promise<void>;
+}) {
+  const [activeDragName, setActiveDragName] = useState<string | null>(null);
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+
+  function handleDragStart({ active }: DragStartEvent) {
+    const s = sections.find((s) => s._id === active.id);
+    setActiveDragName(s?.name ?? null);
+  }
+
+  async function handleDragEnd({ active, over }: DragEndEvent) {
+    setActiveDragName(null);
+    if (!over || active.id === over.id) return;
+    const oldIdx = sections.findIndex((s) => s._id === active.id);
+    const newIdx = sections.findIndex((s) => s._id === over.id);
+    if (oldIdx === -1 || newIdx === -1) return;
+    const reordered = arrayMove(sections, oldIdx, newIdx);
+    await onReorderSections(reordered.map((s) => s._id));
+  }
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={sections.map((s) => s._id)} strategy={verticalListSortingStrategy}>
+        <ul className="h-full overflow-y-auto py-1">
+          {sections.map((section) => (
+            <SortableRouteItem
+              key={section._id}
+              section={section}
+              isSelected={selectedSectionId === section._id}
+              editingSectionId={editingSectionId}
+              editSectionName={editSectionName}
+              onSelect={() => onSelect(section._id)}
+              onEditSectionNameChange={onEditSectionNameChange}
+              onConfirmEditSection={onConfirmEditSection}
+              onCancelEditSection={onCancelEditSection}
+              onStartEditSection={() => onStartEditSection(section)}
+              onToggleSectionHidden={() => onToggleSectionHidden(section)}
+              onDeleteSection={() => onDeleteSection(section._id)}
+            />
+          ))}
+        </ul>
+      </SortableContext>
+      <DragOverlay>
+        {activeDragName && (
+          <div className="flex items-center gap-1.5 rounded bg-white px-3 py-1.5 text-sm font-medium text-slate-800 shadow-lg ring-1 ring-[var(--color-blue)] ring-opacity-50">
+            <svg width="10" height="16" viewBox="0 0 10 16" fill="currentColor" className="text-slate-400">
+              <circle cx="3" cy="3" r="1.5"/><circle cx="7" cy="3" r="1.5"/>
+              <circle cx="3" cy="8" r="1.5"/><circle cx="7" cy="8" r="1.5"/>
+              <circle cx="3" cy="13" r="1.5"/><circle cx="7" cy="13" r="1.5"/>
+            </svg>
+            {activeDragName}
+          </div>
+        )}
+      </DragOverlay>
+    </DndContext>
+  );
+}
+
 // ── Details Tab ───────────────────────────────────────────────────────────────
 
 function DetailsTab({
@@ -637,7 +1243,7 @@ function DetailsTab({
   onCancelEditSection,
   onDeleteSection,
   onToggleSectionHidden,
-  onMoveSection,
+  onReorderSections,
   onSaveSection,
 }: {
   projectId: Id<"projects">;
@@ -658,7 +1264,7 @@ function DetailsTab({
   onCancelEditSection: () => void;
   onDeleteSection: (id: Id<"stageSections">) => void;
   onToggleSectionHidden: (s: Doc<"stageSections">) => void;
-  onMoveSection: (s: Doc<"stageSections">, dir: -1 | 1) => void;
+  onReorderSections: (ids: Id<"stageSections">[]) => Promise<void>;
   onSaveSection: (id: Id<"stageSections">, patch: Partial<Pick<Doc<"stageSections">, "description" | "subsections">>) => void;
 }) {
   const [selectedSectionId, setSelectedSectionId] = useState<Id<"stageSections"> | null>(
@@ -680,7 +1286,7 @@ function DetailsTab({
   return (
     <div className="flex h-full gap-0 rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden">
       {/* Left sidebar — section tabs */}
-      <div className="flex w-64 flex-shrink-0 flex-col border-r border-slate-200">
+      <div className="flex h-full w-64 flex-shrink-0 flex-col border-r border-slate-200">
         <div className="flex items-center justify-between border-b border-slate-100 px-3 py-2">
           <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">Routes</span>
           <button
@@ -693,115 +1299,49 @@ function DetailsTab({
           </button>
         </div>
 
-        <ul className="flex-1 overflow-y-auto py-1">
-          {sections.map((section, idx) => (
-            <li
-              key={section._id}
-              className={`group flex items-center gap-1 px-2 py-0.5 ${
-                selectedSectionId === section._id ? "bg-slate-100" : "hover:bg-slate-50"
-              } ${section.isHidden ? "opacity-50" : ""}`}
-            >
-              {/* Reorder */}
-              <div className="flex flex-col opacity-0 group-hover:opacity-100">
-                <button
-                  onClick={() => onMoveSection(section, -1)}
-                  disabled={idx === 0}
-                  className="px-0.5 text-[9px] text-slate-300 hover:text-slate-600 disabled:opacity-20"
-                  title="Move up"
-                >▲</button>
-                <button
-                  onClick={() => onMoveSection(section, 1)}
-                  disabled={idx === sections.length - 1}
-                  className="px-0.5 text-[9px] text-slate-300 hover:text-slate-600 disabled:opacity-20"
-                  title="Move down"
-                >▼</button>
-              </div>
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <SortableRoutesList
+            sections={sections}
+            selectedSectionId={selectedSectionId}
+            editingSectionId={editingSectionId}
+            editSectionName={editSectionName}
+            onSelect={setSelectedSectionId}
+            onEditSectionNameChange={onEditSectionNameChange}
+            onConfirmEditSection={onConfirmEditSection}
+            onCancelEditSection={onCancelEditSection}
+            onStartEditSection={(s) => { onStartEditSection(s); setSelectedSectionId(s._id); }}
+            onToggleSectionHidden={onToggleSectionHidden}
+            onDeleteSection={onDeleteSection}
+            onReorderSections={onReorderSections}
+          />
+        </div>
 
-              {/* Name / inline edit */}
-              <div className="flex-1 min-w-0">
-                {editingSectionId === section._id ? (
-                  <Input
-                    autoFocus
-                    value={editSectionName}
-                    onChange={(e) => onEditSectionNameChange(e.target.value)}
-                    onKeyDown={(e) => {
-                      e.stopPropagation();
-                      if (e.key === "Enter") onConfirmEditSection();
-                      if (e.key === "Escape") onCancelEditSection();
-                    }}
-                    onBlur={onConfirmEditSection}
-                    className="h-6 text-xs"
-                  />
-                ) : (
-                  <button
-                    onClick={() => setSelectedSectionId(section._id)}
-                    className={`w-full truncate py-1.5 text-left text-sm ${
-                      selectedSectionId === section._id
-                        ? "font-medium text-slate-900"
-                        : "text-slate-700"
-                    } ${section.isHidden ? "line-through" : ""}`}
-                  >
-                    {section.name}
-                  </button>
-                )}
-              </div>
+        {/* Inline add row */}
+        {addingSectionForStage === stage._id && (
+          <div className="border-t border-slate-100 px-2 py-1.5">
+            <Input
+              ref={addSectionInputRef}
+              value={newSectionName}
+              onChange={(e) => onNewSectionNameChange(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") onConfirmAddSection();
+                if (e.key === "Escape") onCancelAddSection();
+              }}
+              placeholder="Section name…"
+              className="h-7 text-xs"
+            />
+            <div className="mt-1 flex gap-1">
+              <Button size="sm" onClick={onConfirmAddSection} disabled={!newSectionName.trim()} className="h-6 text-xs px-2">Add</Button>
+              <Button size="sm" variant="ghost" onClick={onCancelAddSection} className="h-6 text-xs px-2">Cancel</Button>
+            </div>
+          </div>
+        )}
 
-              {/* Hover actions */}
-              {editingSectionId !== section._id && (
-                <div className="flex shrink-0 items-center gap-0.5 opacity-0 group-hover:opacity-100">
-                  <button
-                    onClick={() => { onStartEditSection(section); setSelectedSectionId(section._id); }}
-                    className="rounded px-1 py-0.5 text-[10px] text-slate-400 hover:bg-slate-200 hover:text-slate-700"
-                    title="Rename"
-                  >✎</button>
-                  <button
-                    onClick={() => onToggleSectionHidden(section)}
-                    className={`rounded px-1 py-0.5 text-[10px] hover:bg-slate-200 ${
-                      section.isHidden
-                        ? "text-slate-400 hover:text-slate-700"
-                        : "text-slate-400 hover:text-slate-700"
-                    }`}
-                    title={section.isHidden ? "Show section" : "Hide section"}
-                  >{section.isHidden ? "Show" : "Hide"}</button>
-                  {!section.isDefault && (
-                    <button
-                      onClick={() => onDeleteSection(section._id)}
-                      className="rounded px-1 py-0.5 text-[10px] text-red-400 hover:bg-red-50 hover:text-red-600"
-                      title="Delete"
-                    >×</button>
-                  )}
-                </div>
-              )}
-            </li>
-          ))}
-
-          {/* Inline add row */}
-          {addingSectionForStage === stage._id && (
-            <li className="px-2 py-1.5">
-              <Input
-                ref={addSectionInputRef}
-                value={newSectionName}
-                onChange={(e) => onNewSectionNameChange(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") onConfirmAddSection();
-                  if (e.key === "Escape") onCancelAddSection();
-                }}
-                placeholder="Section name…"
-                className="h-7 text-xs"
-              />
-              <div className="mt-1 flex gap-1">
-                <Button size="sm" onClick={onConfirmAddSection} disabled={!newSectionName.trim()} className="h-6 text-xs px-2">Add</Button>
-                <Button size="sm" variant="ghost" onClick={onCancelAddSection} className="h-6 text-xs px-2">Cancel</Button>
-              </div>
-            </li>
-          )}
-
-          {sections.length === 0 && addingSectionForStage !== stage._id && (
-            <li className="px-3 py-4 text-center text-xs text-slate-400">
-              No routes yet.<br />Click + Add to start.
-            </li>
-          )}
-        </ul>
+        {sections.length === 0 && addingSectionForStage !== stage._id && (
+          <div className="px-3 py-4 text-center text-xs text-slate-400">
+            No routes yet.<br />Click + Add to start.
+          </div>
+        )}
       </div>
 
       {/* Right panel — selected section */}
@@ -827,7 +1367,7 @@ function DetailsTab({
 
 type SubSection = { id: string; name: string; fields: Field[] };
 type Subsection = { id: string; name: string; description?: string; fields: Field[]; sections: SubSection[] };
-type Field = { id: string; name: string; fieldType: string };
+type Field = { id: string; name: string; fieldType: string; picklistValues?: string[]; length?: number; decimalPlaces?: number };
 
 const FIELD_TYPES = ["Text", "Number", "Date", "Checkbox", "Picklist", "Lookup", "Currency", "Percentage", "TextArea"];
 
@@ -1406,6 +1946,20 @@ function SubRouteTab({
   );
 }
 
+// Config per numeric-ish type: [maxTotal, defaultLength, defaultDp, maxDp]
+const NUMERIC_CONFIG: Record<string, [number, number, number, number]> = {
+  Number:     [16, 14, 2, 15],
+  Currency:   [18, 16, 2, 17],
+  Percentage: [18,  3, 2, 17],
+};
+
+function applyTypeDefaults(fieldType: string): Partial<Field> {
+  const cfg = NUMERIC_CONFIG[fieldType];
+  if (cfg) return { fieldType, length: cfg[1], decimalPlaces: cfg[2], picklistValues: undefined };
+  if (fieldType === "Picklist") return { fieldType, length: undefined, decimalPlaces: undefined };
+  return { fieldType, length: undefined, decimalPlaces: undefined, picklistValues: undefined };
+}
+
 function FieldRow({
   field,
   onUpdate,
@@ -1417,6 +1971,7 @@ function FieldRow({
 }) {
   const [editingName, setEditingName] = useState(false);
   const [nameVal, setNameVal] = useState(field.name);
+  const [newPicklistVal, setNewPicklistVal] = useState("");
 
   function commitName() {
     setEditingName(false);
@@ -1425,45 +1980,140 @@ function FieldRow({
     else setNameVal(field.name);
   }
 
+  function addPicklistValue() {
+    const trimmed = newPicklistVal.trim();
+    if (!trimmed) return;
+    const current = field.picklistValues ?? [];
+    if (current.includes(trimmed)) { setNewPicklistVal(""); return; }
+    onUpdate({ picklistValues: [...current, trimmed] });
+    setNewPicklistVal("");
+  }
+
+  function removePicklistValue(val: string) {
+    onUpdate({ picklistValues: (field.picklistValues ?? []).filter((v) => v !== val) });
+  }
+
+  const numCfg = NUMERIC_CONFIG[field.fieldType];
+  const length = field.length ?? (numCfg ? numCfg[1] : 0);
+  const dp = field.decimalPlaces ?? (numCfg ? numCfg[2] : 0);
+  const maxTotal = numCfg ? numCfg[0] : 0;
+  const maxDp = numCfg ? numCfg[3] : 0;
+  const totalExceeded = numCfg && (length + dp) > maxTotal;
+  const dpExceeded = numCfg && dp > maxDp;
+  const lengthError = totalExceeded ? `Length + decimal places must not exceed ${maxTotal}` : null;
+  const dpError = dpExceeded ? `Max decimal places is ${maxDp}` : (totalExceeded ? `Length + decimal places must not exceed ${maxTotal}` : null);
+
   return (
-    <div className="flex items-center gap-2 px-3 py-1.5">
-      {/* Field name */}
-      <div className="flex-1 min-w-0">
-        {editingName ? (
-          <input
-            autoFocus
-            value={nameVal}
-            onChange={(e) => setNameVal(e.target.value)}
-            onBlur={commitName}
-            onKeyDown={(e) => { if (e.key === "Enter") commitName(); if (e.key === "Escape") { setNameVal(field.name); setEditingName(false); } }}
-            className="w-full rounded border border-slate-300 px-2 py-0.5 text-xs focus:outline-none focus:border-[var(--color-blue)]"
-          />
-        ) : (
-          <button
-            onClick={() => setEditingName(true)}
-            className="truncate text-left text-xs text-slate-700 hover:text-[var(--color-blue)]"
-            title="Click to rename"
-          >
-            {field.name}
-          </button>
+    <div className="px-3 py-1.5">
+      <div className="flex items-center gap-2">
+        {/* Field name — fixed width so all rows align regardless of extra inputs */}
+        <div className="w-40 shrink-0 min-w-0">
+          {editingName ? (
+            <input
+              autoFocus
+              value={nameVal}
+              onChange={(e) => setNameVal(e.target.value)}
+              onBlur={commitName}
+              onKeyDown={(e) => { if (e.key === "Enter") commitName(); if (e.key === "Escape") { setNameVal(field.name); setEditingName(false); } }}
+              className="w-full rounded border border-slate-300 px-2 py-0.5 text-xs focus:outline-none focus:border-[var(--color-blue)]"
+            />
+          ) : (
+            <button
+              onClick={() => setEditingName(true)}
+              className="w-full truncate text-left text-xs text-slate-700 hover:text-[var(--color-blue)]"
+              title="Click to rename"
+            >
+              {field.name}
+            </button>
+          )}
+        </div>
+
+        {/* Field type */}
+        <select
+          value={field.fieldType}
+          onChange={(e) => onUpdate(applyTypeDefaults(e.target.value))}
+          className="rounded border border-slate-200 bg-white px-1.5 py-0.5 text-xs text-slate-600 focus:outline-none focus:border-[var(--color-blue)]"
+        >
+          {FIELD_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+        </select>
+
+        {/* Spacer pushes Len/DP and delete to the right */}
+        <div className="flex-1" />
+
+        {/* Inline numeric config — pinned to the right */}
+        {numCfg && (
+          <>
+            <span className="text-[10px] text-slate-400 shrink-0">Len</span>
+            <input
+              type="number"
+              min={1}
+              max={maxTotal - 1}
+              value={length}
+              onChange={(e) => onUpdate({ length: Math.max(1, parseInt(e.target.value) || 1) })}
+              title={lengthError ?? `Max length: ${maxTotal - 1}`}
+              className={`w-10 rounded border px-1.5 py-0.5 text-[10px] text-center focus:outline-none ${lengthError ? "border-red-400 bg-red-50 text-red-600 focus:border-red-500" : "border-slate-200 focus:border-[var(--color-blue)]"}`}
+            />
+            <span className="text-[10px] text-slate-400 shrink-0">DP</span>
+            <input
+              type="number"
+              min={0}
+              max={maxDp}
+              value={dp}
+              onChange={(e) => onUpdate({ decimalPlaces: Math.max(0, parseInt(e.target.value) || 0) })}
+              title={dpError ?? `Max decimal places: ${maxDp}`}
+              className={`w-10 rounded border px-1.5 py-0.5 text-[10px] text-center focus:outline-none ${dpError ? "border-red-400 bg-red-50 text-red-600 focus:border-red-500" : "border-slate-200 focus:border-[var(--color-blue)]"}`}
+            />
+          </>
         )}
+
+        {/* Delete */}
+        <button
+          onClick={onDelete}
+          className="text-xs text-red-400 hover:text-red-600 shrink-0"
+          title="Delete field"
+        >×</button>
       </div>
 
-      {/* Field type */}
-      <select
-        value={field.fieldType}
-        onChange={(e) => onUpdate({ fieldType: e.target.value })}
-        className="rounded border border-slate-200 bg-white px-1.5 py-0.5 text-xs text-slate-600 focus:outline-none focus:border-[var(--color-blue)]"
-      >
-        {FIELD_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
-      </select>
-
-      {/* Delete */}
-      <button
-        onClick={onDelete}
-        className="text-xs text-red-400 hover:text-red-600"
-        title="Delete field"
-      >×</button>
+      {/* Picklist values editor */}
+      {field.fieldType === "Picklist" && (
+        <div className="mt-1.5 border-l-2 border-slate-200 pl-2">
+          <div className="flex flex-wrap gap-1 mb-1">
+            {(field.picklistValues ?? []).map((val) => (
+              <span key={val} className="inline-flex items-center gap-0.5 rounded-full bg-blue-50 border border-blue-200 px-2 py-0.5 text-[10px] text-blue-700">
+                {val}
+                <button onClick={() => removePicklistValue(val)} className="ml-0.5 text-blue-400 hover:text-red-500 leading-none">×</button>
+              </span>
+            ))}
+            {(field.picklistValues ?? []).length === 0 && (
+              <span className="text-[10px] text-slate-400 italic">No values yet</span>
+            )}
+          </div>
+          <div className="flex items-center gap-1">
+            <input
+              value={newPicklistVal}
+              onChange={(e) => setNewPicklistVal(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") addPicklistValue(); }}
+              onPaste={(e) => {
+                const text = e.clipboardData.getData("text");
+                if (!text.includes("\n")) return;
+                e.preventDefault();
+                const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+                if (lines.length === 0) return;
+                const current = field.picklistValues ?? [];
+                const toAdd = lines.filter((l) => !current.includes(l));
+                if (toAdd.length > 0) onUpdate({ picklistValues: [...current, ...toAdd] });
+                setNewPicklistVal("");
+              }}
+              placeholder="Add value… or paste a list"
+              className="flex-1 rounded border border-slate-200 px-2 py-0.5 text-[10px] focus:outline-none focus:border-[var(--color-blue)]"
+            />
+            <button
+              onClick={addPicklistValue}
+              className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600 hover:bg-slate-200"
+            >Add</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1474,11 +2124,13 @@ function ExportDialog({
   open,
   onOpenChange,
   projectName,
+  hasFieldErrors,
   onExport,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   projectName: string;
+  hasFieldErrors: boolean;
   onExport: (scope: "ui" | "all", format: "yaml" | "excel") => void;
 }) {
   const [scope, setScope] = useState<"ui" | "all">("ui");
@@ -1553,11 +2205,18 @@ function ExportDialog({
           </p>
         )}
 
+        {hasFieldErrors && (
+          <p className="text-xs text-red-600 mb-4 rounded-md bg-red-50 border border-red-200 px-3 py-2">
+            Some fields have invalid length or decimal place values. Fix the errors before exporting.
+          </p>
+        )}
+
         <div className="flex justify-end gap-2">
           <Button size="sm" variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button
             size="sm"
-            className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)]"
+            disabled={hasFieldErrors}
+            className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)] disabled:opacity-40 disabled:cursor-not-allowed"
             onClick={() => onExport(scope, format)}
           >
             Download

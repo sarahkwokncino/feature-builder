@@ -160,6 +160,7 @@ export const updateStage = mutation({
     id: v.id("stages"),
     name: v.optional(v.string()),
     keyFields: v.optional(v.array(v.string())),
+    guidanceForSuccess: v.optional(v.string()),
     enabledTabs: v.optional(v.array(v.string())),
   },
   handler: async (ctx, { id, ...patch }) => {
@@ -242,11 +243,25 @@ export const updateSection = mutation({
       id: v.string(),
       name: v.string(),
       description: v.optional(v.string()),
-      fields: v.array(v.object({ id: v.string(), name: v.string(), fieldType: v.string() })),
+      fields: v.array(v.object({
+        id: v.string(),
+        name: v.string(),
+        fieldType: v.string(),
+        picklistValues: v.optional(v.array(v.string())),
+        length: v.optional(v.number()),
+        decimalPlaces: v.optional(v.number()),
+      })),
       sections: v.optional(v.array(v.object({
         id: v.string(),
         name: v.string(),
-        fields: v.array(v.object({ id: v.string(), name: v.string(), fieldType: v.string() })),
+        fields: v.array(v.object({
+          id: v.string(),
+          name: v.string(),
+          fieldType: v.string(),
+          picklistValues: v.optional(v.array(v.string())),
+          length: v.optional(v.number()),
+          decimalPlaces: v.optional(v.number()),
+        })),
       }))),
     }))),
   },
@@ -261,10 +276,11 @@ export const updateSection = mutation({
     if (subsections !== undefined) patch.subsections = subsections;
     await ctx.db.patch(id, patch);
 
-    // For user-added (non-default) sections, mirror content + rename to
-    // same-named sections on other stages. isHidden is intentionally NOT
-    // mirrored — each stage controls its own visibility independently.
-    if (!section.isDefault && (subsections !== undefined || description !== undefined || name !== undefined)) {
+    // Mirror subsections + description to all same-named sections on other stages.
+    // isHidden is never mirrored — each stage controls its own visibility.
+    // name is only mirrored for non-default sections (default sections cannot be renamed).
+    const shouldMirror = subsections !== undefined || description !== undefined || (!section.isDefault && name !== undefined);
+    if (shouldMirror) {
       const allSections = await ctx.db
         .query("stageSections")
         .withIndex("byProject", (q) => q.eq("projectId", section.projectId))
@@ -273,7 +289,7 @@ export const updateSection = mutation({
       const mirrorPatch: Record<string, unknown> = { updatedAt: Date.now() };
       if (subsections !== undefined) mirrorPatch.subsections = subsections;
       if (description !== undefined) mirrorPatch.description = description;
-      if (name !== undefined) mirrorPatch.name = name;
+      if (!section.isDefault && name !== undefined) mirrorPatch.name = name;
       for (const mirror of mirrors) {
         await ctx.db.patch(mirror._id, mirrorPatch);
       }
@@ -299,10 +315,53 @@ export const deleteSection = mutation({
 
 export const reorderSections = mutation({
   args: { stageId: v.id("stages"), ids: v.array(v.string()) },
-  handler: async (ctx, { ids }) => {
+  handler: async (ctx, { stageId, ids }) => {
     const now = Date.now();
+
+    // Apply the new order to the sections being reordered
     for (let i = 0; i < ids.length; i++) {
       await ctx.db.patch(ids[i] as Id<"stageSections">, { order: i, updatedAt: now });
+    }
+
+    // Build the canonical name order from the reordered stage
+    const reorderedSections = await Promise.all(ids.map((id) => ctx.db.get(id as Id<"stageSections">)));
+    const nameOrder = reorderedSections
+      .filter((s): s is NonNullable<typeof s> => s !== null)
+      .map((s) => s.name);
+
+    // Get the project so we can find all other stages
+    const thisStage = await ctx.db.get(stageId);
+    if (!thisStage) return;
+
+    // Mirror the name-based order to every other stage in the project
+    const allSections = await ctx.db
+      .query("stageSections")
+      .withIndex("byProject", (q) => q.eq("projectId", thisStage.projectId))
+      .collect();
+
+    const otherStageIds = [...new Set(
+      allSections
+        .filter((s) => s.stageId !== stageId)
+        .map((s) => s.stageId)
+    )];
+
+    for (const otherStageId of otherStageIds) {
+      const stageSections = allSections.filter((s) => s.stageId === otherStageId);
+
+      // Sort this stage's sections by the canonical name order.
+      // Sections whose name doesn't appear in nameOrder go at the end, preserving their relative order.
+      stageSections.sort((a, b) => {
+        const ai = nameOrder.indexOf(a.name);
+        const bi = nameOrder.indexOf(b.name);
+        const aPos = ai === -1 ? nameOrder.length : ai;
+        const bPos = bi === -1 ? nameOrder.length : bi;
+        if (aPos !== bPos) return aPos - bPos;
+        return a.order - b.order; // stable for unknowns
+      });
+
+      for (let i = 0; i < stageSections.length; i++) {
+        await ctx.db.patch(stageSections[i]._id, { order: i, updatedAt: now });
+      }
     }
   },
 });
@@ -319,11 +378,25 @@ const stageImportRow = v.object({
     id: v.string(),
     name: v.string(),
     description: v.optional(v.string()),
-    fields: v.array(v.object({ id: v.string(), name: v.string(), fieldType: v.string() })),
+    fields: v.array(v.object({
+      id: v.string(),
+      name: v.string(),
+      fieldType: v.string(),
+      picklistValues: v.optional(v.array(v.string())),
+      length: v.optional(v.number()),
+      decimalPlaces: v.optional(v.number()),
+    })),
     sections: v.optional(v.array(v.object({
       id: v.string(),
       name: v.string(),
-      fields: v.array(v.object({ id: v.string(), name: v.string(), fieldType: v.string() })),
+      fields: v.array(v.object({
+        id: v.string(),
+        name: v.string(),
+        fieldType: v.string(),
+        picklistValues: v.optional(v.array(v.string())),
+        length: v.optional(v.number()),
+        decimalPlaces: v.optional(v.number()),
+      })),
     }))),
   }))),
 });

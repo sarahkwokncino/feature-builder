@@ -11,10 +11,13 @@ function yamlStr(s: string | undefined | null): string {
 }
 
 function downloadBlob(blob: Blob, filename: string) {
+  const ts = new Date().toISOString().slice(0, 16).replace("T", "_").replace(/:/g, "-");
+  const dot = filename.lastIndexOf(".");
+  const stamped = dot === -1 ? `${filename}_${ts}` : `${filename.slice(0, dot)}_${ts}${filename.slice(dot)}`;
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = filename;
+  a.download = stamped;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -1114,23 +1117,147 @@ export function parseDocmanYaml(text: string): DocmanExport | string {
   return { placeholders, groups };
 }
 
-export function parseDocmanExcel(text: string): DocmanExport | string {
-  // Parses the Default Templates or Conditional Templates sheet saved as CSV
+export function parseDocmanExcel(text: string, filename = ""): DocmanExport | string {
+  const lower = filename.toLowerCase();
+  if (lower.endsWith(".xls") || lower.endsWith(".xlsx") || text.trimStart().startsWith("<?xml")) {
+    return parseDocmanSpreadsheetML(text);
+  }
+  return parseDocmanCsv(text);
+}
+
+function parseDocmanSpreadsheetML(text: string): DocmanExport | string {
+  try {
+    // Extract a named worksheet's XML
+    const getSheet = (name: string): string | null => {
+      const re = new RegExp(`<Worksheet[^>]*ss:Name="${name}"[^>]*>([\\s\\S]*?)</Worksheet>`);
+      return text.match(re)?.[1] ?? null;
+    };
+
+    // Parse SpreadsheetML rows into string[][] respecting ss:Index sparse cells
+    const sheetRows = (sheetXml: string): string[][] => {
+      const rows: string[][] = [];
+      for (const rm of sheetXml.matchAll(/<Row[^>]*>([\s\S]*?)<\/Row>/g)) {
+        const cells: string[] = [];
+        for (const cm of rm[1].matchAll(/<Cell([^>]*)>([\s\S]*?)<\/Cell>/g)) {
+          const idxAttr = cm[1].match(/ss:Index="(\d+)"/);
+          const target = idxAttr ? parseInt(idxAttr[1], 10) - 1 : cells.length;
+          while (cells.length < target) cells.push("");
+          const data = cm[2].match(/<Data[^>]*>([\s\S]*?)<\/Data>/);
+          cells.push(data ? data[1].trim() : "");
+        }
+        rows.push(cells);
+      }
+      return rows;
+    };
+
+    const buildFromRows = (rows: string[][]): { placeholders: DocmanPlaceholderRecord[]; groups: Map<string, DocmanGroupRecord> } | null => {
+      if (rows.length < 2) return null;
+      const headers = rows[0].map((h) => h.toLowerCase().trim());
+      const col = (search: (h: string) => boolean) => headers.findIndex(search);
+
+      const nameIdx       = col((h) => h === "name");
+      const levelIdx      = col((h) => h === "level (ui)" || h === "level");
+      const categoryIdx   = col((h) => h.includes("category") || h.includes("doctype"));
+      const isDefaultIdx  = col((h) => h.includes("is default"));
+      const criteriaIdx   = col((h) => h === "llc_bi__criteria__c" || h === "criteria");
+      const criteriaPlainIdx = col((h) => h.includes("plain english") || h.includes("criteria (plain"));
+      const groupIdx      = col((h) => h === "condition group");
+
+      if (nameIdx === -1 || levelIdx === -1) return null;
+
+      const placeholders: DocmanPlaceholderRecord[] = [];
+      const conditionalMap = new Map<string, DocmanGroupRecord>();
+
+      for (let i = 1; i < rows.length; i++) {
+        const r = rows[i];
+        const name  = (r[nameIdx]  ?? "").trim();
+        const level = (r[levelIdx] ?? "").trim() as DocmanLevel;
+        if (!name || name.startsWith("#") || !DOCMAN_LEVELS.includes(level)) continue;
+
+        const category     = categoryIdx >= 0    ? (r[categoryIdx]    ?? "").trim() || undefined : undefined;
+        const criteria     = criteriaIdx >= 0    ? (r[criteriaIdx]    ?? "").trim() || undefined : undefined;
+        const criteriaPlain = criteriaPlainIdx >= 0 ? (r[criteriaPlainIdx] ?? "").trim() || undefined : undefined;
+        const groupName    = groupIdx >= 0       ? (r[groupIdx]       ?? "").trim() || undefined : undefined;
+        const isDefault    = isDefaultIdx >= 0   ? (r[isDefaultIdx]   ?? "").trim().toLowerCase() === "true" : false;
+
+        if (!placeholders.find((p) => p.name === name && p.level === level)) {
+          placeholders.push({ name, level, category, isDefault: isDefault || undefined });
+        }
+        if (criteria) {
+          const key = `${level}|${criteria}`;
+          if (!conditionalMap.has(key)) {
+            conditionalMap.set(key, {
+              name: groupName ?? criteriaPlain ?? criteria,
+              level,
+              criteriaFormgen: criteria,
+              criteriaUserWritten: criteriaPlain ?? criteria,
+              placeholderNames: [],
+            });
+          }
+          conditionalMap.get(key)!.placeholderNames.push(name);
+        }
+      }
+      return { placeholders, groups: conditionalMap };
+    };
+
+    const placeholders: DocmanPlaceholderRecord[] = [];
+    const conditionalMap = new Map<string, DocmanGroupRecord>();
+
+    // Primary sheet: "Placeholders" — has Level, Category, Name, Is Default, Criteria all together
+    const phSheet = getSheet("Placeholders");
+    if (phSheet) {
+      const result = buildFromRows(sheetRows(phSheet));
+      if (result) {
+        placeholders.push(...result.placeholders);
+        for (const [k, v] of result.groups) conditionalMap.set(k, v);
+      }
+    }
+
+    // Fallback: also read "Default Docman Placeholders" and "Conditional Templates" sheets
+    // if the Placeholders sheet didn't yield results (e.g. importing a partial export)
+    if (!placeholders.length) {
+      for (const sheetName of ["Default Docman Placeholders", "Conditional Templates"]) {
+        const sheet = getSheet(sheetName);
+        if (!sheet) continue;
+        const result = buildFromRows(sheetRows(sheet));
+        if (!result) continue;
+        for (const p of result.placeholders) {
+          if (!placeholders.find((x) => x.name === p.name && x.level === p.level)) {
+            placeholders.push(p);
+          }
+        }
+        for (const [k, v] of result.groups) {
+          if (!conditionalMap.has(k)) conditionalMap.set(k, v);
+          else conditionalMap.get(k)!.placeholderNames.push(...v.placeholderNames);
+        }
+      }
+    }
+
+    if (!placeholders.length) return "No placeholder rows found in the Excel file.";
+    return { placeholders, groups: [...conditionalMap.values()] };
+  } catch (e) {
+    return `Excel parse error: ${String(e)}`;
+  }
+}
+
+function parseDocmanCsv(text: string): DocmanExport | string {
   const raw = text.replace(/^\uFEFF/, "");
   const lines = raw.split(/\r?\n/).filter((l) => l.trim());
   if (lines.length < 2) return "File appears empty.";
 
-  const headers = parseCsvRow(lines[0]).map((h) => h.trim());
-  const nameIdx = headers.findIndex((h) => h === "Name");
-  const levelIdx = headers.findIndex((h) => h === "Level (UI)");
-  const categoryIdx = headers.findIndex((h) => h.includes("docType") || h.toLowerCase().includes("category"));
-  const isDefaultIdx = headers.findIndex((h) => h.toLowerCase().includes("is default"));
-  const criteriaIdx = headers.findIndex((h) => h === "LLC_BI__Criteria__c" || h.toLowerCase() === "criteria");
-  const criteriaPlainIdx = headers.findIndex((h) => h.toLowerCase().includes("plain english"));
-  const groupIdx = headers.findIndex((h) => h === "Condition Group");
+  const headers = parseCsvRow(lines[0]).map((h) => h.trim().toLowerCase());
+  const col = (search: (h: string) => boolean) => headers.findIndex(search);
+
+  const nameIdx        = col((h) => h === "name");
+  const levelIdx       = col((h) => h === "level (ui)" || h === "level");
+  const categoryIdx    = col((h) => h.includes("category") || h.includes("doctype"));
+  const isDefaultIdx   = col((h) => h.includes("is default"));
+  const criteriaIdx    = col((h) => h === "llc_bi__criteria__c" || h === "criteria");
+  const criteriaPlainIdx = col((h) => h.includes("plain english") || h.includes("criteria (plain"));
+  const groupIdx       = col((h) => h === "condition group");
 
   if (nameIdx === -1 || levelIdx === -1) {
-    return 'Could not find "Name" and "Level (UI)" columns. Export the YAML file for re-importing.';
+    return 'Could not find "Name" and "Level (UI)" columns.';
   }
 
   const placeholders: DocmanPlaceholderRecord[] = [];
@@ -1138,16 +1265,15 @@ export function parseDocmanExcel(text: string): DocmanExport | string {
 
   for (let i = 1; i < lines.length; i++) {
     const cells = parseCsvRow(lines[i]);
-    const name = (cells[nameIdx] ?? "").trim();
+    const name  = (cells[nameIdx]  ?? "").trim();
     const level = (cells[levelIdx] ?? "").trim() as DocmanLevel;
-    if (!name || !DOCMAN_LEVELS.includes(level)) continue;
-    const category = categoryIdx !== -1 ? (cells[categoryIdx] ?? "").trim() || undefined : undefined;
-    const criteria = criteriaIdx !== -1 ? (cells[criteriaIdx] ?? "").trim() || undefined : undefined;
-    const criteriaPlain = criteriaPlainIdx !== -1 ? (cells[criteriaPlainIdx] ?? "").trim() || undefined : undefined;
-    const groupName = groupIdx !== -1 ? (cells[groupIdx] ?? "").trim() || undefined : undefined;
-    const isDefault = isDefaultIdx !== -1
-      ? (cells[isDefaultIdx] ?? "").trim().toLowerCase() === "true"
-      : false;
+    if (!name || name.startsWith("#") || !DOCMAN_LEVELS.includes(level)) continue;
+
+    const category     = categoryIdx >= 0    ? (cells[categoryIdx]    ?? "").trim() || undefined : undefined;
+    const criteria     = criteriaIdx >= 0    ? (cells[criteriaIdx]    ?? "").trim() || undefined : undefined;
+    const criteriaPlain = criteriaPlainIdx >= 0 ? (cells[criteriaPlainIdx] ?? "").trim() || undefined : undefined;
+    const groupName    = groupIdx >= 0       ? (cells[groupIdx]       ?? "").trim() || undefined : undefined;
+    const isDefault    = isDefaultIdx >= 0   ? (cells[isDefaultIdx]   ?? "").trim().toLowerCase() === "true" : false;
 
     if (!placeholders.find((p) => p.name === name && p.level === level)) {
       placeholders.push({ name, level, category, isDefault: isDefault || undefined });
@@ -1156,10 +1282,10 @@ export function parseDocmanExcel(text: string): DocmanExport | string {
       const key = `${level}|${criteria}`;
       if (!conditionalMap.has(key)) {
         conditionalMap.set(key, {
-          name: groupName ?? criteriaPlain ?? "Imported condition",
+          name: groupName ?? criteriaPlain ?? criteria,
           level,
           criteriaFormgen: criteria,
-          criteriaUserWritten: criteriaPlain,
+          criteriaUserWritten: criteriaPlain ?? criteria,
           placeholderNames: [],
         });
       }
@@ -1965,7 +2091,7 @@ const ROUTE_BODY_COMPONENT: Record<string, string> = {
   "Fees":                "nCino:feeManagement",
 };
 
-type StageField = { id: string; name: string; fieldType: string };
+type StageField = { id: string; name: string; fieldType: string; picklistValues?: string[]; length?: number; decimalPlaces?: number };
 type StageSubSection = { id: string; name: string; fields: StageField[] };
 type StageSubRoute = {
   id: string;
@@ -1988,6 +2114,8 @@ type StageExportData = {
   stages: {
     name: string;
     isFixed?: boolean;
+    keyFields?: string[];
+    guidanceForSuccess?: string;
     enabledTabs?: string[];
     sections: {
       name: string;
@@ -1998,6 +2126,16 @@ type StageExportData = {
     }[];
   }[];
 };
+
+function emitFieldYaml(lines: string[], f: StageField, indent: string) {
+  lines.push(`${indent}- name: "${yamlStr(f.name)}"`);
+  lines.push(`${indent}  fieldType: "${yamlStr(f.fieldType)}"`);
+  if (f.length !== undefined) lines.push(`${indent}  length: ${f.length}`);
+  if (f.decimalPlaces !== undefined) lines.push(`${indent}  decimalPlaces: ${f.decimalPlaces}`);
+  if (f.fieldType === "Picklist" && f.picklistValues && f.picklistValues.length > 0) {
+    lines.push(`${indent}  picklistValues: [${f.picklistValues.map((v) => `"${yamlStr(v)}"`).join(", ")}]`);
+  }
+}
 
 export function buildStagesYaml(
   data: StageExportData,
@@ -2028,10 +2166,7 @@ export function buildStagesYaml(
           if (sub.description) lines.push(`            description: "${yamlStr(sub.description)}"`);
           if (sub.fields && sub.fields.length > 0) {
             lines.push(`            fields:`);
-            for (const f of sub.fields) {
-              lines.push(`              - name: "${yamlStr(f.name)}"`);
-              lines.push(`                fieldType: "${yamlStr(f.fieldType)}"`);
-            }
+            for (const f of sub.fields) emitFieldYaml(lines, f, "              ");
           }
           if (sub.sections && sub.sections.length > 0) {
             lines.push(`            sections:`);
@@ -2039,10 +2174,7 @@ export function buildStagesYaml(
               lines.push(`              - name: "${yamlStr(sec2.name)}"`);
               if (sec2.fields.length > 0) {
                 lines.push(`                fields:`);
-                for (const f of sec2.fields) {
-                  lines.push(`                  - name: "${yamlStr(f.name)}"`);
-                  lines.push(`                    fieldType: "${yamlStr(f.fieldType)}"`);
-                }
+                for (const f of sec2.fields) emitFieldYaml(lines, f, "                  ");
               }
             }
           }
@@ -2050,6 +2182,20 @@ export function buildStagesYaml(
       }
     }
   }
+
+  lines.push("");
+  lines.push("# ── Settings > User Interface > Path Settings > Loan Path ──────────────");
+  lines.push("loan_path_settings:");
+  for (const stage of data.stages) {
+    lines.push(`  - stage: "${yamlStr(stage.name)}"`);
+    if (stage.keyFields && stage.keyFields.length > 0) {
+      lines.push(`    keyFields: [${stage.keyFields.map((f) => `"${yamlStr(f)}"`).join(", ")}]`);
+    }
+    if (stage.guidanceForSuccess) {
+      lines.push(`    guidanceForSuccess: "${yamlStr(stage.guidanceForSuccess)}"`);
+    }
+  }
+
   return lines.join("\n");
 }
 
@@ -2063,35 +2209,36 @@ export function downloadStagesYaml(
 
 export function downloadStagesExcel(data: StageExportData) {
   const allRows: string[][] = [];
-  const COLS = ["Stage", "Route", "Is User Created", "nFORCE__Body__c", "Is Hidden", "Description", "Sub Route", "Sub Route Description", "Section Name", "Field Name", "Field Type"];
+  const COLS = ["Stage", "Route", "Is User Created", "nFORCE__Body__c", "Is Hidden", "Description", "Sub Route", "Sub Route Description", "Section Name", "Field Name", "Field Type", "Picklist Values", "Length", "Decimal Places"];
+
+  function fCells(f: StageField): string[] {
+    return [f.name, f.fieldType, f.picklistValues?.join(";") ?? "", f.length !== undefined ? String(f.length) : "", f.decimalPlaces !== undefined ? String(f.decimalPlaces) : ""];
+  }
 
   for (const stage of data.stages) {
     for (const sec of stage.sections) {
       const userCreated = !sec.isDefault ? "true" : "false";
       const bodyComponent = sec.isDefault ? (ROUTE_BODY_COMPONENT[sec.name] ?? "") : "";
+      const prefix = [stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? ""];
       if (!sec.subsections || sec.subsections.length === 0) {
-        allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", "", "", "", "", ""]);
+        allRows.push([...prefix, "", "", "", "", "", "", ""]);
       } else {
         for (const sub of sec.subsections) {
           const subDesc = sub.description ?? "";
           const hasSections = sub.sections && sub.sections.length > 0;
           const hasTopFields = sub.fields && sub.fields.length > 0;
           if (!hasSections && !hasTopFields) {
-            allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, "", "", ""]);
+            allRows.push([...prefix, sub.name, subDesc, "", "", "", "", ""]);
           } else {
             if (hasTopFields) {
-              for (const f of sub.fields) {
-                allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, "", f.name, f.fieldType]);
-              }
+              for (const f of sub.fields) allRows.push([...prefix, sub.name, subDesc, "", ...fCells(f)]);
             }
             if (hasSections) {
               for (const sec2 of sub.sections!) {
                 if (sec2.fields.length === 0) {
-                  allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, sec2.name, "", ""]);
+                  allRows.push([...prefix, sub.name, subDesc, sec2.name, "", "", "", ""]);
                 } else {
-                  for (const f of sec2.fields) {
-                    allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, sec2.name, f.name, f.fieldType]);
-                  }
+                  for (const f of sec2.fields) allRows.push([...prefix, sub.name, subDesc, sec2.name, ...fCells(f)]);
                 }
               }
             }
@@ -2121,43 +2268,59 @@ export function downloadStagesExcel(data: StageExportData) {
     sheetsXml += `<Worksheet ss:Name="${sheetName}"><Table>${headerRow}\n${stageDataRows}</Table></Worksheet>\n`;
   }
 
+  sheetsXml += buildLoanPathSheetXml(data);
+
   const xml = `<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">${sheetsXml}</Workbook>`;
   downloadBlob(new Blob([xml], { type: "application/vnd.ms-excel" }), "stages-export.xls");
 }
 
 // ── All-config sheet builders (used by downloadAllConfigExcel) ────────────────
 
+function buildLoanPathSheetXml(data: StageExportData): string {
+  const rows: unknown[][] = [
+    ["Where to configure: Settings > User Interface > Path Settings > Loan Path"],
+    [],
+    ["Stage", "Key Field 1", "Key Field 2", "Key Field 3", "Key Field 4", "Key Field 5", "Guidance for Success"],
+    ...data.stages.map((stage) => {
+      const kf = stage.keyFields ?? [];
+      return [stage.name, kf[0] ?? "", kf[1] ?? "", kf[2] ?? "", kf[3] ?? "", kf[4] ?? "", stage.guidanceForSuccess ?? ""];
+    }),
+  ];
+  return buildXlsxSheet(rows, "Loan Path Settings");
+}
+
 function buildStagesSheetsXml(data: StageExportData): string {
-  const COLS = ["Stage", "Route", "Is User Created", "nFORCE__Body__c", "Is Hidden", "Description", "Sub Route", "Sub Route Description", "Section Name", "Field Name", "Field Type"];
+  const COLS = ["Stage", "Route", "Is User Created", "nFORCE__Body__c", "Is Hidden", "Description", "Sub Route", "Sub Route Description", "Section Name", "Field Name", "Field Type", "Picklist Values", "Length", "Decimal Places"];
   const allRows: string[][] = [];
+
+  function fCells(f: StageField): string[] {
+    return [f.name, f.fieldType, f.picklistValues?.join(";") ?? "", f.length !== undefined ? String(f.length) : "", f.decimalPlaces !== undefined ? String(f.decimalPlaces) : ""];
+  }
 
   for (const stage of data.stages) {
     for (const sec of stage.sections) {
       const userCreated = !sec.isDefault ? "true" : "false";
       const bodyComponent = sec.isDefault ? (ROUTE_BODY_COMPONENT[sec.name] ?? "") : "";
+      const prefix = [stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? ""];
       if (!sec.subsections || sec.subsections.length === 0) {
-        allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", "", "", "", "", ""]);
+        allRows.push([...prefix, "", "", "", "", "", "", ""]);
       } else {
         for (const sub of sec.subsections) {
           const subDesc = sub.description ?? "";
           const hasSections = sub.sections && sub.sections.length > 0;
           const hasTopFields = sub.fields && sub.fields.length > 0;
           if (!hasSections && !hasTopFields) {
-            allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, "", "", ""]);
+            allRows.push([...prefix, sub.name, subDesc, "", "", "", "", ""]);
           } else {
             if (hasTopFields) {
-              for (const f of sub.fields) {
-                allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, "", f.name, f.fieldType]);
-              }
+              for (const f of sub.fields) allRows.push([...prefix, sub.name, subDesc, "", ...fCells(f)]);
             }
             if (hasSections) {
               for (const sec2 of sub.sections!) {
                 if (sec2.fields.length === 0) {
-                  allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, sec2.name, "", ""]);
+                  allRows.push([...prefix, sub.name, subDesc, sec2.name, "", "", "", ""]);
                 } else {
-                  for (const f of sec2.fields) {
-                    allRows.push([stage.name, sec.name, userCreated, bodyComponent, sec.isHidden ? "true" : "", sec.description ?? "", sub.name, subDesc, sec2.name, f.name, f.fieldType]);
-                  }
+                  for (const f of sec2.fields) allRows.push([...prefix, sub.name, subDesc, sec2.name, ...fCells(f)]);
                 }
               }
             }
@@ -2173,6 +2336,7 @@ function buildStagesSheetsXml(data: StageExportData): string {
     const stageRows = allRows.filter((r) => r[0] === stage.name);
     xml += buildXlsxSheetWithTitle(`STAGE: ${stage.name}`, [COLS, ...stageRows], sheetName);
   }
+  xml += buildLoanPathSheetXml(data);
   return xml;
 }
 
@@ -2260,12 +2424,222 @@ function buildPolicyExceptionsSheetsXml(records: PolicyExceptionRecord[]): strin
   );
 }
 
+function buildCovenantsSheetsXml(picklists: CovenantPicklists): string {
+  const typeRows: unknown[][] = [
+    ["LLC_BI__Category__c", "Name", "LLC_BI__Active__c"],
+  ];
+  for (const cat of picklists.categories) {
+    for (const t of picklists.covenantTypesByCategory[cat] ?? []) {
+      typeRows.push([cat, t, "true"]);
+    }
+  }
+  if (typeRows.length === 1) typeRows.push(["# No covenant types defined", "", ""]);
+
+  const freqRows: unknown[][] = [
+    ["Name"],
+    ...picklists.frequencies.map((f) => [f]),
+  ];
+  if (picklists.frequencies.length === 0) freqRows.push(["# No frequencies defined"]);
+
+  return (
+    buildXlsxSheetWithTitle("COVENANT TYPES — LLC_BI__Covenant_Type__c", typeRows, "Covenant Types") +
+    buildXlsxSheetWithTitle("COVENANT FREQUENCY TEMPLATES — LLC_BI__Date_Template__c", freqRows, "Covenant Frequencies")
+  );
+}
+
+function buildCollateralSheetsXml(picklists: CollateralPicklists, fieldConfigs: CollateralFieldConfig[]): string {
+  const typeRows: unknown[][] = [
+    ["LLC_BI__Type__c", "LLC_BI__Subtype__c"],
+  ];
+  for (const type of picklists.types) {
+    for (const subtype of picklists.subtypesByType[type] ?? []) {
+      typeRows.push([type, subtype]);
+    }
+  }
+  if (typeRows.length === 1) typeRows.push(["# No collateral types defined", ""]);
+
+  const fieldRows: unknown[][] = [
+    ["Collateral Type", "Collateral Subtype", "Section", "Field Name", "Field Type", "Picklist Values"],
+  ];
+  for (const type of picklists.types) {
+    for (const subtype of picklists.subtypesByType[type] ?? []) {
+      const config = fieldConfigs.find((c) => c.collateralType === type && c.collateralSubtype === subtype);
+      if (!config || config.sections.length === 0) {
+        fieldRows.push([type, subtype, "", "", "", ""]);
+      } else {
+        for (const section of config.sections) {
+          if (section.fields.length === 0) {
+            fieldRows.push([type, subtype, section.name, "", "", ""]);
+          } else {
+            for (const field of section.fields) {
+              fieldRows.push([type, subtype, section.name, field.name, field.fieldType, (field.picklistValues ?? []).join(";")]);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return (
+    buildXlsxSheetWithTitle("COLLATERAL TYPES — LLC_BI__Collateral_Type__c", typeRows, "Collateral Types") +
+    buildXlsxSheetWithTitle("COLLATERAL FIELD CONFIG", fieldRows, "Collateral Fields")
+  );
+}
+
+function buildInvolvementSheetsXml(records: InvolvementTypeRecord[]): string {
+  const rows: unknown[][] = [
+    ["LLC_BI__Borrower_Type__c (Name)"],
+    ...records.map((r) => [r.name]),
+  ];
+  if (records.length === 0) rows.push(["# No involvement types defined"]);
+  return buildXlsxSheetWithTitle("ENTITY INVOLVEMENT TYPES — LLC_BI__Legal_Entities__c", rows, "Involvement Types");
+}
+
+function buildProductHierarchySheetsXml(data: { lines: { name: string; productObject?: string }[]; types: { name: string; productLineName: string; usageType?: string }[]; products: { name: string; productLineName: string; productTypeName: string; productCode?: string }[] }): string {
+  const lineRows: unknown[][] = [
+    ["Name", "LLC_BI__Product_Object__c"],
+    ...data.lines.map((l) => [l.name, l.productObject ?? ""]),
+  ];
+  if (data.lines.length === 0) lineRows.push(["# No product lines defined", ""]);
+
+  const typeRows: unknown[][] = [
+    ["Name", "LLC_BI__Product_Line__c (Name lookup)", "LLC_BI__Usage_Type__c"],
+    ...data.types.map((t) => [t.name, t.productLineName, t.usageType ?? ""]),
+  ];
+  if (data.types.length === 0) typeRows.push(["# No product types defined", "", ""]);
+
+  const productRows: unknown[][] = [
+    ["Name", "LLC_BI__Product_Line__c (Name lookup)", "LLC_BI__Product_Type__c (Name lookup)", "LLC_BI__lookupKey__c"],
+    ...data.products.map((p) => [p.name, p.productLineName, p.productTypeName, p.productCode ?? ""]),
+  ];
+  if (data.products.length === 0) productRows.push(["# No products defined", "", "", ""]);
+
+  return (
+    buildXlsxSheetWithTitle("PRODUCT LINES — LLC_BI__Product_Line__c", lineRows, "Product Lines") +
+    buildXlsxSheetWithTitle("PRODUCT TYPES — LLC_BI__Product_Type__c", typeRows, "Product Types") +
+    buildXlsxSheetWithTitle("PRODUCTS — LLC_BI__Product__c", productRows, "Products")
+  );
+}
+
+function buildChecklistSheetsXml(records: ChecklistRecord[], userPicklists: Map<string, string[]>): string {
+  const loanReqs = records.filter((r) => r.name.trim() && (r.checklistLevel ?? "Loan") === "Loan");
+  const relReqs = records.filter((r) => r.name.trim() && r.checklistLevel === "Relationship");
+
+  const cols = ["Name", "Checklist_Level__c", "LLC_BI__Description__c", "LLC_BI__Assigned_Party__c", "LLC_BI__Stage_Check__c", "LLC_BI__Needed_By__c", "LLC_BI__Do_Not_Auto_Generate__c", "LLC_BI__Document_Manager_Placeholder__c", "Criteria_User_Written__c"];
+  const toRow = (r: ChecklistRecord) => [
+    r.name, r.checklistLevel ?? "Loan", r.description ?? "", r.assignedParty ?? "",
+    r.stageCheck ? "TRUE" : "FALSE", r.stageCheck ? (r.neededBy ?? "") : "",
+    r.doNotAutoGenerate ? "TRUE" : "FALSE", r.placeholderName ?? "", r.criteriaUserWritten ?? "",
+  ];
+
+  const loanRows: unknown[][] = [cols, ...loanReqs.map(toRow)];
+  if (loanReqs.length === 0) loanRows.push(["# No loan-level requirements defined"]);
+
+  const relRows: unknown[][] = [cols, ...relReqs.map(toRow)];
+  if (relReqs.length === 0) relRows.push(["# No relationship-level requirements defined"]);
+
+  const customValues = getCustomPicklistValues([...loanReqs, ...relReqs], userPicklists);
+  const customRows: unknown[][] = [["Picklist Field (Label)", "Object API Name", "Field API Name", "New Value to Add"]];
+  for (const [fieldLabel, values] of customValues.entries()) {
+    for (const v of values) customRows.push([fieldLabel, "LLC_BI__Requirement__c", "", v]);
+  }
+  if (customValues.size === 0) customRows.push(["# No custom picklist values"]);
+
+  return (
+    buildXlsxSheetWithTitle("SMART CHECKLIST — Loan Requirements (LLC_BI__Requirement__c)", loanRows, "Checklist — Loan") +
+    buildXlsxSheetWithTitle("SMART CHECKLIST — Relationship Requirements (LLC_BI__Requirement__c)", relRows, "Checklist — Relationship") +
+    buildXlsxSheetWithTitle("SMART CHECKLIST — Custom Picklist Values", customRows, "Checklist — Picklists")
+  );
+}
+
+function buildDocmanSheetsXml(data: DocmanExport): string {
+  const phRows: unknown[][] = [
+    ["Level (UI)", "Category", "Name", "Is Default", "Criteria (User Written)"],
+    ...data.placeholders.map((p) => {
+      const criteria = data.groups
+        .filter((g) => g.level === p.level && g.placeholderNames.includes(p.name))
+        .map((g) => g.criteriaUserWritten ?? g.criteriaFormgen ?? "")
+        .filter(Boolean)
+        .join(" | ");
+      return [p.level, p.category ?? "", p.name, p.isDefault ? "true" : "false", criteria];
+    }),
+  ];
+  if (data.placeholders.length === 0) phRows.push(["# No placeholders defined", "", "", "", ""]);
+
+  const grpRows: unknown[][] = [
+    ["Level (UI)", "Group Name", "Criteria (User Written)", "Placeholder Names"],
+    ...data.groups.map((g) => [g.level, g.name, g.criteriaUserWritten ?? "", g.placeholderNames.join(";")]),
+  ];
+  if (data.groups.length === 0) grpRows.push(["# No groups defined", "", "", ""]);
+
+  return (
+    buildXlsxSheetWithTitle("DOCUMENT MANAGER — Placeholders (LLC_BI__ClosingChecklist__c)", phRows, "Docman — Placeholders") +
+    buildXlsxSheetWithTitle("DOCUMENT MANAGER — Conditional Groups", grpRows, "Docman — Groups")
+  );
+}
+
+function buildConnectionsSheetsXml(records: ConnectionRoleRecord[]): string {
+  const rows: unknown[][] = [
+    ["LLC_BI__Role__c (Name)", "Self Reciprocating", "Reciprocal Role"],
+    ...records.map((r) => [r.name, r.selfReciprocating ? "true" : "false", r.reciprocalRole ?? ""]),
+  ];
+  if (records.length === 0) rows.push(["# No connection roles defined", "", ""]);
+  return buildXlsxSheetWithTitle("CONNECTION ROLES — LLC_BI__Connection_Role__c", rows, "Connection Roles");
+}
+
+function buildRelationshipsSheetsXml(types: string[], fieldConfigs: RelationshipFieldConfig[], hiddenTypes: string[]): string {
+  const typeRows: unknown[][] = [
+    ["LLC_BI__Type__c", "Active"],
+    ...types.map((t) => [t, hiddenTypes.includes(t) ? "false" : "true"]),
+  ];
+  if (types.length === 0) typeRows.push(["# No relationship types defined", ""]);
+
+  const fieldRows: unknown[][] = [["Relationship Type", "Section", "Field Name", "Field Type", "Picklist Values"]];
+  for (const type of types) {
+    const config = fieldConfigs.find((c) => c.relationshipType === type);
+    if (!config || config.sections.length === 0) {
+      fieldRows.push([type, "", "", "", ""]);
+    } else {
+      for (const section of config.sections) {
+        if (section.fields.length === 0) {
+          fieldRows.push([type, section.name, "", "", ""]);
+        } else {
+          for (const field of section.fields) {
+            fieldRows.push([type, section.name, field.name, field.fieldType, (field.picklistValues ?? []).join(";")]);
+          }
+        }
+      }
+    }
+  }
+
+  return (
+    buildXlsxSheetWithTitle("RELATIONSHIP TYPES — LLC_BI__Relationship__c", typeRows, "Relationship Types") +
+    buildXlsxSheetWithTitle("RELATIONSHIP FIELD CONFIG", fieldRows, "Relationship Fields")
+  );
+}
+
+export type AllConfigProductHierarchy = {
+  lines: { name: string; productObject?: string }[];
+  types: { name: string; productLineName: string; usageType?: string }[];
+  products: { name: string; productLineName: string; productTypeName: string; productCode?: string }[];
+};
+
 export type AllConfigExcelInput = {
   projectName: string;
   stages: StageExportData;
   fees: FeeRecord[];
   conditions: ConditionRecord[];
   policyExceptions: PolicyExceptionRecord[];
+  covenants: CovenantPicklists;
+  collateral: CollateralPicklists;
+  collateralFieldConfigs: CollateralFieldConfig[];
+  involvementTypes: InvolvementTypeRecord[];
+  productHierarchy: AllConfigProductHierarchy;
+  checklist: ChecklistRecord[];
+  checklistPicklists: Map<string, string[]>;
+  docman: DocmanExport;
+  connections: ConnectionRoleRecord[];
+  relationships: { types: string[]; fieldConfigs: RelationshipFieldConfig[]; hiddenTypes: string[] };
 };
 
 export function downloadAllConfigExcel(input: AllConfigExcelInput) {
@@ -2275,12 +2649,29 @@ export function downloadAllConfigExcel(input: AllConfigExcelInput) {
     [],
     ["Tab", "Feature Builder", "Salesforce Object(s)"],
     ["Stages — All / Stage — [Name]", "Stages & UI Builder", "nFORCE__Route__c"],
+    ["Loan Path Settings", "Stages & UI Builder", "Settings > User Interface > Path Settings > Loan Path"],
     ["Fees", "Fees Builder", "LLC_BI__Template_Records__c"],
     ["Fees — Product Assignments", "Fees Builder", "LLC_BI__Product_Template_Join__c"],
     ["Conditions Precedent", "Conditions Builder", "LLC_BI__Requirement__c"],
     ["Conditions Subsequent", "Conditions Builder", "LLC_BI__Requirement__c"],
     ["Policy Exceptions", "Policy Exceptions Builder", "LLC_BI__Policy_Exception_Template__c"],
     ["PE — Mitigation Reasons", "Policy Exceptions Builder", "LLC_BI__Policy_Exception_Mitigation_Reason__c"],
+    ["Covenant Types", "Covenant Type Builder", "LLC_BI__Covenant_Type__c"],
+    ["Covenant Frequencies", "Covenant Type Builder", "LLC_BI__Date_Template__c"],
+    ["Collateral Types", "Collateral Management Builder", "LLC_BI__Collateral_Type__c"],
+    ["Collateral Fields", "Collateral Management Builder", "LLC_BI__Collateral_Type__c (field config)"],
+    ["Involvement Types", "Entity Involvement Type Builder", "LLC_BI__Legal_Entities__c"],
+    ["Product Lines", "Product Hierarchy Builder", "LLC_BI__Product_Line__c"],
+    ["Product Types", "Product Hierarchy Builder", "LLC_BI__Product_Type__c"],
+    ["Products", "Product Hierarchy Builder", "LLC_BI__Product__c"],
+    ["Checklist — Loan", "Smart Checklist Builder", "LLC_BI__Requirement__c"],
+    ["Checklist — Relationship", "Smart Checklist Builder", "LLC_BI__Requirement__c"],
+    ["Checklist — Picklists", "Smart Checklist Builder", "Picklist changes"],
+    ["Docman — Placeholders", "Document Manager Builder", "LLC_BI__ClosingChecklist__c"],
+    ["Docman — Groups", "Document Manager Builder", "LLC_BI__ClosingChecklist__c (conditional groups)"],
+    ["Connection Roles", "Connections Builder", "LLC_BI__Connection_Role__c"],
+    ["Relationship Types", "Relationships Builder", "LLC_BI__Relationship__c"],
+    ["Relationship Fields", "Relationships Builder", "LLC_BI__Relationship__c (field config)"],
   ];
 
   const sheetsXml =
@@ -2288,7 +2679,15 @@ export function downloadAllConfigExcel(input: AllConfigExcelInput) {
     buildStagesSheetsXml(input.stages) +
     buildFeesSheetsXml(input.fees) +
     buildConditionsSheetsXml(input.conditions) +
-    buildPolicyExceptionsSheetsXml(input.policyExceptions);
+    buildPolicyExceptionsSheetsXml(input.policyExceptions) +
+    buildCovenantsSheetsXml(input.covenants) +
+    buildCollateralSheetsXml(input.collateral, input.collateralFieldConfigs) +
+    buildInvolvementSheetsXml(input.involvementTypes) +
+    buildProductHierarchySheetsXml(input.productHierarchy) +
+    buildChecklistSheetsXml(input.checklist, input.checklistPicklists) +
+    buildDocmanSheetsXml(input.docman) +
+    buildConnectionsSheetsXml(input.connections) +
+    buildRelationshipsSheetsXml(input.relationships.types, input.relationships.fieldConfigs, input.relationships.hiddenTypes);
 
   const xml =
     `<?xml version="1.0" encoding="UTF-8"?>` +

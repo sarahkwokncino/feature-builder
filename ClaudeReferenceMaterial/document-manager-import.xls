@@ -1,0 +1,1596 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <LastAuthor>Sarah Kwok</LastAuthor>
+  <LastSaved>2026-06-11T08:17:53Z</LastSaved>
+  <Version>16.00</Version>
+ </DocumentProperties>
+ <OfficeDocumentSettings xmlns="urn:schemas-microsoft-com:office:office">
+  <AllowPNG/>
+ </OfficeDocumentSettings>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>19500</WindowHeight>
+  <WindowWidth>32767</WindowWidth>
+  <WindowTopX>32767</WindowTopX>
+  <WindowTopY>32767</WindowTopY>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Aptos Narrow" x:Family="Swiss" ss:Size="11"
+    ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="Placeholders">
+  <Table ss:ExpandedColumnCount="5" ss:ExpandedRowCount="114" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Column ss:Width="69.75"/>
+   <Column ss:Width="81.75"/>
+   <Column ss:Width="306"/>
+   <Column ss:Width="150.75"/>
+   <Column ss:Width="213.75"/>
+   <Row>
+    <Cell><Data ss:Type="String">Level (UI)</Data></Cell>
+    <Cell><Data ss:Type="String">Category</Data></Cell>
+    <Cell><Data ss:Type="String">Name</Data></Cell>
+    <Cell><Data ss:Type="String">Is Default Docman Placeholder</Data></Cell>
+    <Cell><Data ss:Type="String">Criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">Application Form</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">Heads Of Terms</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">Heads Of Terms Credit Backed</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">Refurbishment Calculator</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Residential Refurbishment</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">BTL Calculator</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Residential BTL</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">Regulated Bridging Calculator</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Residential Regulated Bridge</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">Unregulated Bridging Calculator</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Residential Unregulated Bridge</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">ESIS</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Residential Regulated Bridge</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">Proof of exit</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">Agreement in Principle</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Line is Residential</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Approval</Data></Cell>
+    <Cell><Data ss:Type="String">Green Light Paper</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Approval</Data></Cell>
+    <Cell><Data ss:Type="String">Final Approval Paper</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Approval</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Approval Confirmation</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Approval</Data></Cell>
+    <Cell><Data ss:Type="String">Fund Approval Sheet</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Update</Data></Cell>
+    <Cell><Data ss:Type="String">Broker Update</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Update</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Update</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Lease &amp; Tenancy</Data></Cell>
+    <Cell><Data ss:Type="String">Lease Document</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Lease &amp; Tenancy</Data></Cell>
+    <Cell><Data ss:Type="String">Tenancy Document</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Directors Questionnare</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Final Signed Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Report on Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Report on Title / Certificate of Title</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Deed of Subordination</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Mortgage Deed</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Regulated Offer Letter</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Regulated Bridge</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Offer Letter</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Buy-To-Let OR Product Type is Refurbishment OR Product Type is Unregulated Residential Bridge OR Product Type is Enviro-Let Loan OR Product Type is Development OR Product Type is Commercial</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Facility Letter</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development OR Porduct Type is Commercial</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Offer / Facility Letter</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Loan Agreement</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Direct Debit Mandate</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Line is Residential OR Product Line is Commercial. Product Type is not Development AND Product Type is not Regulated Bridge</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Personal Guarantee</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">ILA for ICD</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Corporate Guarantee</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Cost Overrun Guarantee</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Solicitors Certficate</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Process Agent Letter</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Intercreditor Deed</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Consent to charge</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Maximum Liabilities Letter</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Debenture</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Share Charge</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development OR Product Type is Commercial</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Existing Charge</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">Board Minutes</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">Redemption Statement</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">Closing Statement</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">Statement of Account</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">Welcome Letter - Debt</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development OR Product Type is Commercial</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">Welcome Letter - Resi</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Line is Residential</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">Drawdown Notice</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">6 Month Pre-expiry</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">7 Day Demand (Arrears)</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">Reservation of Rights</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">Extension Confirmation</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">Standstill</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">Demand Letter</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">Proof of ID</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">Proof of Address</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">Proof of Funds</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">Source of Wealth</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">Proof of Income</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">Income and Expenditure Form</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">Adverse explanation</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">Payment History</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">Doctors Letter</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">Evidence of experience</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">Law Society Search</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship Type is Solicitor</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">Compliance approval</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Searches</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Safe - Company</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship Type is Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Searches</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Safe - Director</Data></Cell>
+    <Cell><Data ss:Type="String">true</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Searches</Data></Cell>
+    <Cell><Data ss:Type="String">World Check</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Searches</Data></Cell>
+    <Cell><Data ss:Type="String">Tracesmart</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Searches</Data></Cell>
+    <Cell><Data ss:Type="String">Google search</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Searches</Data></Cell>
+    <Cell><Data ss:Type="String">Experian</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Land Registry</Data></Cell>
+    <Cell><Data ss:Type="String">Assets</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Land Registry</Data></Cell>
+    <Cell><Data ss:Type="String">HMLR Receipt</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Land Registry</Data></Cell>
+    <Cell><Data ss:Type="String">Security Register</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Land Registry</Data></Cell>
+    <Cell><Data ss:Type="String">Land Registry - Title Plan</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Property</Data></Cell>
+    <Cell><Data ss:Type="String">Rental Income</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Property</Data></Cell>
+    <Cell><Data ss:Type="String">Building Regulations &amp; Consents</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Property</Data></Cell>
+    <Cell><Data ss:Type="String">Planning Permission</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Property</Data></Cell>
+    <Cell><Data ss:Type="String">Buildings Insurance</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Property</Data></Cell>
+    <Cell><Data ss:Type="String">Warranty</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Property</Data></Cell>
+    <Cell><Data ss:Type="String">Sales Particulars</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Property</Data></Cell>
+    <Cell><Data ss:Type="String">Schedule of Works &amp; Costs</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Property</Data></Cell>
+    <Cell><Data ss:Type="String">EWS1 Certificate</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Property</Data></Cell>
+    <Cell><Data ss:Type="String">EPC</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Property</Data></Cell>
+    <Cell><Data ss:Type="String">ESG</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation</Data></Cell>
+    <Cell><Data ss:Type="String">Asset Manager Instruction</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation - Asset Manager Report</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation Report</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation</Data></Cell>
+    <Cell><Data ss:Type="String">Valuer's comments on RoT</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation</Data></Cell>
+    <Cell><Data ss:Type="String">Valuer's comments on QS report</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation</Data></Cell>
+    <Cell><Data ss:Type="String">QS Initial Report</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation</Data></Cell>
+    <Cell><Data ss:Type="String">QS Interim Report</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation</Data></Cell>
+    <Cell><Data ss:Type="String">QS Comments on ROT</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation</Data></Cell>
+    <Cell><Data ss:Type="String">QS comments on Valuation</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is not Guarantee AND Collateral Type is not Possessory</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation</Data></Cell>
+    <Cell><Data ss:Type="String">Specialist Report</Data></Cell>
+    <Cell><Data ss:Type="Boolean">1</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation</Data></Cell>
+    <Cell><Data ss:Type="String">AVM Report</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String">Collateral Type is Residential</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion - Title Plan</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">All</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">Residential</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">Development/Commercial</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">Development</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">Agreement in Principle</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">Heads of Terms</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">Development/Commercial/Refurbishment</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">Facility Letter</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">BTL/Refurbishment/Unregulated Residential Bridge/Enviro-let</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">Regulated Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">Residential/Commercial</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">BTL/Refurbishment/Commercial/Unregulated Residential Bridge</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">Regulated bridge</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">Ground Investigation Report</Data></Cell>
+    <Cell><Data ss:Type="String">false</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Selected/>
+   <TopRowVisible>81</TopRowVisible>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>103</ActiveRow>
+     <ActiveCol>4</ActiveCol>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="DocTypes (Categories)">
+  <Table ss:ExpandedColumnCount="3" ss:ExpandedRowCount="14" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Row>
+    <Cell><Data ss:Type="String">object</Data></Cell>
+    <Cell><Data ss:Type="String">Name</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__docManager__c (DocManager Type__c value)</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__DocType__c</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__DocType__c</Data></Cell>
+    <Cell><Data ss:Type="String">Approval</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__DocType__c</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Update</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__DocType__c</Data></Cell>
+    <Cell><Data ss:Type="String">Lease &amp; Tenancy</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__DocType__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__DocType__c</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__DocType__c</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__DocType__c</Data></Cell>
+    <Cell><Data ss:Type="String">Searches</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__DocType__c</Data></Cell>
+    <Cell><Data ss:Type="String">Land Registry</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Collateral__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__DocType__c</Data></Cell>
+    <Cell><Data ss:Type="String">Property</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Collateral__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__DocType__c</Data></Cell>
+    <Cell><Data ss:Type="String">Valuation</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Collateral__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__DocType__c</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Collateral__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__DocType__c</Data></Cell>
+    <Cell><Data ss:Type="String">No category</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Default Docman Placeholders">
+  <Table ss:ExpandedColumnCount="7" ss:ExpandedRowCount="37" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Column ss:Width="136.5"/>
+   <Column ss:Width="162.75"/>
+   <Column ss:Width="117"/>
+   <Column ss:Width="147.75"/>
+   <Row>
+    <Cell><Data ss:Type="String">object</Data></Cell>
+    <Cell><Data ss:Type="String">Name</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__docManager__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__docType__c (Category)</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Criteria__c</Data></Cell>
+    <Cell><Data ss:Type="String">Level (UI)</Data></Cell>
+    <Cell><Data ss:Type="String">Notes</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Application Form</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Proof of exit</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Approval Confirmation</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Approval</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Fund Approval Sheet</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Approval</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Broker Update</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Update</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Update</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Update</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Lease Document</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Lease &amp; Tenancy</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Tenancy Document</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Lease &amp; Tenancy</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Directors Questionnare</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Final Signed Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Report on Borrower</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Report on Title / Certificate of Title</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Deed of Subordination</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Mortgage Deed</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Offer / Facility Letter</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Loan Agreement</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Personal Guarantee</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">ILA for ICD</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Corporate Guarantee</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Solicitors Certficate</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Process Agent Letter</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Intercreditor Deed</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Consent to charge</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Maximum Liabilities Letter</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Debenture</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Existing Charge</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Board Minutes</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Redemption Statement</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Closing Statement</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Statement of Account</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Welcome Letter</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Drawdown Notice</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">6 Month Pre-expiry</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">7 Day Demand (Arrears)</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Reservation of Rights</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Extension Confirmation</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String"></Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Default template — no criteria</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveCol>3</ActiveCol>
+     <RangeSelection>C4</RangeSelection>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Conditional Templates">
+  <Table ss:ExpandedColumnCount="8" ss:ExpandedRowCount="27" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Row>
+    <Cell><Data ss:Type="String">object</Data></Cell>
+    <Cell><Data ss:Type="String">Name</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__docManager__c</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__docType__c (Category)</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Criteria__c</Data></Cell>
+    <Cell><Data ss:Type="String">Criteria (Plain English)</Data></Cell>
+    <Cell><Data ss:Type="String">Level (UI)</Data></Cell>
+    <Cell><Data ss:Type="String">Condition Group</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Proof of ID</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Proof of Address</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Source of Wealth</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Proof of Funds</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Proof of Income</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Income and Expenditure Form</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Adverse explanation</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Payment History</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Doctors Letter</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Evidence of experience</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Compliance approval</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">World Check</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">Searches</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Tracesmart</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">Searches</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Google search</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">Searches</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Experian</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">Searches</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship type&quot; IS=&quot;Individual&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship type is Individual and Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Credit Safe - Company</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">Searches</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship Type&quot; IS=&quot;Business&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship Type is Business</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship Type is Business</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Law Society Search</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+    <Cell><Data ss:Type="String">KYC</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.Relationship Type&quot; IS=&quot;Solicitor&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship Type is Solicitor</Data></Cell>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Relationship Type is Solicitor</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Heads Of Terms</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.LLC_BI__Product_Type__c&quot; IS=&quot;Development&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Heads Of Terms Credit Backed</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.LLC_BI__Product_Type__c&quot; IS=&quot;Development&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Green Light Paper</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Approval</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.LLC_BI__Product_Type__c&quot; IS=&quot;Development&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Final Approval Paper</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Approval</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.LLC_BI__Product_Type__c&quot; IS=&quot;Development&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Cost Overrun Guarantee</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.LLC_BI__Product_Type__c&quot; IS=&quot;Development&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Share Charge</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Legal Document</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.LLC_BI__Product_Type__c&quot; IS=&quot;Development&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Demand Letter</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.LLC_BI__Product_Type__c&quot; IS=&quot;Development&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Standstill</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Post Completion</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.LLC_BI__Product_Type__c&quot; IS=&quot;Development&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Development</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">LLC_BI__ClosingChecklist__c</Data></Cell>
+    <Cell><Data ss:Type="String">Refurbishment Calculator</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+    <Cell><Data ss:Type="String">Application</Data></Cell>
+    <Cell><Data ss:Type="String">{{IF=&quot;1&quot;}}{{COND=&quot;1&quot; FIELD=&quot;LLC_BI__Loan__c.LLC_BI__Product_Type__c&quot; IS=&quot;Residential Refurbishment&quot;}}__GUID__{{ENDIF}}</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Residential Refurbishment</Data></Cell>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">Product Type is Residential Refurbishment</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+ <Worksheet ss:Name="Level Reference">
+  <Table ss:ExpandedColumnCount="2" ss:ExpandedRowCount="5" x:FullColumns="1"
+   x:FullRows="1" ss:DefaultRowHeight="15">
+   <Row>
+    <Cell><Data ss:Type="String">UI Level</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__DocManager__c.LLC_BI__Type__c value</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Loans</Data></Cell>
+    <Cell><Data ss:Type="String">llc_bi__loan__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Relationships</Data></Cell>
+    <Cell><Data ss:Type="String">Account</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Collateral</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Collateral__c</Data></Cell>
+   </Row>
+   <Row>
+    <Cell><Data ss:Type="String">Product Package</Data></Cell>
+    <Cell><Data ss:Type="String">LLC_BI__Product_Package__c</Data></Cell>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>

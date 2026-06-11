@@ -807,14 +807,14 @@ function LevelPanel({
         </div>
 
         {/* Tab bar */}
-        <div className="flex items-center gap-0 border-b border-slate-200">
+        <div className="flex items-center gap-0 border-b border-slate-200 overflow-x-auto scrollbar-thin" style={{ scrollbarWidth: "thin" }}>
           {levelGroups.map((g) => {
             const isActive = activeGroup?._id === g._id;
             return (
               <button
                 key={g._id}
                 onClick={() => setActiveGroupId(g._id)}
-                className={`border-b-2 px-4 py-2 text-xs font-medium transition-colors max-w-[160px] whitespace-normal text-left leading-snug ${
+                className={`shrink-0 border-b-2 px-4 py-2 text-xs font-medium transition-colors max-w-[160px] whitespace-normal text-left leading-snug ${
                   isActive
                     ? "border-slate-700 text-slate-900 bg-white"
                     : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
@@ -952,7 +952,7 @@ export function DocmanTool({
   function parseImportFile(text: string, filename: string): DocmanExport[] | string {
     const result = filename.endsWith(".yaml") || filename.endsWith(".yml")
       ? parseDocmanYaml(text)
-      : parseDocmanExcel(text);
+      : parseDocmanExcel(text, filename);
     if (typeof result === "string") return result;
     return [result];
   }
@@ -1052,13 +1052,25 @@ export function DocmanTool({
         open={importOpen}
         onOpenChange={setImportOpen}
         title="Import Document Manager"
-        acceptFileTypes=".yaml,.yml,.csv"
+        acceptFileTypes=".yaml,.yml,.csv,.xls,.xlsx"
         parseFile={parseImportFile}
         onConfirm={handleImportConfirm}
         renderPreviewRow={(data, i) => (
-          <div key={i} className="text-xs text-slate-700 py-0.5">
-            {data.placeholders.length} placeholder{data.placeholders.length !== 1 ? "s" : ""},{" "}
-            {data.groups.length} group{data.groups.length !== 1 ? "s" : ""}
+          <div key={i} className="space-y-1">
+            <p className="text-xs font-medium text-slate-700">
+              {data.placeholders.length} placeholder{data.placeholders.length !== 1 ? "s" : ""} · {data.groups.length} condition group{data.groups.length !== 1 ? "s" : ""}
+            </p>
+            {LEVELS.map((level) => {
+              const phs = data.placeholders.filter((p) => p.level === level);
+              if (!phs.length) return null;
+              const grps = data.groups.filter((g) => g.level === level);
+              return (
+                <div key={level} className="text-xs text-slate-500 pl-2">
+                  <span className="font-medium text-slate-700">{level}</span>: {phs.length} placeholder{phs.length !== 1 ? "s" : ""}
+                  {grps.length > 0 && `, ${grps.length} condition group${grps.length !== 1 ? "s" : ""}`}
+                </div>
+              );
+            })}
           </div>
         )}
       />

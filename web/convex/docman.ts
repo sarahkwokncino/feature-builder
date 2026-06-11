@@ -54,6 +54,77 @@ export const listPlaceholdersForProject = query({
   },
 });
 
+// Returns all docman groups and placeholders across every docman card for a project.
+// Used by the All Configuration export.
+export const listForProject = query({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, { projectId }) => {
+    const heatmaps = await ctx.db
+      .query("heatmaps")
+      .withIndex("byProject", (q) => q.eq("projectId", projectId))
+      .collect();
+
+    const allPlaceholders: Array<{
+      _id: string; name: string; level: string;
+      category?: string; isDefault?: boolean; order: number;
+    }> = [];
+    const allGroups: Array<{
+      _id: string; name: string; level: string;
+      criteriaUserWritten?: string; criteriaFormgen?: string;
+      placeholderIds: string[]; order: number;
+    }> = [];
+
+    for (const hm of heatmaps) {
+      const phases = await ctx.db
+        .query("phases")
+        .withIndex("byHeatmap", (q) => q.eq("heatmapId", hm._id))
+        .collect();
+      for (const phase of phases) {
+        const subphases = await ctx.db
+          .query("subphases")
+          .withIndex("byPhase", (q) => q.eq("phaseId", phase._id))
+          .collect();
+        for (const sp of subphases) {
+          const cards = await ctx.db
+            .query("cards")
+            .withIndex("bySubphase", (q) => q.eq("subphaseId", sp._id))
+            .collect();
+          for (const card of cards) {
+            if (card.configuratorKind !== "docman") continue;
+            const phs = await ctx.db
+              .query("docmanPlaceholders")
+              .withIndex("byCard", (q) => q.eq("cardId", card._id))
+              .collect();
+            for (const p of phs) {
+              allPlaceholders.push({
+                _id: p._id, name: p.name, level: p.level,
+                category: p.category, isDefault: p.isDefault, order: p.order,
+              });
+            }
+            const grps = await ctx.db
+              .query("docmanGroups")
+              .withIndex("byCard", (q) => q.eq("cardId", card._id))
+              .collect();
+            for (const g of grps) {
+              allGroups.push({
+                _id: g._id, name: g.name, level: g.level,
+                criteriaUserWritten: g.criteriaUserWritten,
+                criteriaFormgen: g.criteriaFormgen,
+                placeholderIds: g.placeholderIds, order: g.order,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    allPlaceholders.sort((a, b) => a.order - b.order);
+    allGroups.sort((a, b) => a.order - b.order);
+
+    return { placeholders: allPlaceholders, groups: allGroups };
+  },
+});
+
 export const listForCard = query({
   args: { cardId: v.id("cards") },
   handler: async (ctx, { cardId }) => {
