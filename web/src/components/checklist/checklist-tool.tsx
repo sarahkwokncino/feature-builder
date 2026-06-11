@@ -64,6 +64,7 @@ export function ChecklistTool({
   const update = useMutation(api.checklist.update);
   const remove = useMutation(api.checklist.remove);
   const bulkImport = useMutation(api.checklist.bulkImport);
+  const recoverOrphans = useMutation(api.checklist.recoverOrphanedReqs);
   const syncDocmanPlaceholders = useMutation(api.docman.syncFromChecklist);
 
   const docmanPlaceholders = useQuery(api.docman.listPlaceholdersForProject, { projectId }) ?? [];
@@ -178,12 +179,7 @@ export function ChecklistTool({
   }
 
   if (!cardId) {
-    return (
-      <div className="p-8 text-sm text-slate-600">
-        This page expects a <code>?cardId=…</code> query parameter — open it
-        from a checklist card in the heatmap.
-      </div>
-    );
+    return <ChecklistCardPicker projectId={projectId} />;
   }
   if (project === undefined || records === undefined) {
     return <div className="p-6 text-sm text-slate-500">Loading…</div>;
@@ -227,6 +223,10 @@ export function ChecklistTool({
             onExcelClick={() => downloadChecklistExcel(checklistRows, picklistMap, docmanPlaceholders)}
             onYamlClick={() => setYamlOpen(true)}
           />
+          <Button variant="outline" onClick={async () => {
+            const n = await recoverOrphans({ projectId });
+            toast.success(n > 0 ? `Recovered ${n} requirement${n === 1 ? "" : "s"}` : "No orphaned requirements found");
+          }}>Recover data</Button>
           <Button variant="outline" onClick={() => setHelpOpen(true)}>? Help</Button>
           <Button
             onClick={handleAdd}
@@ -832,4 +832,16 @@ function DetailField({ label, value, wide }: { label: string; value?: string; wi
       <p className="text-sm text-slate-800">{value || <span className="italic text-slate-400">—</span>}</p>
     </div>
   );
+}
+
+function ChecklistCardPicker({ projectId }: { projectId: Id<"projects"> }) {
+  const ensureCard = useMutation(api.checklist.ensureProjectChecklistCard);
+
+  useEffect(() => {
+    ensureCard({ projectId }).then(cardId => {
+      window.location.href = `?cardId=${cardId}`;
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return <div className="p-8 text-sm text-slate-500">Opening Smart Checklist Builder…</div>;
 }

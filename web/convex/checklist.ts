@@ -1,6 +1,101 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import type { Doc } from "./_generated/dataModel";
+import type { Doc, Id } from "./_generated/dataModel";
+
+// Returns the cardId of the project-level checklist card, creating one if needed.
+export const ensureProjectChecklistCard = mutation({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, { projectId }): Promise<Id<"cards">> => {
+    // Look for an existing checklist card in this project
+    const heatmaps = await ctx.db.query("heatmaps")
+      .withIndex("byProject", (q) => q.eq("projectId", projectId)).collect();
+    for (const heatmap of heatmaps) {
+      const phases = await ctx.db.query("phases")
+        .withIndex("byHeatmap", (q) => q.eq("heatmapId", heatmap._id)).collect();
+      for (const phase of phases) {
+        const subphases = await ctx.db.query("subphases")
+          .withIndex("byPhase", (q) => q.eq("phaseId", phase._id)).collect();
+        for (const sub of subphases) {
+          const cards = await ctx.db.query("cards")
+            .withIndex("bySubphase", (q) => q.eq("subphaseId", sub._id)).collect();
+          for (const card of cards) {
+            if (
+              card.configuratorKind === "checklist" ||
+              card.sub?.toLowerCase() === "smart checklist"
+            ) {
+              return card._id;
+            }
+          }
+        }
+      }
+    }
+    // None found — create a virtual card on the first subphase
+    const heatmap = heatmaps[0];
+    if (!heatmap) throw new Error("No heatmap found for project");
+    const phases = await ctx.db.query("phases")
+      .withIndex("byHeatmap", (q) => q.eq("heatmapId", heatmap._id)).collect();
+    const phase = phases[0];
+    if (!phase) throw new Error("No phase found");
+    const subphases = await ctx.db.query("subphases")
+      .withIndex("byPhase", (q) => q.eq("phaseId", phase._id)).collect();
+    const sub = subphases[0];
+    if (!sub) throw new Error("No subphase found");
+    const order = (await ctx.db.query("cards")
+      .withIndex("bySubphase", (q) => q.eq("subphaseId", sub._id)).collect()).length;
+    return await ctx.db.insert("cards", {
+      subphaseId: sub._id,
+      name: "Smart Checklist",
+      sub: "Smart Checklist",
+      type: "linked",
+      status: "linked",
+      configuratorKind: "checklist",
+      order,
+    });
+  },
+});
+
+export const recoverOrphanedReqs = mutation({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, { projectId }): Promise<number> => {
+    // Find the live checklist card for this project
+    const heatmaps = await ctx.db.query("heatmaps")
+      .withIndex("byProject", (q) => q.eq("projectId", projectId)).collect();
+    let liveCardId: Id<"cards"> | null = null;
+    outer: for (const heatmap of heatmaps) {
+      const phases = await ctx.db.query("phases")
+        .withIndex("byHeatmap", (q) => q.eq("heatmapId", heatmap._id)).collect();
+      for (const phase of phases) {
+        const subs = await ctx.db.query("subphases")
+          .withIndex("byPhase", (q) => q.eq("phaseId", phase._id)).collect();
+        for (const sub of subs) {
+          const cards = await ctx.db.query("cards")
+            .withIndex("bySubphase", (q) => q.eq("subphaseId", sub._id)).collect();
+          for (const card of cards) {
+            if (card.configuratorKind === "checklist" || card.sub?.toLowerCase() === "smart checklist") {
+              liveCardId = card._id;
+              break outer;
+            }
+          }
+        }
+      }
+    }
+    if (!liveCardId) return 0;
+
+    // Scan all checklistReqs and re-link any whose card no longer exists
+    const all = await ctx.db.query("checklistReqs").collect();
+    let recovered = 0;
+    for (const req of all) {
+      if (req.cardId === liveCardId) continue; // already on the live card
+      const card = await ctx.db.get(req.cardId);
+      if (!card) {
+        // Orphaned — re-link to the live card
+        await ctx.db.patch(req._id, { cardId: liveCardId });
+        recovered++;
+      }
+    }
+    return recovered;
+  },
+});
 
 export const listForCard = query({
   args: { cardId: v.id("cards") },

@@ -5,7 +5,6 @@ import { useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Doc } from "../../../convex/_generated/dataModel";
 import { Input } from "@/components/ui/input";
-import { AddSubphaseForm } from "./add-subphase-form";
 
 export function PhaseBanner({ phase }: { phase: Doc<"phases"> }) {
   const renamePhase = useMutation(api.heatmap.renamePhase);
@@ -30,7 +29,7 @@ export function PhaseBanner({ phase }: { phase: Doc<"phases"> }) {
   }
 
   return (
-    <div className="group/phase relative rounded-t-md bg-[var(--color-navy)] px-4 py-2 text-center text-sm font-semibold text-white">
+    <div className="group/phase relative rounded-t-md px-4 py-2 text-center text-[12.5px] font-[650] text-[#eaf3ff] min-h-[42px] flex items-center justify-center" style={{background:"linear-gradient(180deg,#16365400,#13314c)",border:"1px solid var(--hm-line)",borderBottom:0,borderRadius:"8px 8px 0 0"}}>
       {editing ? (
         <Input
           autoFocus
@@ -61,7 +60,6 @@ export function PhaseBanner({ phase }: { phase: Doc<"phases"> }) {
       >
         ×
       </button>
-      <AddSubphaseForm phaseId={phase._id} />
     </div>
   );
 }

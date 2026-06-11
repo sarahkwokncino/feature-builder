@@ -97,6 +97,7 @@ export function BuildersHub({ projectId }: { projectId: Id<"projects"> }) {
   const PROJECT_LEVEL_BUILDERS: { kind: string; route: string }[] = [
     { kind: "product-hierarchy", route: `/projects/${projectId}/product-hierarchy` },
     { kind: "collateral", route: `/projects/${projectId}/collateral` },
+    { kind: "checklist", route: `/projects/${projectId}/checklist` },
     { kind: "conditions", route: `/projects/${projectId}/conditions` },
     { kind: "policy-exceptions", route: `/projects/${projectId}/policy-exceptions` },
     { kind: "fees", route: `/projects/${projectId}/fees` },

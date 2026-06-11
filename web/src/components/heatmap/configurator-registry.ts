@@ -8,6 +8,12 @@ export function configuratorRoute(
   card: Doc<"cards">,
   projectId: Id<"projects">,
 ): string | null {
+  if (card.sub === "Relationship" || card.sub === "Connections") return `/projects/${projectId}/relationships`;
+  if (card.sub?.toLowerCase() === "smart checklist") return `/projects/${projectId}/checklist?cardId=${card._id}`;
+  if (card.sub === "Conditions") return `/projects/${projectId}/conditions`;
+  if (card.sub === "Collateral") return `/projects/${projectId}/collateral`;
+  if (card.sub === "Policy Exceptions" || card.sub === "Policy Exception") return `/projects/${projectId}/policy-exceptions`;
+  if (card.sub === "Covenants" || card.sub === "Covenant Mgmt" || card.sub === "Covenant Management") return `/projects/${projectId}/covenants`;
   if (!card.configuratorKind) return null;
   switch (card.configuratorKind) {
     case "covenants":

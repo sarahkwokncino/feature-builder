@@ -32,6 +32,7 @@ export default defineSchema({
     subphaseId: v.id("subphases"),
     name: v.string(),
     sub: v.optional(v.string()),
+    featureId: v.optional(v.number()),
     type: v.union(
       v.literal("low"),
       v.literal("high"),

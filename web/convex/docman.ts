@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { Id } from "./_generated/dataModel";
+import type { Id } from "./_generated/dataModel";
 
 const LEVEL_VALIDATOR = v.union(
   v.literal("Relationships"),
@@ -409,5 +409,96 @@ export const bulkImport = mutation({
         updatedAt: now,
       });
     }
+  },
+});
+
+export const recoverOrphanedData = mutation({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, { projectId }): Promise<number> => {
+    // Find the live docman card
+    const heatmaps = await ctx.db.query("heatmaps")
+      .withIndex("byProject", (q) => q.eq("projectId", projectId)).collect();
+    let liveCardId: Id<"cards"> | null = null;
+    outer: for (const heatmap of heatmaps) {
+      const phases = await ctx.db.query("phases")
+        .withIndex("byHeatmap", (q) => q.eq("heatmapId", heatmap._id)).collect();
+      for (const phase of phases) {
+        const subs = await ctx.db.query("subphases")
+          .withIndex("byPhase", (q) => q.eq("phaseId", phase._id)).collect();
+        for (const sub of subs) {
+          const cards = await ctx.db.query("cards")
+            .withIndex("bySubphase", (q) => q.eq("subphaseId", sub._id)).collect();
+          for (const card of cards) {
+            if (card.configuratorKind === "docman" || card.sub === "Document Manager") {
+              liveCardId = card._id;
+              break outer;
+            }
+          }
+        }
+      }
+    }
+    if (!liveCardId) return 0;
+
+    let recovered = 0;
+    // Recover orphaned placeholders
+    const placeholders = await ctx.db.query("docmanPlaceholders").collect();
+    for (const p of placeholders) {
+      if (p.cardId === liveCardId) continue;
+      const card = await ctx.db.get(p.cardId);
+      if (!card) { await ctx.db.patch(p._id, { cardId: liveCardId }); recovered++; }
+    }
+    // Recover orphaned groups
+    const groups = await ctx.db.query("docmanGroups").collect();
+    for (const g of groups) {
+      if (g.cardId === liveCardId) continue;
+      const card = await ctx.db.get(g.cardId);
+      if (!card) { await ctx.db.patch(g._id, { cardId: liveCardId }); recovered++; }
+    }
+    return recovered;
+  },
+});
+
+export const ensureProjectCard = mutation({
+  args: { projectId: v.id("projects") },
+  handler: async (ctx, { projectId }): Promise<Id<"cards">> => {
+    const heatmaps = await ctx.db.query("heatmaps")
+      .withIndex("byProject", (q) => q.eq("projectId", projectId)).collect();
+    for (const heatmap of heatmaps) {
+      const phases = await ctx.db.query("phases")
+        .withIndex("byHeatmap", (q) => q.eq("heatmapId", heatmap._id)).collect();
+      for (const phase of phases) {
+        const subs = await ctx.db.query("subphases")
+          .withIndex("byPhase", (q) => q.eq("phaseId", phase._id)).collect();
+        for (const sub of subs) {
+          const cards = await ctx.db.query("cards")
+            .withIndex("bySubphase", (q) => q.eq("subphaseId", sub._id)).collect();
+          for (const card of cards) {
+            if (card.configuratorKind === "docman" || card.sub === "Document Manager")
+              return card._id;
+          }
+        }
+      }
+    }
+    const heatmap = heatmaps[0];
+    if (!heatmap) throw new Error("No heatmap found");
+    const phases = await ctx.db.query("phases")
+      .withIndex("byHeatmap", (q) => q.eq("heatmapId", heatmap._id)).collect();
+    const phase = phases[0];
+    if (!phase) throw new Error("No phase found");
+    const subs = await ctx.db.query("subphases")
+      .withIndex("byPhase", (q) => q.eq("phaseId", phase._id)).collect();
+    const sub = subs[0];
+    if (!sub) throw new Error("No subphase found");
+    const order = (await ctx.db.query("cards")
+      .withIndex("bySubphase", (q) => q.eq("subphaseId", sub._id)).collect()).length;
+    return await ctx.db.insert("cards", {
+      subphaseId: sub._id,
+      name: "Document Manager",
+      sub: "Document Manager",
+      type: "linked",
+      status: "linked",
+      configuratorKind: "docman",
+      order,
+    });
   },
 });

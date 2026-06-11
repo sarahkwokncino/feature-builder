@@ -21,7 +21,7 @@ export default async function ProjectPage(
           </Link>
         }
       />
-      <main className="flex-1 overflow-auto bg-slate-100">
+      <main className="flex-1 overflow-auto" style={{background:"linear-gradient(180deg,#091321,#0a1828)"}}>
         <HeatmapBoard projectId={projectId as Id<"projects">} />
       </main>
     </>

@@ -3,9 +3,14 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Doc } from "../../../convex/_generated/dataModel";
-import { CARD_TYPE_STYLES } from "./card-styles";
 
 type Card = Doc<"cards">;
+
+const STATUS_BORDER: Record<string, string> = {
+  configured:    "border-l-[var(--hm-ev)]",
+  "in-progress": "border-l-[var(--hm-potential)]",
+  gap:           "border-l-[var(--hm-confirmed)]",
+};
 
 export function HeatmapCard({
   card,
@@ -31,6 +36,8 @@ export function HeatmapCard({
     opacity: sortableDragging ? 0.4 : isDragging ? 0.9 : 1,
   };
 
+  const borderCls = STATUS_BORDER[card.status ?? ""] ?? "border-l-[var(--hm-none)]";
+
   return (
     <div
       ref={setNodeRef}
@@ -38,30 +45,13 @@ export function HeatmapCard({
       {...attributes}
       {...listeners}
       onClick={() => onSelect?.(card)}
-      className={`cursor-grab rounded-md px-3 py-2 text-xs shadow-sm active:cursor-grabbing ${
-        CARD_TYPE_STYLES[card.type] ?? CARD_TYPE_STYLES.low
-      }`}
+      className={`relative cursor-grab rounded-md border border-[var(--hm-line)] border-l-4 ${borderCls} bg-[var(--hm-panel)] px-2.5 py-2 text-xs shadow-sm transition-transform active:cursor-grabbing hover:-translate-y-px hover:bg-[var(--hm-panel2)]`}
     >
-      <div className="font-semibold leading-snug">{card.name}</div>
+      <div className="text-[10px] text-[var(--hm-muted)]">{card.featureId ? `#${card.featureId}` : ""}</div>
+      <div className="mt-0.5 text-[12.5px] font-semibold leading-snug text-[var(--hm-ink)]">{card.name}</div>
       {card.sub ? (
-        <div className="mt-0.5 text-[11px] opacity-80">{card.sub}</div>
+        <div className="mt-0.5 text-[11px] italic text-[var(--hm-muted)]">{card.sub}</div>
       ) : null}
-      <div className="mt-1.5 flex items-center justify-between">
-        {card.type === "linked" ? (
-          <span className="text-[10px] font-semibold uppercase tracking-wide text-amber-900">
-            Open ↗
-          </span>
-        ) : (
-          <span
-            className={`inline-block h-2 w-2 rounded-full ${
-              card.status === "configured"
-                ? "bg-emerald-400"
-                : "bg-white/30"
-            }`}
-            aria-label={card.status}
-          />
-        )}
-      </div>
     </div>
   );
 }

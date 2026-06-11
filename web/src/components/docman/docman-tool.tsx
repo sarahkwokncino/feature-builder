@@ -595,7 +595,7 @@ function ConditionalGroupEditor({
               <p className="text-[10px] text-slate-400 mb-1.5 leading-relaxed">
                 These always generate and cannot have criteria. To assign one to a condition instead, remove it from <strong>Default Docman Placeholders</strong> above first.
               </p>
-              <ul className="space-y-1">
+              <ul className="space-y-1 max-h-48 overflow-y-auto pr-1">
                 {defaultPhs.map((p) => (
                   <li key={p._id} className="flex items-center gap-2 rounded px-2 py-1.5 bg-slate-50 border border-slate-200 opacity-60 cursor-not-allowed">
                     <input type="checkbox" checked disabled className="rounded border-slate-300" />
@@ -643,7 +643,7 @@ function ConditionalGroupEditor({
                     </button>
                   </div>
                 )}
-                <ul className="space-y-1.5">
+                <ul className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
                   {optionalPhs.map((p) => (
                     <li key={p._id}>
                       <label className={`flex items-center gap-2 group ${isLocked ? "cursor-not-allowed" : "cursor-pointer"}`}>
@@ -881,6 +881,7 @@ export function DocmanTool({
   ) as { groups: Group[]; placeholders: Placeholder[] } | undefined;
   const checklistReqs = useQuery(api.checklist.listForProject, { projectId });
   const bulkImport = useMutation(api.docman.bulkImport);
+  const recoverOrphans = useMutation(api.docman.recoverOrphanedData);
 
   const [activeLevel, setActiveLevel] = useState<DocmanLevel>(LEVELS[0]);
   const [placeholderBuilderOpen, setPlaceholderBuilderOpen] = useState(false);
@@ -941,12 +942,7 @@ export function DocmanTool({
   );
 
   if (!cardId) {
-    return (
-      <div className="p-8 text-sm text-slate-600">
-        This page expects a <code>?cardId=…</code> query parameter — open it
-        from a Document Manager card in the heatmap.
-      </div>
-    );
+    return <DocmanAutoOpen projectId={projectId} />;
   }
   if (project === undefined || raw === undefined) {
     return <div className="p-6 text-sm text-slate-500">Loading…</div>;
@@ -993,6 +989,10 @@ export function DocmanTool({
             onExcelClick={() => downloadDocmanExcel(exportData)}
             onYamlClick={() => setYamlOpen(true)}
           />
+          <Button variant="outline" size="sm" onClick={async () => {
+            const n = await recoverOrphans({ projectId });
+            toast.success(n > 0 ? `Recovered ${n} item${n === 1 ? "" : "s"}` : "No orphaned data found");
+          }}>Recover data</Button>
           <Button variant="outline" size="sm" onClick={() => setHelpOpen(true)}>? Help</Button>
           <Button variant="outline" onClick={() => setPlaceholderBuilderOpen(true)} disabled={isLocked}>
             Placeholder Builder
@@ -1261,6 +1261,25 @@ export function DocmanPreviewPlayground() {
       </div>
     </div>
   );
+}
+
+function DocmanAutoOpen({ projectId }: { projectId: Id<"projects"> }) {
+  const ensureCard = useMutation(api.docman.ensureProjectCard);
+  const [loading, setLoading] = useState(false);
+
+  async function handleOpen() {
+    setLoading(true);
+    try {
+      const cardId = await ensureCard({ projectId });
+      window.location.href = `?cardId=${cardId}`;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { handleOpen(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return <div className="p-8 text-sm text-slate-500">{loading ? "Opening Document Manager Builder…" : "Redirecting…"}</div>;
 }
 
 function DocmanHelpDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {

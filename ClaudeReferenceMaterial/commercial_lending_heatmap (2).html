@@ -1,7 +1,5 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
+<html lang="en"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Commercial Lending Feature Heat Map — nCino</title>
 <style>
@@ -26,10 +24,8 @@
   .board{display:flex;gap:12px;padding:18px;overflow-x:auto;align-items:flex-start}
   .col{min-width:188px;max-width:212px;flex:1 0 188px}
   .colhead{text-align:center;font-weight:650;font-size:12.5px;padding:9px 6px;border-radius:8px 8px 0 0;
-    background:linear-gradient(180deg,#16365400,#13314c);border:1px solid var(--line);border-bottom:0;
-    color:#eaf3ff;min-height:42px;display:flex;align-items:center;justify-content:center}
-  .stack{display:flex;flex-direction:column;gap:8px;padding:8px;border:1px solid var(--line);
-    border-top:0;border-radius:0 0 8px 8px;background:#0c1d30aa;min-height:60px}
+    background:linear-gradient(180deg,#16365400,#13314c);border:1px solid var(--line);border-bottom:0;color:#eaf3ff;min-height:42px;display:flex;align-items:center;justify-content:center}
+  .stack{display:flex;flex-direction:column;gap:8px;padding:8px;border:1px solid var(--line);border-top:0;border-radius:0 0 8px 8px;background:#0c1d30aa;min-height:60px}
   .card{position:relative;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--none);
     border-radius:7px;padding:8px 9px;cursor:pointer;transition:.12s}
   .card:hover,.card:focus{background:var(--panel2);outline:none;transform:translateY(-1px)}
@@ -43,8 +39,7 @@
   .card.rs-confirmed{border-left-color:var(--gap)}
   .card.dim{opacity:.2;filter:grayscale(.4)}
   .card .mflag{position:absolute;top:6px;right:7px;font-size:11px;opacity:.85}
-  .platform{margin:6px 18px 26px;border:1px dashed var(--line);border-radius:8px;
-    background:#0c1d3066;padding:10px 12px}
+  .platform{margin:6px 18px 26px;border:1px dashed var(--line);border-radius:8px;background:#0c1d3066;padding:10px 12px}
   .platform h3{margin:0 0 8px;font-size:12.5px;color:var(--accent);font-weight:650}
   .pgrid{display:flex;gap:8px;flex-wrap:wrap}
   .platform .card{min-width:200px;flex:1 0 200px}
@@ -52,21 +47,18 @@
   #scrim.show{display:block}
   #drawer{position:fixed;top:0;right:0;height:100vh;width:440px;max-width:92vw;z-index:50;
     background:#0b1d31;border-left:1px solid #27537a;box-shadow:-22px 0 60px #000a;
-    transform:translateX(105%);transition:transform .22s;display:flex;flex-direction:column;overflow:hidden}
+    transform:translateX(105%);transition:transform .22s;display:flex;flex-direction:column}
   #drawer.show{transform:translateX(0)}
-  .dhead{padding:14px 16px 12px;border-bottom:1px solid var(--line);position:relative;flex-shrink:0}
+  .dhead{padding:14px 16px 12px;border-bottom:1px solid var(--line);position:relative}
   .dhead .pstage{font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
   .dhead h2{margin:3px 0 0;font-size:18px;color:#fff}
   .dhead .sub2{color:var(--muted);font-size:12.5px;margin-top:2px}
-  .dhead .x{position:absolute;top:12px;right:12px;background:#13314c;border:1px solid var(--line);
-    color:var(--ink);border-radius:7px;width:30px;height:30px;cursor:pointer;font-size:16px;
-    display:flex;align-items:center;justify-content:center}
-  .dbody{padding:14px 16px 28px;overflow-y:auto;flex:1}
+  .dhead .x{position:absolute;top:12px;right:12px;background:#13314c;border:1px solid var(--line);color:var(--ink);border-radius:7px;width:30px;height:30px;cursor:pointer;font-size:16px}
+  .dbody{padding:14px 16px 28px;overflow:auto}
   .sec{margin-bottom:16px}
   .lbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:#7fa6c4;margin-bottom:5px}
   .desc{color:#e0ecf6}
-  .pill{display:inline-block;background:var(--chip);border:1px solid var(--line);border-radius:999px;
-    padding:2px 9px;margin:2px 5px 0 0;font-size:11.5px}
+  .pill{display:inline-block;background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:2px 9px;margin:2px 5px 0 0;font-size:11.5px}
   ul.steps{margin:0;padding:0;list-style:none}
   ul.steps li{margin:5px 0;padding-left:20px;position:relative;color:#cfe0ee}
   .tag{position:absolute;left:0;top:2px;font-size:9px;font-weight:700;border-radius:3px;padding:0 3px}
@@ -77,24 +69,19 @@
   .epicline{font-size:12.5px;margin:3px 0}
   .epicline .key{color:#ffd27c;font-weight:600}
   .note{color:var(--muted);font-style:italic;font-size:11.5px}
-  .intchip{display:inline-block;font-size:9px;background:#3a1430;border:1px solid #7a2d63;
-    color:#f3a8df;border-radius:4px;padding:0 4px}
+  .intchip{display:inline-block;font-size:9px;background:#3a1430;border:1px solid #7a2d63;color:#f3a8df;border-radius:4px;padding:0 4px}
   body.client .internal-only{display:none !important}
   .media-grid{display:flex;flex-direction:column;gap:10px}
   .media-item img{width:100%;border-radius:8px;border:1px solid var(--line);display:block;cursor:zoom-in}
   .media-item video{width:100%;border-radius:8px;border:1px solid var(--line);background:#000}
   .media-item iframe{width:100%;aspect-ratio:16/9;border:1px solid var(--line);border-radius:8px}
-  .ytfacade{position:relative;cursor:pointer;border-radius:8px;overflow:hidden;
-    border:1px solid var(--line);aspect-ratio:16/9;background:#000}
+  .ytfacade{position:relative;cursor:pointer;border-radius:8px;overflow:hidden;border:1px solid var(--line);aspect-ratio:16/9;background:#000}
   .ytfacade img{width:100%;height:100%;object-fit:cover;display:block;opacity:.82}
   .ytfacade:hover img{opacity:1}
-  .ytfacade .playbtn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    font-size:46px;color:#fff;text-shadow:0 2px 12px #000;pointer-events:none}
+  .ytfacade .playbtn{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:46px;color:#fff;text-shadow:0 2px 12px #000;pointer-events:none}
   .media-cap{font-size:11px;color:var(--muted);margin-top:3px}
-  .media-empty{border:1px dashed var(--line);border-radius:8px;padding:16px;text-align:center;
-    color:var(--muted);font-size:12px;background:#0c1f3355}
-  #lightbox{position:fixed;inset:0;z-index:80;background:#000c;display:none;align-items:center;
-    justify-content:center;cursor:zoom-out}
+  .media-empty{border:1px dashed var(--line);border-radius:8px;padding:16px;text-align:center;color:var(--muted);font-size:12px;background:#0c1f3355}
+  #lightbox{position:fixed;inset:0;z-index:80;background:#000c;display:none;align-items:center;justify-content:center;cursor:zoom-out}
   #lightbox.show{display:flex}
   #lightbox img{max-width:92vw;max-height:90vh;border-radius:8px;box-shadow:0 20px 60px #000}
   .covbadge{font-size:10px;border-radius:5px;padding:2px 8px;border:1px solid var(--line);font-weight:600}
@@ -103,71 +90,42 @@
   .rsb-confirmed{color:#ff9a9a;border-color:#8a2626;background:#3a141466}
   .rsb-none{color:#aebccb;border-color:#3c4d60;background:#1a2a3b66}
   .gaps{display:flex;flex-direction:column;gap:7px}
-  .gap-item{border:1px solid var(--line);border-left:4px solid var(--none);border-radius:7px;
-    padding:7px 9px;background:#0d2034}
+  .gap-item{border:1px solid var(--line);border-left:4px solid var(--none);border-radius:7px;padding:7px 9px;background:#0d2034}
   .gap-item.g-potential{border-left-color:var(--part);background:#2a1d0f55}
   .gap-item.g-confirmed{border-left-color:var(--gap);background:#2a121255}
   .gap-item .gh{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:3px}
   .gap-item .gid{font-size:10px;color:var(--muted);font-weight:600}
-  .gtag{font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
-    border-radius:4px;padding:1px 6px}
+  .gtag{font-size:9px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;border-radius:4px;padding:1px 6px}
   .gtag.t-potential{color:#ffbf86;border:1px solid #8a5a20;background:#3a280f}
   .gtag.t-confirmed{color:#ff9a9a;border:1px solid #8a2626;background:#3a1414}
   .gtag.t-review{color:#ffd27c;border:1px solid #8a7320;background:#33300f}
   .gap-item .gstmt{font-size:12.5px;color:#e7eff7}
   .gap-item .gmeta{font-size:11px;color:var(--muted);margin-top:3px}
-  .gaps-empty{border:1px dashed var(--line);border-radius:7px;padding:11px;color:var(--muted);
-    font-size:12px;background:#0c1f3355}
-  /* export/import buttons */
-  .hdr-btn{background:#0c2034;border:1px solid var(--line);color:var(--ink);border-radius:7px;
-    padding:5px 12px;font-size:12px;cursor:pointer}
-  .hdr-btn:hover{background:#13314c}
+  .gaps-empty{border:1px dashed var(--line);border-radius:7px;padding:11px;color:var(--muted);font-size:12px;background:#0c1f3355}
   footer{color:var(--muted);font-size:11px;padding:0 18px 24px}
-  /* toast */
-  .toast{position:fixed;bottom:24px;right:24px;background:#1a3a5c;border:1px solid var(--line);
-    color:var(--ink);padding:10px 16px;border-radius:8px;font-size:13px;
-    box-shadow:0 4px 20px #000a;z-index:300;opacity:0;transform:translateY(8px);
-    transition:opacity .2s,transform .2s;pointer-events:none}
-  .toast.show{opacity:1;transform:translateY(0)}
-</style>
-</head>
+</style></head>
 <body class="internal">
-
 <header>
-  <div>
-    <h1>Commercial Lending — Feature &amp; Capability Heat Map <span class="intchip">TEMPLATE / SAMPLE</span></h1>
-    <div class="sub">nCino loan origination lifecycle · 69 features · click a card for detail</div>
-  </div>
+  <div><h1>Commercial Lending — Feature &amp; Capability Heat Map <span class="intchip">TEMPLATE / SAMPLE</span></h1>
+  <div class="sub">nCino loan origination lifecycle · 69 features · click a box for detail</div></div>
   <div class="spacer"></div>
   <div class="legend">
     <span><span class="dot" style="background:var(--ev)"></span>evidenced</span>
     <span><span class="dot" style="background:var(--part)"></span>potential gap</span>
     <span><span class="dot" style="background:var(--gap)"></span>confirmed gap</span>
-    <span><span class="dot" style="background:var(--none)"></span>not yet assessed</span>
-  </div>
-  <div class="ctrl">
-    <input id="q" type="text" placeholder="filter features…" oninput="filter(this.value)">
-  </div>
+    <span><span class="dot" style="background:var(--none)"></span>not yet assessed</span></div>
+  <div class="ctrl"><input id="q" type="text" placeholder="filter features…" oninput="filter(this.value)"></div>
   <div class="ctrl">View:<span class="switch">
     <button id="bInt" class="on" onclick="setMode('internal')">Internal</button>
-    <button id="bCli" onclick="setMode('client')">Client</button>
-  </span></div>
-  <div class="ctrl">
-    <button class="hdr-btn" onclick="exportJSON()">↓ Export</button>
-    <button class="hdr-btn" onclick="triggerImport()">↑ Import</button>
-  </div>
+    <button id="bCli" onclick="setMode('client')">Client</button></span></div>
 </header>
-
 <div id="board" class="board"></div>
-<div id="platform" class="platform" style="display:none"></div>
+<div id="platform" class="platform"></div>
 <div id="scrim" onclick="closeDrawer()"></div>
 <aside id="drawer" aria-hidden="true"></aside>
 <div id="lightbox" onclick="closeLB()"><img id="lbimg" src="" alt=""/></div>
-<div class="toast" id="toast"></div>
-<input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
-
+<footer>Source of truth: <code>05_features_full.json</code>. JIRA epics are <b>internal-only</b> (hidden in Client view). Media slots accept images &amp; video per feature (schema in the data file meta).</footer>
 <script>
-// ── DATA (69 features) ────────────────────────────────────────────────────────
 const DATA=[
   {
     "id": 101,
@@ -5499,262 +5457,99 @@ const DATA=[
     "media": [],
     "subtitle": ""
   }
-];
-
-// ── Stage order ───────────────────────────────────────────────────────────────
-const STAGES=["Prospecting","Qualification","Underwriting","Approval","Processing","Doc Preparation","Final Review","Booking & Monitoring","Complete"];
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-const byStage={};
-DATA.forEach(f=>{(byStage[f.stage]=byStage[f.stage]||[]).push(f);});
+]; const STAGES=["Prospecting", "Qualification", "Underwriting", "Approval", "Processing", "Doc Preparation", "Final Review", "Booking & Monitoring", "Complete"];
+const byStage={}; DATA.forEach(f=>{(byStage[f.stage]=byStage[f.stage]||[]).push(f)});
 const esc=s=>(s==null?'':String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const RS={
-  none:     {label:'Not yet assessed', cls:'none'},
-  evidenced:{label:'Evidenced',        cls:'evidenced'},
-  potential:{label:'Potential gap',    cls:'potential'},
-  confirmed:{label:'Confirmed gap',    cls:'confirmed'}
-};
+const RS={none:{label:'Not yet assessed',cls:'none'},evidenced:{label:'Evidenced',cls:'evidenced'},
+  potential:{label:'Potential gap',cls:'potential'},confirmed:{label:'Confirmed gap',cls:'confirmed'}};
 function rstat(f){return RS[f.req_status]||RS.none;}
-
-// ── Card builder ──────────────────────────────────────────────────────────────
-function card(f){
-  const s=rstat(f);
-  const hasMedia=(f.media&&f.media.length);
-  return `<div class="card rs-${s.cls}" tabindex="0" data-id="${f.id}"
-    onclick="openDrawer(${f.id})" onkeydown="if(event.key==='Enter')openDrawer(${f.id})">
+function card(f){const s=rstat(f);const hasMedia=(f.media&&f.media.length);
+  return `<div class="card rs-${s.cls}" tabindex="0" data-id="${f.id}" onclick="openDrawer(${f.id})" onkeydown="if(event.key==='Enter')openDrawer(${f.id})">
     ${hasMedia?'<span class="mflag" title="has media">▦</span>':''}
-    <div class="fid">#${f.id}</div>
-    <div class="ttl">${esc(f.feature)}</div>
-    ${f.subtitle?`<div class="st">${esc(f.subtitle)}</div>`:''}
-  </div>`;
-}
-
-// ── Render board ──────────────────────────────────────────────────────────────
+    <div class="fid">#${f.id}</div><div class="ttl">${esc(f.feature)}</div>
+    ${f.subtitle?`<div class="st">${esc(f.subtitle)}</div>`:''}</div>`;}
 const board=document.getElementById('board');
-STAGES.forEach(st=>{
-  const col=document.createElement('div');
-  col.className='col';
-  col.innerHTML=`<div class="colhead">${esc(st)}</div><div class="stack">${(byStage[st]||[]).map(card).join('')}</div>`;
-  board.appendChild(col);
-});
+STAGES.forEach(st=>{const c=document.createElement('div');c.className='col';
+  c.innerHTML=`<div class="colhead">${esc(st)}</div><div class="stack">${(byStage[st]||[]).map(card).join('')}</div>`;board.appendChild(c);});
+document.getElementById('platform').innerHTML=`<h3>Platform / cross-cutting (operate across all stages)</h3><div class="pgrid">${(byStage['Platform / cross-cutting']||[]).map(card).join('')}</div>`;
 
-// Platform / cross-cutting section (if any entries use that stage)
-const platCards=(byStage['Platform / cross-cutting']||[]);
-if(platCards.length){
-  const plat=document.getElementById('platform');
-  plat.style.display='';
-  plat.innerHTML=`<h3>Platform / cross-cutting (operate across all stages)</h3><div class="pgrid">${platCards.map(card).join('')}</div>`;
-}
-
-// ── Media HTML ────────────────────────────────────────────────────────────────
 function mediaHTML(f){
   const items=f.media||[];
-  if(!items.length) return `<div class="media-empty">No media yet.</div>`;
-  return `<div class="media-grid">`+items.map((m,i)=>{
-    let body;
+  if(!items.length) return `<div class="media-empty">No media yet. Images and video clips can be embedded here per feature — they'll show as a gallery for easier navigation once captured.</div>`;
+  return `<div class="media-grid">`+items.map((m,i)=>{let body;
     if(m.type==='video'){
-      if(!m.url) body=`<div class="media-empty">Video slot — add a URL</div>`;
-      else if(/youtube\.com|youtu\.be/.test(m.url)){
-        const id=(m.url.match(/(?:v=|youtu\.be\/|embed\/)([\w-]+)/)||[])[1];
-        body=`<div class="ytfacade" onclick="ytplay(this,'${id}')">
-          <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="video thumbnail"/>
-          <div class="playbtn">&#9658;</div></div>
-          <a class="link" href="${esc(m.url)}" target="_blank" rel="noopener">&#8599; Open on YouTube</a>`;
-      } else if(/vimeo\.com/.test(m.url)){
-        const id=(m.url.match(/vimeo\.com\/(\d+)/)||[])[1];
-        body=`<iframe src="https://player.vimeo.com/video/${id}" allowfullscreen></iframe>`;
-      } else body=`<video controls src="${esc(m.url)}"></video>`;
-    } else {
-      body=`<img src="${m.url}" alt="${esc(m.caption||'')}" onclick="enlarge(${f.id},${i})"/>`;
-    }
-    return `<div class="media-item">${body}${m.caption?`<div class="media-cap">${esc(m.caption)}</div>`:''}</div>`;
-  }).join('')+`</div>`;
+      if(!m.url) body=`<div class="media-empty">Video slot — add a YouTube/Vimeo or .mp4 URL</div>`;
+      else if(/youtube\.com|youtu\.be/.test(m.url)){const id=(m.url.match(/(?:v=|youtu\.be\/|embed\/)([\w-]+)/)||[])[1];
+        body=`<div class="ytfacade" onclick="ytplay(this,'${id}')"><img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="video thumbnail"/><div class="playbtn">&#9658;</div></div><a class="link" href="${esc(m.url)}" target="_blank" rel="noopener">&#8599; Open on YouTube</a>`;}
+      else if(/vimeo\.com/.test(m.url)){const id=(m.url.match(/vimeo\.com\/(\d+)/)||[])[1];body=`<iframe src="https://player.vimeo.com/video/${id}" allowfullscreen></iframe>`;}
+      else body=`<video controls src="${esc(m.url)}"></video>`;
+    } else { body=`<img src="${m.url}" alt="${esc(m.caption||'')}" onclick="enlarge(${f.id},${i})"/>`; }
+    return `<div class="media-item">${body}${m.caption?`<div class="media-cap">${esc(m.caption)}</div>`:''}</div>`;}).join('')+`</div>`;
 }
-
-// ── Gaps HTML ─────────────────────────────────────────────────────────────────
 function gapsHTML(f){
   const all=f.requirement_gaps||[];
   const items=all.filter(g=>g.classification!=='covered');
   if(!items.length){
-    if(all.length) return `<div class="gaps-empty">Assessed — evidenced as covered. No outstanding gaps.</div>`;
-    return `<div class="gaps-empty">No requirements documented yet for this feature.</div>`;
+    if(all.length) return `<div class="gaps-empty">Assessed against requirements and evidenced as covered. No outstanding gaps.</div>`;
+    return `<div class="gaps-empty">No requirements identified or documented yet for this feature.</div>`;
   }
   return `<div class="gaps">`+items.map(g=>{
     const confirmed=g.classification==='genuine_gap';
     const cls=confirmed?'g-confirmed':'g-potential';
-    const tag=confirmed
-      ?`<span class="gtag t-confirmed">confirmed gap</span>`
-      :`<span class="gtag t-potential">potential gap</span>`;
+    const tag=confirmed?`<span class="gtag t-confirmed">confirmed gap</span>`:`<span class="gtag t-potential">potential gap</span>`;
+    const src=g.source?`<div class="gmeta">Source: ${esc(g.source)}</div>`:'';
     return `<div class="gap-item ${cls}">
       <div class="gh"><span class="gid">${esc(g.item_id||'')}</span>${tag}</div>
       <div class="gstmt">${esc(g.requirement_statement||'')}</div>
-      ${g.source?`<div class="gmeta">Source: ${esc(g.source)}</div>`:''}
-    </div>`;
-  }).join('')+`</div>`;
+      ${src}
+    </div>`;}).join('')+`</div>`;
 }
-
-// ── Drawer HTML ───────────────────────────────────────────────────────────────
 function drawerHTML(f){
-  const roles=(f.roles&&f.roles.length)
-    ?f.roles.map(r=>`<span class="pill">${esc(r)}</span>`).join('')
-    :`<span class="note">none named in transcript</span>`;
-  const steps=(f.process_steps||[]).map(s=>{
-    const e=s.source==='evidenced';
-    return `<li><span class="tag ${e?'tagE':'tagI'}">${e?'E':'I'}</span>${esc(s.step)}${s.note?` <span class="note">— ${esc(s.note)}</span>`:''}</li>`;
-  }).join('');
-  const comm=(f.community_articles&&f.community_articles.length)
-    ?f.community_articles.map(a=>`<a class="link" href="${esc(a.url)}" target="_blank" rel="noopener">&#8599; ${esc(a.title)}</a>`).join('')
-    :`<span class="note">no qualifying article found</span>`;
-  const je=f.jira_epic&&f.jira_epic.matches;
-  let epic;
-  if(Array.isArray(je)&&je.length){
-    epic=je.map(m=>{
-      if(typeof m==='string') return `<div class="epicline">${esc(m)}</div>`;
-      const url=`https://ncinodev.atlassian.net/browse/${m.key}`;
-      return `<a class="link" href="${url}" target="_blank" rel="noopener">&#8599; <span class="key">${esc(m.key)}</span> — ${esc(m.summary)}${m.match?` <span class="note">(${esc(m.match)})</span>`:''}</a>`;
-    }).join('');
-  } else epic=`<span class="note">no close match</span>`;
-  const integ=(f.common_integrations&&f.common_integrations.length)
-    ?f.common_integrations.map(i=>`<span class="pill">${esc(i)}</span>`).join('')
-    :`<span class="note">none mentioned</span>`;
+  const roles=(f.roles&&f.roles.length)?f.roles.map(r=>`<span class="pill">${esc(r)}</span>`).join(''):'<span class="note">none named in transcript</span>';
+  const steps=(f.process_steps||[]).map(s=>{const e=s.source==='evidenced';
+    return `<li><span class="tag ${e?'tagE':'tagI'}">${e?'E':'I'}</span>${esc(s.step)}${s.note?` <span class="note">— ${esc(s.note)}</span>`:''}</li>`;}).join('');
+  let comm=(f.community_articles&&f.community_articles.length)
+    ? f.community_articles.map(a=>`<a class="link" href="${esc(a.url)}" target="_blank" rel="noopener">↗ ${esc(a.title)}</a>`).join('')
+    : `<span class="note">no qualifying How-to-Use / How-to-Configure / Gold Standard article</span>`;
+  const je=f.jira_epic&&f.jira_epic.matches; let epic;
+  if(Array.isArray(je)&&je.length){epic=je.map(m=>{if(typeof m==='string')return `<div class="epicline">${esc(m)}</div>`;
+    const url=`https://ncinodev.atlassian.net/browse/${m.key}`;
+    return `<a class="link" href="${url}" target="_blank" rel="noopener">↗ <span class="key">${esc(m.key)}</span> — ${esc(m.summary)}${m.match?` <span class="note">(${esc(m.match)})</span>`:''}</a>`;}).join('');}
+  else epic=`<span class="note">no close match</span>`;
+  const integ=(f.common_integrations&&f.common_integrations.length)?f.common_integrations.map(i=>`<span class="pill">${esc(i)}</span>`).join(''):'<span class="note">none mentioned</span>';
   const st=rstat(f);
   const covB=`<span class="covbadge rsb-${st.cls}">${st.label}</span>`;
   return `<div class="dhead">
-    <button class="x" onclick="closeDrawer()" aria-label="close">✕</button>
-    <div class="pstage">${esc(f.stage)} · #${f.id}</div>
-    <h2>${esc(f.feature)}</h2>
-    <div class="sub2">${f.subtitle?esc(f.subtitle)+' · ':''}${esc(f.heatmap_box||'')}</div>
-    <div style="margin-top:7px">${covB}</div>
-  </div>
-  <div class="dbody">
-    <div class="sec"><div class="lbl">Description</div><div class="desc">${esc(f.description)}</div></div>
-    <div class="sec"><div class="lbl">Media</div>${mediaHTML(f)}</div>
-    <div class="sec"><div class="lbl">Roles</div>${roles}</div>
-    <div class="sec"><div class="lbl">Requirement gaps</div>${gapsHTML(f)}</div>
-    <div class="sec"><div class="lbl">Process steps <span class="note">(E evidenced · I inferred)</span></div><ul class="steps">${steps}</ul></div>
-    <div class="sec"><div class="lbl">Common integrations</div>${integ}</div>
-    <div class="sec"><div class="lbl">Community articles</div>${comm}</div>
-    <div class="sec internal-only"><div class="lbl">JIRA epic <span class="intchip">internal</span></div>${epic}</div>
-  </div>`;
+      <button class="x" onclick="closeDrawer()" aria-label="close">✕</button>
+      <div class="pstage">${esc(f.stage)} · #${f.id}</div>
+      <h2>${esc(f.feature)}</h2>
+      <div class="sub2">${f.subtitle?esc(f.subtitle)+' · ':''}${esc(f.heatmap_box||'')}</div>
+      <div style="margin-top:7px">${covB}</div></div>
+    <div class="dbody">
+      <div class="sec"><div class="lbl">Description</div><div class="desc">${esc(f.description)}</div></div>
+      <div class="sec"><div class="lbl">Media</div>${mediaHTML(f)}</div>
+      <div class="sec"><div class="lbl">Roles</div>${roles}</div>
+      <div class="sec"><div class="lbl">Requirement gaps</div>${gapsHTML(f)}</div>
+      <div class="sec"><div class="lbl">Process steps <span class="note">(E evidenced · I inferred)</span></div><ul class="steps">${steps}</ul></div>
+      <div class="sec"><div class="lbl">Common integrations</div>${integ}</div>
+      <div class="sec"><div class="lbl">Community articles</div>${comm}</div>
+      <div class="sec internal-only"><div class="lbl">JIRA epic <span class="intchip">internal</span></div>${epic}</div>
+    </div>`;
 }
-
-// ── Drawer open / close ───────────────────────────────────────────────────────
-const drawer=document.getElementById('drawer');
-const scrim=document.getElementById('scrim');
-
-function openDrawer(id){
-  const f=DATA.find(x=>x.id===id);
-  if(!f) return;
+const drawer=document.getElementById('drawer'),scrim=document.getElementById('scrim');
+function openDrawer(id){const f=DATA.find(x=>x.id===id);if(!f)return;
   document.querySelectorAll('.card.sel').forEach(c=>c.classList.remove('sel'));
-  const el=document.querySelector(`.card[data-id="${id}"]`);
-  if(el) el.classList.add('sel');
-  drawer.innerHTML=drawerHTML(f);
-  drawer.classList.add('show');
-  drawer.setAttribute('aria-hidden','false');
-  scrim.classList.add('show');
-  drawer.querySelector('.dbody').scrollTop=0;
-}
-
-function closeDrawer(){
-  drawer.classList.remove('show');
-  scrim.classList.remove('show');
-  drawer.setAttribute('aria-hidden','true');
-  document.querySelectorAll('.card.sel').forEach(c=>c.classList.remove('sel'));
-}
-
-// ── Lightbox ──────────────────────────────────────────────────────────────────
-function enlarge(fid,i){
-  const f=DATA.find(x=>x.id===fid);
-  if(!f) return;
-  const m=f.media[i];
-  if(!m) return;
-  document.getElementById('lbimg').src=m.url;
-  document.getElementById('lightbox').classList.add('show');
-}
+  const el=document.querySelector(`.card[data-id="${id}"]`);if(el)el.classList.add('sel');
+  drawer.innerHTML=drawerHTML(f);drawer.classList.add('show');drawer.setAttribute('aria-hidden','false');
+  scrim.classList.add('show');drawer.querySelector('.dbody').scrollTop=0;}
+function closeDrawer(){drawer.classList.remove('show');scrim.classList.remove('show');drawer.setAttribute('aria-hidden','true');
+  document.querySelectorAll('.card.sel').forEach(c=>c.classList.remove('sel'));}
+function enlarge(fid,i){const f=DATA.find(x=>x.id===fid);if(!f)return;const m=f.media[i];if(!m)return;
+  document.getElementById('lbimg').src=m.url;document.getElementById('lightbox').classList.add('show');}
 function closeLB(){document.getElementById('lightbox').classList.remove('show');}
-function ytplay(el,id){
-  el.outerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1" allow="autoplay;encrypted-media;picture-in-picture;fullscreen" allowfullscreen></iframe>`;
-}
-
-// ── Keyboard shortcuts ────────────────────────────────────────────────────────
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeLB();closeDrawer();}
-});
-
-// ── Internal / Client view toggle ─────────────────────────────────────────────
-function setMode(m){
-  document.body.className=m;
-  document.getElementById('bInt').classList.toggle('on',m==='internal');
-  document.getElementById('bCli').classList.toggle('on',m==='client');
-}
-
-// ── Filter ────────────────────────────────────────────────────────────────────
-function filter(q){
-  q=q.trim().toLowerCase();
-  document.querySelectorAll('.card').forEach(c=>{
-    const f=DATA.find(x=>x.id==c.dataset.id);
-    const hit=!q||(f.feature+' '+(f.subtitle||'')+' '+f.stage+' '+f.description).toLowerCase().includes(q);
-    c.classList.toggle('dim',!hit);
-  });
-}
-
-// ── Export ────────────────────────────────────────────────────────────────────
-function exportJSON(){
-  const payload={
-    features: DATA.map(f=>({
-      id:f.id, feature:f.feature, stage:f.stage,
-      subtitle:f.subtitle||'', req_status:f.req_status||'none'
-    }))
-  };
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url; a.download='heatmap-export.json';
-  document.body.appendChild(a); a.click();
-  document.body.removeChild(a); URL.revokeObjectURL(url);
-  showToast('Exported heatmap-export.json');
-}
-
-// ── Import ────────────────────────────────────────────────────────────────────
-function triggerImport(){
-  document.getElementById('import-file').value='';
-  document.getElementById('import-file').click();
-}
-function handleImport(event){
-  const file=event.target.files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      const data=JSON.parse(e.target.result);
-      if(!data.features||!Array.isArray(data.features)) throw new Error('Expected { features: [...] }');
-      let updated=0;
-      data.features.forEach(f=>{
-        const match=DATA.find(x=>x.id===f.id);
-        if(match&&f.req_status){match.req_status=f.req_status; updated++;}
-      });
-      // Re-render board with updated statuses
-      board.innerHTML='';
-      STAGES.forEach(st=>{
-        const col=document.createElement('div');
-        col.className='col';
-        col.innerHTML=`<div class="colhead">${esc(st)}</div><div class="stack">${(byStage[st]||[]).map(card).join('')}</div>`;
-        board.appendChild(col);
-      });
-      showToast(`Imported — updated ${updated} feature status${updated!==1?'es':''}.`);
-    } catch(err){
-      showToast('Import failed: '+err.message);
-    }
-  };
-  reader.readAsText(file);
-}
-
-// ── Toast ─────────────────────────────────────────────────────────────────────
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
-}
-</script>
-</body>
-</html>
+function ytplay(el,id){el.outerHTML=`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1" allow="autoplay;encrypted-media;picture-in-picture;fullscreen" allowfullscreen></iframe>`;}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLB();closeDrawer();}});
+function setMode(m){document.body.className=m;document.getElementById('bInt').classList.toggle('on',m==='internal');document.getElementById('bCli').classList.toggle('on',m==='client');}
+function filter(q){q=q.trim().toLowerCase();document.querySelectorAll('.card').forEach(c=>{const f=DATA.find(x=>x.id==c.dataset.id);
+  const hit=!q||(f.feature+' '+(f.subtitle||'')+' '+f.stage+' '+f.description).toLowerCase().includes(q);c.classList.toggle('dim',!hit);});}
+</script></body></html>

@@ -11,7 +11,6 @@ import {
   type DragStartEvent,
 } from "@dnd-kit/core";
 import { useMutation, useQuery } from "convex/react";
-import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { api } from "../../../convex/_generated/api";
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
@@ -30,8 +29,9 @@ export function HeatmapBoard({ projectId }: { projectId: Id<"projects"> }) {
   const data = useQuery(api.heatmap.getForProject, { projectId });
   const project = useQuery(api.projects.get, { id: projectId });
   const moveCard = useMutation(api.heatmap.moveCard);
-  const router = useRouter();
 
+
+  const reseedHeatmap = useMutation(api.projects.reseedHeatmap);
   const migrateSelectProducts = useMutation(api.heatmap.migrateSelectProductsCards);
   const migrateDocman = useMutation(api.heatmap.migrateDocmanCards);
   const migrated = useRef(false);
@@ -45,6 +45,7 @@ export function HeatmapBoard({ projectId }: { projectId: Id<"projects"> }) {
 
   const [activeCard, setActiveCard] = useState<Card | null>(null);
   const [detailsCard, setDetailsCard] = useState<Card | null>(null);
+  const [detailsRoute, setDetailsRoute] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
@@ -119,12 +120,8 @@ export function HeatmapBoard({ projectId }: { projectId: Id<"projects"> }) {
   }
 
   function handleSelectCard(card: Card) {
-    const route = configuratorRoute(card, projectId);
-    if (route) {
-      router.push(route);
-      return;
-    }
     setDetailsCard(card);
+    setDetailsRoute(configuratorRoute(card, projectId));
   }
 
   // Each phase column is sized by its subphase count; one extra column for
@@ -138,16 +135,29 @@ export function HeatmapBoard({ projectId }: { projectId: Id<"projects"> }) {
     <div className="p-4">
       <div className="mb-4 flex items-baseline justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">
+          <h2 className="text-xl font-semibold text-[var(--hm-ink)]">
             {project.name}
           </h2>
           {project.customer ? (
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-[var(--hm-muted)]">
               {project.customer}
               {project.region ? ` · ${project.region}` : ""}
             </p>
           ) : null}
         </div>
+        <button
+          onClick={async () => {
+            if (!confirm("Reset this heatmap to the standard commercial lending template? This will replace all current cards and columns.")) return;
+            await reseedHeatmap({ projectId });
+          }}
+          style={{
+            background: "#13314c", border: "1px solid var(--hm-line)",
+            color: "var(--hm-muted)", borderRadius: 7, padding: "5px 12px",
+            fontSize: 12, cursor: "pointer",
+          }}
+        >
+          Reset to template
+        </button>
       </div>
 
       <DndContext
@@ -210,7 +220,8 @@ export function HeatmapBoard({ projectId }: { projectId: Id<"projects"> }) {
       <CardDetailsDialog
         card={detailsCard}
         open={!!detailsCard}
-        onOpenChange={(o) => !o && setDetailsCard(null)}
+        builderRoute={detailsRoute}
+        onOpenChange={(o) => { if (!o) { setDetailsCard(null); setDetailsRoute(null); } }}
       />
     </div>
   );
